@@ -25,7 +25,6 @@ from common import audit
 # 手机演示页（与微信小程序同构的 H5 PoC）：仅作为演示入口，业务流程一致
 _H5_DIR = Path(__file__).resolve().parent.parent / "h5"
 _H5_PAGE = _H5_DIR / "index.html"
-_H5_STAFF = _H5_DIR / "staff.html"
 from common.config import (
     DATA_KEY, DMZ_URL, SCHEMA_VERSION, SECRET_DMZ_OUTER, SERVICE_TOKEN, db_path,
 )
@@ -100,12 +99,6 @@ def _now() -> str:
 def demo_home() -> FileResponse:
     """手机演示页（H5，与小程序同构）。生产环境小程序走微信正式链路，此页仅为演示入口。"""
     return FileResponse(_H5_PAGE)
-
-
-@app.get("/staff", include_in_schema=False)
-def staff_portal() -> FileResponse:
-    """员工入口页：坐席工作台 / 管理控制台登录（局域网模式指向 inner:8101）。"""
-    return FileResponse(_H5_STAFF)
 
 
 @app.get("/outer/api/v1/health")
