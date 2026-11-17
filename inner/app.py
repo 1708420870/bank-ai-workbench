@@ -73,12 +73,16 @@ def _user(request: Request) -> dict | None:
 
 @app.get("/login")
 def login_page(request: Request):
+    # 安全口径（用户要求）：登录页一律强制重新登录——
+    # 已带有效会话访问 /login 时立即吊销该会话、清除 Cookie，再渲染登录表单，
+    # 防止共用电脑/离开座位后他人打开地址即直接进入控制台。
+    # 再次登录按单会话规则顶掉旧会话（此处吊销后再登录效果一致）。
     u = _user(request)
-    # force=1（员工入口页跳转）：已有会话也强制显示登录表单，不自动进控制台；
-    # 再次登录按单会话规则顶掉旧会话。直接输入 /login 地址的已登录用户仍自动直达。
-    if u and request.query_params.get("force") != "1":
-        return RedirectResponse("/client" if u["portal"] == "client" else "/admin", 302)
-    return FileResponse(WEB / "login.html")
+    resp = FileResponse(WEB / "login.html")
+    if u:
+        auth.logout(u["sid"], u["emp_id"])
+        auth.clear_cookie(resp)
+    return resp
 
 
 @app.get("/")
