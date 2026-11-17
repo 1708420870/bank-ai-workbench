@@ -62,6 +62,16 @@ main{padding:24px clamp(16px, 2.6vw, 44px) 48px;max-width:1680px;margin:0 auto}
 .card-h h2{font-size:13px;font-weight:600;letter-spacing:.02em;color:var(--navy);display:flex;align-items:center;gap:8px}
 .card-h h2::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--gold);flex:none}
 .card-b{padding:16px}
+
+/* ---------- 页面化导航内容（用户要求：各功能独立页面，不用弹窗） ---------- */
+.page-body{padding:16px}
+/* 满高页面（站内私信 / 客户反馈工单处理）：内部 dm-wrap / fb-layout 需要
+   明确高度才能 100% 撑开；预留顶栏+页头+页脚空间。 */
+.page-body.fill{height:calc(100vh - 210px);min-height:420px;padding:0;overflow:hidden}
+.page-body.fill .dm-wrap,.page-body.fill .fb-layout{height:100%}
+@media (max-width:1080px){
+  .page-body.fill{height:auto;min-height:0;overflow:visible}
+}
 .muted{color:var(--ink3);font-size:12.5px}
 
 /* ---- case list ---- */

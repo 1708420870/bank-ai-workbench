@@ -38,6 +38,7 @@
   </nav>
 
   <main style="min-width:0">
+<div id="page-home">
   <div class="split">
     <div class="card">
       <div class="card-h"><h2>合成案例库</h2><span class="muted" id="case-count">—</span></div>
@@ -72,6 +73,14 @@
   <div class="card">
     <div class="card-b" style="padding:0" id="my-tickets"><div class="empty">暂无工单</div></div>
   </div>
+</div><!-- /page-home -->
+
+<!-- 其余导航项均为独立页面（用户要求：不用弹窗，与合成案例库同级切换） -->
+<div id="page-notices" hidden></div>
+<div id="page-dm" hidden></div>
+<div id="page-feedback" hidden></div>
+<div id="page-archive" hidden></div>
+<div id="page-me" hidden></div>
 </main>
 </div><!-- /shell -->
 
@@ -330,18 +339,31 @@ function openModal(title, html, opts = {}) {
 function closeModal() {
   $('#modal').hidden = true;
   document.querySelector('#modal .modal-card').classList.remove('wide');
-  if (dmTimer) { clearInterval(dmTimer); dmTimer = null; }
-  dmPeer = null;
-  if (fbTimer) { clearInterval(fbTimer); fbTimer = null; }
-  fbPeer = null;
-  navOn('nav-home');  // 关闭弹窗后回到工作区高亮
 }
 $('#modal-x').onclick = closeModal;
 $('#modal-mask').onclick = closeModal;
 
+/* 页面化：把原弹窗内容渲染到与合成案例库同级的独立页面（用户要求不用弹窗）。
+   fill=true 的页面（私信/工单处理）内部布局需要占满给定高度。 */
+function showPage(pid, title, html, opts = {}) {
+  $('#' + pid).innerHTML = `
+    <div class="card page-card">
+      <div class="card-h"><h2>${title}</h2>${opts.sub ? `<span class="muted">${opts.sub}</span>` : ''}</div>
+      <div class="page-body${opts.fill ? ' fill' : ''}">${html}</div>
+    </div>`;
+}
+
 /* ---------- 左侧导航 ---------- */
+const NAV_PAGES = {
+  'nav-home': 'page-home', 'nav-notices': 'page-notices', 'nav-dm': 'page-dm',
+  'nav-feedback': 'page-feedback', 'nav-archive': 'page-archive', 'nav-me': 'page-me',
+};
 function navOn(id) {
   document.querySelectorAll('.sidenav button').forEach(b => b.classList.toggle('on', b.id === id));
+  Object.entries(NAV_PAGES).forEach(([nav, pid]) => { const p = $('#' + pid); if (p) p.hidden = nav !== id; });
+  // 离开轮询页面时停掉对应定时器，避免后台空转
+  if (id !== 'nav-dm' && dmTimer) { clearInterval(dmTimer); dmTimer = null; dmPeer = null; }
+  if (id !== 'nav-feedback' && fbTimer) { clearInterval(fbTimer); fbTimer = null; fbPeer = null; }
 }
 $('#nav-home').onclick = () => navOn('nav-home');
 $('#nav-notices').onclick = () => { navOn('nav-notices'); showNotices(); };
@@ -389,7 +411,7 @@ async function showNotices() {
       <div class="nbody">${esc(n.body)}</div>
       <div class="nmeta">${esc(n.sender_name || '系统')} 发布于 ${esc((n.created_at || '').replace('T', ' '))}</div>
     </div>`).join('') : '<div class="empty">暂无通知</div>';
-  openModal('通知公告', html + `<div class="hint">未读通知点击即可标记已读；管理员撤回的通知不再出现在列表中。</div>`);
+  showPage('page-notices', '通知公告', html + `<div class="hint">未读通知点击即可标记已读；管理员撤回的通知不再出现在列表中。</div>`);
   document.querySelectorAll('.notice.unread').forEach(el => {
     el.onclick = async () => {
       const r2 = await fetch(`${API}/internal/api/v1/notices/${el.dataset.nid}/read`, {method: 'POST', credentials: 'same-origin'});
@@ -454,7 +476,7 @@ async function showMe() {
   if (!r.ok) return;
   const p = await r.json();
   const ROLE_CN = {agent:'客服坐席', supervisor:'客服主管', auditor:'审计员', developer:'科技开发'};
-  openModal('个人中心', `
+  showPage('page-me', '个人中心', `
     <div class="meta-grid">
       <div class="meta-cell"><div class="k">姓名</div><div class="v">${esc(p.name)}</div></div>
       <div class="meta-cell"><div class="k">工号</div><div class="v">${esc(p.emp_id)}</div></div>
@@ -478,13 +500,13 @@ $('#btn-me') && ($('#btn-me').onclick = showMe);
 const ROLE_CN2 = {agent: '客服坐席', supervisor: '客服主管', auditor: '审计员', developer: '科技开发'};
 
 function dmOpen() {
-  openModal('通讯录 · 站内私信', `
+  showPage('page-dm', '通讯录 · 站内私信', `
     <div class="dm-wrap">
       <div class="dm-list" id="dm-list"><div class="empty">加载中…</div></div>
       <div class="dm-chat" id="dm-chat">
         <div class="dm-empty">从左侧选择同事开始私信</div>
       </div>
-    </div>`, {wide: true});
+    </div>`, {fill: true});
   loadDmContacts();
   dmTimer = setInterval(() => { refreshBadge(); if (dmPeer) loadDmThread(dmPeer, true); }, 5000);
 }
@@ -731,14 +753,14 @@ async function loadFbThread(fbId, silent = false) {
 }
 
 function fbOpen() {
-  openModal('客户反馈 · 工单处理', `
+  showPage('page-feedback', '客户反馈 · 工单处理', `
     <div class="fb-layout">
       <div class="fb-tabs" id="fb-tabs"></div>
       <div class="fb-body">
         <div class="dm-list" id="fb-list"><div class="empty">加载中…</div></div>
         <div class="dm-chat" id="fb-chat"><div class="dm-empty">从左侧选择反馈工单</div></div>
       </div>
-    </div>`, {wide: true});
+    </div>`, {fill: true, sub: '未处理工单会置顶标红'});
   loadFbList();
   loadFbBadge();
   fbTimer = setInterval(() => { loadFbBadge(); if (fbPeer) loadFbThread(fbPeer, true); }, 5000);
@@ -772,7 +794,7 @@ async function loadMine() {
 }
 
 function showArchive() {
-  openModal('我的档案 · 工作历史', `
+  showPage('page-archive', '我的档案 · 工作历史', `
     <div class="ar-stats" id="ar-stats"><span class="muted">加载中…</span></div>
     <div id="ar-list"><div class="empty">加载中…</div></div>`);
   loadMine();
