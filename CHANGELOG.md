@@ -4,6 +4,27 @@
 版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)（主.次.修订）。
 每次发布同步打 git tag（`v1.1.0` 格式），tag 与本文件条目一一对应。
 
+## [1.4.4] - 2026-11-17
+
+布局修复版本：解决"功能页缩成中间一条、两侧大片留白"的观感缺陷，全部页面铺满可用宽度。
+
+### 修复
+- **根因**：`main` / `.admin-main` 既是 `.shell`（Grid）的子项，又写了 `margin:0 auto`
+  + `max-width:1680px`。Grid 子项一旦出现 auto 外边距，`justify-self:stretch` 失效，
+  宽度退化为内容宽度（shrink-to-fit）——首页内容宽所以看着正常，客户反馈这类
+  内容窄的页面就塌成中间一条并居中，两侧留白。
+- `main` / `.admin-main` 改为 `width:100%;min-width:0;max-width:none`，
+  宽屏不再被 1680px 截断；`.shell` 列定义改 `200px minmax(0,1fr)` 防内容撑破轨道。
+- `.page-card` 撑满并把 `min-height` 锁到 `calc(100vh - 180px)`，`.page-body` 用
+  `flex:1` 吃掉剩余高度——空数据页（通知/档案/个人中心）也不再"上重下空"。
+- 工单/私信列表列由固定 200px 改为 `clamp(240px,20vw,360px)` 自适应；
+  工单号超长走省略号、`.fb-item` 加 `overflow:hidden`，消除列表底部横向滚动条。
+- 四个页面入口的样式引用加 `?v=1.4.4`，避免浏览器继续命中旧 `app.css` 缓存。
+
+### 工具
+- 新增 `tools/shot_pages.py`：无头 Edge + CDP 注入登录 Cookie，逐页截图并量取
+  内容卡宽度，作为布局回归手段（本次修复前后各跑一次取证）。
+
 ## [1.4.3] - 2026-11-17
 
 审计整改版本：依据《独立验收审计报告-20261117》(`docs/11`) 逐项关闭 P0/P1/P2。

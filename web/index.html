@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>客服工作台 · 内网可信域</title>
-<link rel="stylesheet" href="/assets/app.css">
+<link rel="stylesheet" href="/assets/app.css?v=1.4.4">
 </head>
 <body>
 
@@ -650,7 +650,7 @@ function fbRenderList() {
   const items = fbItems.filter(t => fbFilter === 'all' || fbBucket(t.status) === fbFilter);
   $('#fb-list').innerHTML = items.length ? items.map(t => `
     <div class="fb-item ${fbBucket(t.status) === 'todo' ? 'hot' : ''}" data-fb="${esc(t.fb_id)}">
-      <div class="fb-fi-row1"><b>${esc(t.fb_id)}</b>${fbBucket(t.status) === 'todo' ? '<span class="fb-hot">未处理</span>' : ''} ${fbChip(t.status)}</div>
+      <div class="fb-fi-row1"><b>${esc(t.fb_id)}</b><span class="fb-tags">${fbBucket(t.status) === 'todo' ? '<span class="fb-hot">未处理</span>' : ''}${fbChip(t.status)}</span></div>
       <div class="fb-fi-row2">${FB_CAT_CN[t.category] || esc(t.category)} · ${esc((t.body_masked || '').slice(0, 34))}</div>
     </div>`).join('') : '<div class="empty">该分类下暂无工单</div>';
   document.querySelectorAll('#fb-list .fb-item').forEach(el => {
