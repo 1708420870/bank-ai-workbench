@@ -123,12 +123,33 @@ class ChangeRequest(BaseModel):
     payload: dict = Field(default_factory=dict)
 
 
+class ChangeReviewRequest(BaseModel):
+    """草稿审批决策。APPROVE 进 APPROVED（仍不可发布前必须过回归门槛）；REJECT 终态。"""
+    decision: Literal["APPROVE", "REJECT"]
+    note: str | None = Field(default=None, max_length=200)
+
+
+class ChangeRollbackRequest(BaseModel):
+    """发布后回滚。原因必填——回滚是事故处置动作，不能无理由执行。"""
+    reason: str = Field(min_length=4, max_length=200)
+
+
 # ---------------- 身份与会话 ----------------
 
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=64)
     password: str = Field(min_length=1, max_length=128)
     portal: Literal["client", "admin"] = "client"
+    # 第二因子（TOTP）。未启用 MFA 的账号忽略该字段；启用后缺失即 401 MFA_REQUIRED。
+    otp: str | None = Field(default=None, max_length=10)
+
+
+class MfaConfirmRequest(BaseModel):
+    otp: str = Field(min_length=6, max_length=10)
+
+
+class MfaDisableRequest(BaseModel):
+    password: str = Field(min_length=1, max_length=128)
 
 
 class McpProxyRequest(BaseModel):

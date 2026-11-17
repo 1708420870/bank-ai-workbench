@@ -11,7 +11,10 @@
 from __future__ import annotations
 
 import hmac
+import json
 import re
+import time
+from collections import deque
 from datetime import datetime, timezone
 
 import httpx
@@ -21,7 +24,9 @@ from fastapi.responses import JSONResponse
 
 from common import audit
 from common.config import (
-    DMZ_PORT, INNER_URL, OUTER_URL, SECRET_DMZ_OUTER, SECRET_INNER_DMZ, SERVICE_TOKEN,
+    DMZ_PORT, INNER_URL, MAX_REQUEST_CHARS, OUTER_URL, RATE_LIMIT_MAX_CALLS,
+    RATE_LIMIT_MAX_PER_ACTOR, RATE_LIMIT_WINDOW_SECONDS, SECRET_DMZ_OUTER,
+    SECRET_INNER_DMZ, SERVICE_TOKEN,
 )
 from common.crypto import sign, verify
 from common.egress import guard
@@ -53,6 +58,22 @@ _DLP = [
     ("AMOUNT_LIKE", re.compile(r"[¥￥]\s?\d")),
 ]
 
+# 令牌形态（与 inner/privacy.TOKEN_RE 一致）：回程 PII 复检前先摘掉，避免误报
+_TOKEN_RE = re.compile(r"\b(?:NAME|CARD|PHONE|ID|AMT|DATE|MERCHANT|ACCT|TXN)_\d{3,}\b")
+
+# 回程恶意内容特征（第⑨道）：外网返回不得携带可执行指令/提示注入/脚本片段。
+# 这批规则的作用不是"识别攻击者"，而是"不让攻击者的载荷以合法 JSON 的形式进内网"。
+_MALICIOUS = [
+    ("PROMPT_INJECTION", re.compile(r"忽略(?:之前|以上|先前)的?(?:指令|规则|设定)|ignore\s+(?:all\s+)?previous\s+instructions", re.I)),
+    ("SYSTEM_PROMPT_PROBE", re.compile(r"system\s*prompt|系统提示词", re.I)),
+    ("SCRIPT_INJECTION", re.compile(r"<\s*script|javascript:|onerror\s*=", re.I)),
+    ("SQL_INJECTION", re.compile(r"\b(?:drop|truncate)\s+table\b|\bunion\s+select\b", re.I)),
+    ("SHELL_INJECTION", re.compile(r"\brm\s+-rf\b|\bcurl\s+http|\bwget\s+http", re.I)),
+]
+
+# 滑动窗口限流：key -> 时间戳队列。PoC 用进程内结构，生产应落 Redis 等共享存储。
+_RATE: dict[str, deque] = {}
+
 MCP_TOOL_ALLOWLIST = {
     "list_rule_catalog", "get_rule_metadata", "get_approved_rule_summary",
     "list_synthetic_cases", "get_masked_sample_case", "get_aggregate_metrics",
@@ -69,8 +90,18 @@ MCP_DENIED_HINTS = {
 
 @app.on_event("startup")
 def _startup() -> None:
-    audit.log("dmz", "ZONE_START", detail={"zone": "dmz", "port": DMZ_PORT})
+    audit.log("dmz", "ZONE_START", trace_id="DMZ-START", detail={"zone": "dmz", "port": DMZ_PORT})
     runlog.info("dmz_zone_started", extra={"extra_data": {"port": DMZ_PORT}})
+
+
+@app.middleware("http")
+async def _trace_middleware(request: Request, call_next):
+    """DMZ 侧 trace：沿用内网传入的 X-Trace-Id，保证跨区事件同一 trace。"""
+    tid = (request.headers.get("x-trace-id") or "").strip() or f"TR-DMZ-{int(time.time() * 1000)}"
+    audit.set_trace(tid)
+    response = await call_next(request)
+    response.headers["X-Trace-Id"] = tid
+    return response
 
 
 @app.get("/dmz/api/v1/health")
@@ -78,9 +109,36 @@ def health() -> dict:
     return {"zone": "dmz", "status": "ok"}
 
 
+def _rate_limit(key: str, limit: int, actor: str, scope: str, detail: dict | None = None) -> None:
+    """滑动窗口限流。超限返回 429 并写 RATE_LIMITED 审计。
+
+    为什么按 key 分开计数而不是全局一个桶：
+    一个科技人员刷爆自己的额度，不应该让另一个人的 MCP 调用被连带拒绝（可用性）；
+    但同一 actor 跨工具的总额度也要有上限（防止换工具绕过）。
+    """
+    now = time.time()
+    q = _RATE.setdefault(key, deque())
+    while q and now - q[0] > RATE_LIMIT_WINDOW_SECONDS:
+        q.popleft()
+    if len(q) >= limit:
+        audit.log("dmz", "RATE_LIMITED", actor=actor or "anonymous", severity="high",
+                  detail={"key": key, "scope": scope,
+                          "window_s": RATE_LIMIT_WINDOW_SECONDS,
+                          "limit": limit, "observed": len(q), **(detail or {})})
+        runlog.warning("rate_limited", extra={"extra_data": {
+            "key": key, "scope": scope, "limit": limit}})
+        raise HTTPException(429, f"调用频率超限（{scope}）：{RATE_LIMIT_WINDOW_SECONDS}s 内上限 {limit} 次")
+    q.append(now)
+
+
 @app.post("/dmz/api/v1/dispatch")
 async def dispatch(task: dict = Body(...)) -> JSONResponse:
     rid = task.get("request_id", "?")
+
+    # ⓪ 入站长度上限：在解析前先量体积，超长载荷不进入任何业务判断
+    raw_len = len(json.dumps(task, ensure_ascii=False))
+    if raw_len > MAX_REQUEST_CHARS:
+        _deny("REQUEST_TOO_LARGE", rid, {"len": raw_len, "max": MAX_REQUEST_CHARS}, 413)
 
     # ① 字段白名单：不认识的键一律拒收
     extra = set(task.keys()) - EGRESS_FIELD_WHITELIST
@@ -100,8 +158,6 @@ async def dispatch(task: dict = Body(...)) -> JSONResponse:
         _deny("TTL_EXPIRED", rid, {"expires_at": task["expires_at"]}, 410)
 
     # ④ 重放检测
-    import time
-
     now = time.time()
     for k, ts in list(_SEEN.items()):
         if now - ts > 600:
@@ -129,7 +185,8 @@ async def dispatch(task: dict = Body(...)) -> JSONResponse:
     guard("dmz", url)
     try:
         async with httpx.AsyncClient(timeout=8) as client:
-            r = await client.post(url, json=forward)
+            r = await client.post(url, json=forward,
+                                  headers={"x-trace-id": str(task.get("trace_id") or rid)})
     except Exception as exc:
         audit.log("dmz", "DOWNSTREAM_UNAVAILABLE", request_id=rid, severity="high",
                   detail={"error": str(exc)})
@@ -147,6 +204,16 @@ async def dispatch(task: dict = Body(...)) -> JSONResponse:
         _deny("RESPONSE_SIGNATURE_INVALID", rid, None, 502)
     if body.get("request_id") != rid:
         _deny("RESPONSE_ID_MISMATCH", rid, {"got": body.get("request_id")}, 502)
+
+    # ⑦a 回程恶意内容扫描：外网返回必须以"纯数据"身份进内网，不得携带指令/脚本/注入
+    text_back = json.dumps({k: v for k, v in body.items() if k != "signature"}, ensure_ascii=False)
+    mal = [label for label, pat in _MALICIOUS if pat.search(text_back)]
+    if mal:
+        _deny("RESPONSE_MALICIOUS_CONTENT", rid, {"patterns": mal}, 502)
+    # ⑦b 回程 PII 形态复检：DMZ 侧独立再查一遍（与内网 scan_text 的失效模式不同）
+    resid = [label for label, pat in _FB_DLP if pat.search(_TOKEN_RE.sub(" ", text_back))]
+    if resid:
+        _deny("RESPONSE_PII_RESIDUE", rid, {"patterns": resid}, 502)
 
     # ⑧ 换回内网密钥签名
     back = {k: v for k, v in body.items() if k != "signature"}
@@ -170,6 +237,20 @@ async def mcp_call(call: McpCall, request: Request) -> JSONResponse:
     # 网关的第一步不是看工具名，而是看调用方凭什么身份到达这里。
     # 无凭证的调用连"工具是否存在"都不该知道。
     _require_service(request)
+
+    # 限流：先于工具存在性判断——否则攻击者可以靠"猜工具名"免费刷满网关日志
+    _rate_limit(f"mcp:{call.actor}:{call.tool}", RATE_LIMIT_MAX_CALLS,
+                call.actor, "actor+tool", {"tool": call.tool})
+    _rate_limit(f"mcp-actor:{call.actor}", RATE_LIMIT_MAX_PER_ACTOR,
+                call.actor, "actor", {"tool": call.tool})
+
+    # 入站参数体积上限：MCP 参数同样可能被用来塞超长载荷
+    args_len = len(json.dumps({"args": call.args}, ensure_ascii=False))
+    if args_len > MAX_REQUEST_CHARS:
+        audit.log("dmz", "MCP_DENIED", actor=call.actor, severity="high",
+                  detail={"tool": call.tool, "reason": "args_too_large", "len": args_len})
+        raise HTTPException(413, f"参数超长：{args_len} > {MAX_REQUEST_CHARS}")
+
     if call.tool in MCP_DENIED_HINTS:
         audit.log("dmz", "MCP_DENIED", actor=call.actor, severity="critical",
                   detail={"tool": call.tool, "reason": "denied_registry"})

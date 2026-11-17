@@ -37,6 +37,8 @@ from common.config import (
     SINGLE_SESSION,
 )
 
+from common import totp
+
 from . import db
 
 ITER = 200_000
@@ -51,9 +53,12 @@ class AuthError(Exception):
     入口不匹配则 403（身份已成立，只是无权进入该端）。
     """
 
-    def __init__(self, message: str, status: int = 401) -> None:
+    def __init__(self, message: str, status: int = 401, code: str | None = None) -> None:
         super().__init__(message)
         self.status = status
+        # code 用于让前端区分"还差第二因子"和"口令错"——两者都是 401，
+        # 但不给前端一个机器可读的 code，前端就只能靠匹配中文提示，脆且易错。
+        self.code = code
 
 
 def _now() -> datetime:
@@ -119,7 +124,7 @@ def issue_token(sid: str) -> str:
 # ---------------- 登录 / 登出 ----------------
 
 def login(username: str, password: str, portal: str, ip: str = "", ua: str = "",
-          device_id: str = "") -> tuple[str, dict]:
+          device_id: str = "", otp: str = "") -> tuple[str, dict]:
     if portal not in PORTAL_ROLES:
         raise AuthError("无效的登录入口")
 
@@ -167,6 +172,26 @@ def login(username: str, password: str, portal: str, ip: str = "", ua: str = "",
                   detail={"reason": "portal_mismatch", "role": user["role"],
                           "portal": portal, "ip": ip})
         raise AuthError("该账号无权登录此入口", status=403)
+
+    # ---- 第二因子（TOTP，标准 RFC 6238）----
+    # 只在用户已启用时强制；启用流程见 /auth/mfa/*。
+    # 校验放在口令之后、会话之前：口令错时不泄露"是否需要 MFA"。
+    totp_secret = (user.get("totp_secret") or "").strip()
+    if totp_secret:
+        if not otp:
+            audit.log("inner", "MFA_REQUIRED", actor=user["emp_id"], severity="medium",
+                      detail={"portal": portal, "ip": ip})
+            raise AuthError("请输入动态验证码", status=401, code="MFA_REQUIRED")
+        if not totp.verify(totp_secret, otp):
+            # 第二因子错误同样计入失败次数：否则攻击者可以无限次猜 6 位码
+            # （30 秒窗口内猜中概率虽低，但"不限次"等于把 MFA 降级为限速题）。
+            n = (user.get("failed_n") or 0) + 1
+            locked = _iso(_now() + timedelta(seconds=LOGIN_LOCK_SECONDS)) if n >= LOGIN_MAX_FAIL else None
+            db.bump_failure(user["emp_id"], n, locked)
+            audit.log("inner", "LOGIN_FAIL", actor=user["emp_id"], severity="high",
+                      detail={"reason": "bad_otp", "portal": portal, "ip": ip, "failed_n": n})
+            raise AuthError("动态验证码错误或已过期", status=401, code="MFA_INVALID")
+        audit.log("inner", "MFA_OK", actor=user["emp_id"], detail={"portal": portal})
 
     # 会话固定攻击防御：每次登录都换新 sid，不复用任何既有标识
     sid = secrets.token_urlsafe(24)

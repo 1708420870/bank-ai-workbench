@@ -36,13 +36,28 @@ class Endpoint:
     version: str
     egress: bool          # True 表示该端点位于外网，调用需经 DMZ 出域
     tier: str
+    region: str = "cn-north"      # 数据驻留区域：合规要求"可签发数据等级"必须能落到区域
+    auth: str = "api-key"         # 鉴权方式：api-key / oauth2-cc / mtls
+    max_data_level: str = "L1"    # 该端点被批准接收的最高数据等级（L0=不出域, L1=脱敏）
+    approved_by: str = ""         # 逐端点审批人（空 = 未审批，不得调用）
+    effective_from: str = ""      # 审批生效日期
 
 
-# 端点清单：模型供应商、版本、位置与是否出域，逐项独立登记、独立审批
+# 端点清单：模型供应商、版本、位置与是否出域，逐项独立登记、独立审批。
+# 与 docs/17-模型端点登记表.md 必须逐字一致——文档是给审计看的，代码是执行用的，
+# 两者不一致时以"更严格的一方"为准（这正是自检脚本 tools/check_endpoints.py 的作用）。
 ENDPOINTS: dict[str, Endpoint] = {
-    "ep-internal-a": Endpoint("ep-internal-a", "internal-llm", HERMES_MODEL,
-                              False, "内网模型 · 牛马仕(Bull Hermes)私有算力"),
-    "ep-partner-b": Endpoint("ep-partner-b", "partner-cloud", "llm-b-2.1", True, "外网模型"),
+    "ep-internal-a": Endpoint(
+        "ep-internal-a", "internal-llm", HERMES_MODEL, False,
+        "内网模型 · 牛马仕(Bull Hermes)私有算力",
+        region="cn-internal", auth="api-key", max_data_level="L2",
+        approved_by="科技+安全（内网端点，随 Agent 部署一并评审）",
+        effective_from="2026-11-01"),
+    "ep-partner-b": Endpoint(
+        "ep-partner-b", "partner-cloud", "llm-b-2.1", True, "外网模型",
+        region="cn-east-1", auth="mtls", max_data_level="L1",
+        approved_by="安全+数据合规（仅脱敏最小上下文）",
+        effective_from="2026-11-01"),
 }
 
 # 意图 → 端点选择策略（策略本身是可配置的，不在代码里硬编码业务偏好）
@@ -69,6 +84,12 @@ class ModelConnector:
         ep = ENDPOINTS.get(eid)
         if ep is None:
             raise RuntimeError(f"模型端点未登记: {eid} —— 未登记端点禁止调用")
+        # 逐端点审批闸门：审批人为空 = 该端点未获批准，出域端点一律降级到内网。
+        # 这条不是"配置建议"，而是把"未审批端点能被调用"变成不可能。
+        if ep.egress and not ep.approved_by:
+            runlog.warning("endpoint_not_approved", extra={"extra_data": {
+                "endpoint": ep.endpoint_id, "fallback": "ep-internal-a"}})
+            return ENDPOINTS["ep-internal-a"]
         return ep
 
     def invoke_local(self, ep: Endpoint, task: dict) -> dict:

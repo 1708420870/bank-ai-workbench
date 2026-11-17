@@ -1,0 +1,76 @@
+{
+  "operator": "交付方自测（v1.4.3 复测）",
+  "executor_role": "self-test",
+  "generated_at": "2026-11-17T16:57:32",
+  "base": "http://127.0.0.1:8101",
+  "steps": [
+    {
+      "no": 1,
+      "name": "坐席登录（无他人提示，自行完成）",
+      "expect": "HTTP 200 且身份为坐席",
+      "actual": "HTTP 200，登录身份=B001（账号 b001），角色=agent",
+      "ok": true,
+      "cost_s": 0.11
+    },
+    {
+      "no": 2,
+      "name": "打开案例列表",
+      "expect": "HTTP 200 且非空",
+      "actual": "HTTP 200，可选案例 12 条，选用 A01",
+      "ok": true,
+      "cost_s": 0.03
+    },
+    {
+      "no": 3,
+      "name": "员工提问 → 提交工单",
+      "expect": "拿到 request_id 且返回 AI 建议",
+      "actual": "request_id=REQ-20261117-45F9BF，AI 建议=有",
+      "ok": true,
+      "cost_s": 0.3
+    },
+    {
+      "no": 4,
+      "name": "脱敏出域（看出域快照）",
+      "expect": "仅令牌形态，无明文 PII",
+      "actual": "令牌 3 个，明文敏感字段 无",
+      "ok": true,
+      "cost_s": 0.0
+    },
+    {
+      "no": 5,
+      "name": "外网建议 + 回程版本指纹",
+      "expect": "建议非空且带 agent/model 版本",
+      "actual": "建议字段 ['intent_summary', 'missing_information', 'reasoning_summary', 'recommended_next_step', 'risk_flags']；版本指纹 agent=True model=True",
+      "ok": true,
+      "cost_s": 0.0
+    },
+    {
+      "no": 6,
+      "name": "内网恢复（三元匹配）",
+      "expect": "HTTP 200 且文本被回填",
+      "actual": "HTTP 200，复原字段=['PHONE_001', 'CARD_001', 'NAME_001']",
+      "ok": true,
+      "cost_s": 0.05
+    },
+    {
+      "no": 7,
+      "name": "人工确认（采纳）",
+      "expect": "状态变 CONFIRMED",
+      "actual": "HTTP 200，状态=CONFIRMED",
+      "ok": true,
+      "cost_s": 0.05
+    },
+    {
+      "no": 8,
+      "name": "审计导出（单 request_id 六要素）",
+      "expect": "六要素齐全",
+      "actual": "审计 9 条，六要素 6/6 ",
+      "ok": true,
+      "cost_s": 0.11
+    }
+  ],
+  "failed": 0,
+  "total": 8,
+  "verdict": "PASS",
+  "usable_as_audit_evidence": false
+}

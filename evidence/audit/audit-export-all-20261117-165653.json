@@ -1,0 +1,6990 @@
+{
+  "generated_at": "2026-11-17T16:56:53",
+  "data_dir": "data_test",
+  "request_id": null,
+  "total": 449,
+  "pii_hits": 0,
+  "by_event": {
+    "MCP_FORWARDED": 102,
+    "MCP_CALL": 77,
+    "LOGIN_OK": 49,
+    "SESSION_KICKED": 38,
+    "AUTHZ_DENIED": 14,
+    "ON_BEHALF": 13,
+    "TOKENIZED": 13,
+    "CASE_CREATED": 13,
+    "LOGIN_FAIL": 12,
+    "ADJUDICATED": 9,
+    "EGRESS_ACCEPTED": 9,
+    "EGRESS_DENIED": 8,
+    "FAULT_MODE_SET": 8,
+    "TASK_DONE": 8,
+    "RESPONSE_RELAYED": 7,
+    "DRAFT_APPROVED": 6,
+    "GATE_CHECKED": 5,
+    "DM_SENT": 4,
+    "RESTORED": 4,
+    "MCP_DENIED": 4,
+    "ZONE_START": 4,
+    "LEAVE_SUBMITTED": 3,
+    "PASSWORD_RESET": 3,
+    "RATE_LIMITED": 3,
+    "NOTICE_PUBLISHED": 2,
+    "NOTICE_READ": 2,
+    "PASSWORD_CHANGED": 2,
+    "USER_CREATED": 2,
+    "USER_MUST_CHANGE_SET": 2,
+    "MFA_OK": 2,
+    "DRAFT_PUBLISHED": 2,
+    "LEAVE_REVIEWED": 1,
+    "NOTICE_REVOKED": 1,
+    "PASSWORD_CHANGE_FAIL": 1,
+    "MFA_DISABLED": 1,
+    "MFA_REQUIRED": 1,
+    "MFA_ENABLED": 1,
+    "MFA_ENROLL_FAILED": 1,
+    "MFA_ENROLL_STARTED": 1,
+    "DRAFT_TAMPERED": 1,
+    "DRAFT_ROLLBACK": 1,
+    "SESSION_DEVICE_MISMATCH": 1,
+    "LOGOUT": 1,
+    "SESSION_REVOKED": 1,
+    "LOGIN_LOCKED": 1,
+    "DISPATCH_FAILED": 1,
+    "RESPONSE_REJECTED": 1,
+    "RESTORE_DENIED": 1,
+    "EGRESS_BLOCKED": 1,
+    "TASK_TIMEOUT_SIMULATED": 1
+  },
+  "events": [
+    {
+      "id": 296,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-97d22408ee609c36",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/users/B002/must-change",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 295,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-33b25f9bfdc0a23a",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/leaves/pending",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 294,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-03fb1d497130f888",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/notices/manage",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 293,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-eab047f7709b6920",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/notices",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 292,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "Q3yQJuOf",
+      "trace_id": "Q3yQJuOf",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 291,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-5026b645d41421ee",
+      "actor": "B001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "Q3yQJuOf",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 290,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "LEAVE_SUBMITTED",
+      "request_id": null,
+      "trace_id": "TR-877385e9acae6058",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "end": "2026-12-21",
+        "leave_id": "LV-261117165652-9077",
+        "start": "2026-12-20"
+      }
+    },
+    {
+      "id": 289,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "quu_lc-4",
+      "trace_id": "quu_lc-4",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 288,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-af35b9a667fc6f7f",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "quu_lc-4",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 287,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "LEAVE_REVIEWED",
+      "request_id": null,
+      "trace_id": "TR-5d57bff9909008e3",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "action": "APPROVED",
+        "applicant": "B003",
+        "comment": "同意，注意交接",
+        "leave_id": "LV-261117165651-E0D9"
+      }
+    },
+    {
+      "id": 286,
+      "ts": "2026-11-17T16:56:52+08:00",
+      "zone": "inner",
+      "event": "LEAVE_SUBMITTED",
+      "request_id": null,
+      "trace_id": "TR-bd882a9a49866b6b",
+      "actor": "B003",
+      "severity": "info",
+      "detail": {
+        "end": "2026-12-11",
+        "leave_id": "LV-261117165651-E0D9",
+        "start": "2026-12-10"
+      }
+    },
+    {
+      "id": 285,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "0ncPze5x",
+      "trace_id": "0ncPze5x",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 284,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-7b729c723b9fb7a1",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "0ncPze5x",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 283,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "eAXPhMio",
+      "trace_id": "eAXPhMio",
+      "actor": "B003",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 282,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-c8974ccd952051f8",
+      "actor": "B003",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "eAXPhMio",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 281,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "LEAVE_SUBMITTED",
+      "request_id": null,
+      "trace_id": "TR-03338cc0767877b9",
+      "actor": "B003",
+      "severity": "info",
+      "detail": {
+        "end": "2026-12-03",
+        "leave_id": "LV-261117165651-961A",
+        "start": "2026-12-01"
+      }
+    },
+    {
+      "id": 280,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "jiPNpp6i",
+      "trace_id": "jiPNpp6i",
+      "actor": "B003",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 279,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "NOTICE_REVOKED",
+      "request_id": null,
+      "trace_id": "TR-39cea8a8a13916c4",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "notice_id": "N-261117165651-F03E"
+      }
+    },
+    {
+      "id": 278,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "NOTICE_PUBLISHED",
+      "request_id": null,
+      "trace_id": "TR-91b5b2be1cf104ad",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "level": "normal",
+        "notice_id": "N-261117165651-F03E",
+        "title": "待撤回通知"
+      }
+    },
+    {
+      "id": 277,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "MWNUjvm2",
+      "trace_id": "MWNUjvm2",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 276,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-f18eec27b0365910",
+      "actor": "B002",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "MWNUjvm2",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 275,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "ylKcJEsR",
+      "trace_id": "ylKcJEsR",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 274,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-7a80c6da6fd03d31",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "ylKcJEsR",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 273,
+      "ts": "2026-11-17T16:56:51+08:00",
+      "zone": "inner",
+      "event": "NOTICE_READ",
+      "request_id": null,
+      "trace_id": "TR-da46da586c5d54ca",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "notice_id": "N-261117165650-4F16"
+      }
+    },
+    {
+      "id": 272,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "NOTICE_READ",
+      "request_id": null,
+      "trace_id": "TR-221405eb56087af9",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "notice_id": "N-261117165650-4F16"
+      }
+    },
+    {
+      "id": 271,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "NOTICE_PUBLISHED",
+      "request_id": null,
+      "trace_id": "TR-c3b6231b780fb453",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "level": "important",
+        "notice_id": "N-261117165650-4F16",
+        "title": "OA 验收通知"
+      }
+    },
+    {
+      "id": 270,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "VldAS6mX",
+      "trace_id": "VldAS6mX",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 269,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-bce8283531305555",
+      "actor": "B001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "VldAS6mX",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 268,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "IrrrQctF",
+      "trace_id": "IrrrQctF",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 267,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-781504efb44267e6",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "IrrrQctF",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 266,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "PASSWORD_CHANGED",
+      "request_id": null,
+      "trace_id": "TR-34abea2dbea1aab9",
+      "actor": "E9001",
+      "severity": "medium",
+      "detail": {
+        "self": true
+      }
+    },
+    {
+      "id": 265,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "B2wwlf2C",
+      "trace_id": "B2wwlf2C",
+      "actor": "E9001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 264,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-37a217674adb5928",
+      "actor": "E9001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "B2wwlf2C",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 263,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "PEI4P12J",
+      "trace_id": "PEI4P12J",
+      "actor": "E9001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 262,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "USER_CREATED",
+      "request_id": null,
+      "trace_id": "TR-0f6822c4f877d3d3",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "portal": "client",
+        "role": "agent",
+        "target": "E9001"
+      }
+    },
+    {
+      "id": 261,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "Xw02fW2v",
+      "trace_id": "Xw02fW2v",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 260,
+      "ts": "2026-11-17T16:56:50+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-12a6c1aa488e2df5",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "Xw02fW2v",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 259,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "USER_MUST_CHANGE_SET",
+      "request_id": null,
+      "trace_id": "TR-06edc69ec038bb7f",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "enabled": false,
+        "target": "B004"
+      }
+    },
+    {
+      "id": 258,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "PASSWORD_RESET",
+      "request_id": null,
+      "trace_id": "TR-6836a7f7dc811972",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "must_change": true,
+        "sessions_revoked": true,
+        "target": "B004"
+      }
+    },
+    {
+      "id": 257,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "zzNG7zvD",
+      "trace_id": "zzNG7zvD",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 256,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-5b0443a05de8386c",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "zzNG7zvD",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 255,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-74742990b2ebe357",
+      "actor": "b004",
+      "severity": "high",
+      "detail": {
+        "failed_n": 1,
+        "ip": "127.0.0.1",
+        "locked": false,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 254,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "PASSWORD_CHANGED",
+      "request_id": null,
+      "trace_id": "TR-186a75dadd1d58ec",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "self": true
+      }
+    },
+    {
+      "id": 253,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "PASSWORD_CHANGE_FAIL",
+      "request_id": null,
+      "trace_id": "TR-9458354e93cac336",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "reason": "bad_old_password"
+      }
+    },
+    {
+      "id": 252,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "_LtIKy3z",
+      "trace_id": "_LtIKy3z",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 251,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "USER_MUST_CHANGE_SET",
+      "request_id": null,
+      "trace_id": "TR-088587f2c1599268",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "enabled": false,
+        "target": "B004"
+      }
+    },
+    {
+      "id": 250,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "PASSWORD_RESET",
+      "request_id": null,
+      "trace_id": "TR-aac2e6feb44fdce8",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "must_change": true,
+        "sessions_revoked": true,
+        "target": "B004"
+      }
+    },
+    {
+      "id": 249,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "QOgYNQih",
+      "trace_id": "QOgYNQih",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 248,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-96e134e156e7a075",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "QOgYNQih",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 247,
+      "ts": "2026-11-17T16:56:49+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-7c3b7c4f8e72cc06",
+      "actor": "B004",
+      "severity": "high",
+      "detail": {
+        "reason": "mfa_disable_bad_password"
+      }
+    },
+    {
+      "id": 246,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "ELAT-Kg7",
+      "trace_id": "ELAT-Kg7",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 245,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-cf04f84496655e14",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "ELAT-Kg7",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 244,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "MFA_DISABLED",
+      "request_id": null,
+      "trace_id": "TR-f36893674d000d7f",
+      "actor": "B004",
+      "severity": "high",
+      "detail": null
+    },
+    {
+      "id": 243,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "T1dNdWad",
+      "trace_id": "T1dNdWad",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 242,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-792e180c9d56fd44",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "T1dNdWad",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 241,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "MFA_OK",
+      "request_id": null,
+      "trace_id": "TR-792e180c9d56fd44",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "portal": "client"
+      }
+    },
+    {
+      "id": 240,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "WNDo8w_p",
+      "trace_id": "WNDo8w_p",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 239,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-88d858fe01e116b1",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "WNDo8w_p",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 238,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "MFA_OK",
+      "request_id": null,
+      "trace_id": "TR-88d858fe01e116b1",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "portal": "client"
+      }
+    },
+    {
+      "id": 237,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-baad3322824c32dc",
+      "actor": "B004",
+      "severity": "high",
+      "detail": {
+        "failed_n": 1,
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "reason": "bad_otp"
+      }
+    },
+    {
+      "id": 236,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "MFA_REQUIRED",
+      "request_id": null,
+      "trace_id": "TR-367d12a7fe77c166",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client"
+      }
+    },
+    {
+      "id": 235,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "MFA_ENABLED",
+      "request_id": null,
+      "trace_id": "TR-0c2802848c93d319",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": {
+        "enabled_at": "2026-11-17T16:56:48+08:00"
+      }
+    },
+    {
+      "id": 234,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "MFA_ENROLL_FAILED",
+      "request_id": null,
+      "trace_id": "TR-541697ef0de9ec63",
+      "actor": "B004",
+      "severity": "medium",
+      "detail": null
+    },
+    {
+      "id": 233,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "MFA_ENROLL_STARTED",
+      "request_id": null,
+      "trace_id": "TR-12e087ae9664803d",
+      "actor": "B004",
+      "severity": "info",
+      "detail": null
+    },
+    {
+      "id": 232,
+      "ts": "2026-11-17T16:56:48+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "xkn20bt5",
+      "trace_id": "xkn20bt5",
+      "actor": "B004",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 231,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "Oi7hAR64",
+      "trace_id": "Oi7hAR64",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 230,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-11fce6c89b5dcf8d",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "Oi7hAR64",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 229,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-21DF37",
+      "trace_id": "REQ-20261117-21DF37",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B002"
+      }
+    },
+    {
+      "id": 228,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-21DF37",
+      "trace_id": "REQ-20261117-21DF37",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 227,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-21DF37",
+      "trace_id": "REQ-20261117-21DF37",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-587F3C7D"
+      }
+    },
+    {
+      "id": 226,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-d565cceeb17caf75",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 225,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-20a66cb6bd4ca81a",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 224,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-290b61f22046de1d",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 223,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-db771de9f630cfc4",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 222,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-eee1845f4e3761f6",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 221,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-b4659eee9de67e01",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 220,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-b43292b701e92135",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 219,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-b3d32af465b72d1d",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 218,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-279fd7c7f3ba0a95",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 217,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-8052c48c5b8242b1",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 216,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-3a9eebb97457fe86",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 215,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-479b6626f7d388af",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 214,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-284930eba15267d8",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 213,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-22fd4e838b954323",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 212,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-d5fa6246f9320c9d",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 211,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-efce6583cd7976bf",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 210,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-74a840d398261a38",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 209,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-d9a0069644fd6d41",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 208,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-a545510628a9fb0a",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 207,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-56e4c9e1d6729ac7",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 206,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-466dbfc0fda3f7b1",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 205,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-e421da849d9bed61",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 204,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-398c3acc02a3827f",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 203,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-6cb22342a38fa03b",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 202,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-e494cc4245953bc3",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 201,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-e8aba23f674873ef",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 200,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-ed24f9ec18e9d1fd",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 199,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-1350332141d0ca02",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 198,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-4d1548c732010bd2",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 197,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-ecaf95d3e0cc7ebf",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 196,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-5ad22f9cf2c8ecd6",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 195,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-2a0a3f4b6dd3c45a",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 194,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-f7a549acf3aa371b",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 193,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-877e37eba4ce945a",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 192,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-022642eb69289391",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 191,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-2df9e1ce2546a69d",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 190,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-5b01f7808f32bf0b",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 189,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-b6d2282e64caf615",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 188,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-a49ec4bc63bb0ba6",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 187,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-33859cd6d8b08c16",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 186,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-68a6deaf5082a1ab",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 185,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-534741ce1b2b3e02",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 184,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-d71176d8496108b2",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 183,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-91289fcc212f2505",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 182,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-504cbfc14c8adc04",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 181,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-be39ddae54491e56",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 180,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-b2dbf1647cfdf010",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 179,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-babbbb2aff48784f",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 178,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-9a9253c397520de4",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 177,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-e8344789528a954f",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 176,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-6856aabab4fad606",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 175,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-8e828b4929b40d63",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 174,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-e58bf89de317891b",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 173,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-7951da435f8e3aa9",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 172,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-67c4c309c7added9",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 171,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-5fe3f145547ce47c",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 170,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-eb5732d09c3c3068",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 169,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-a8c6cfb32a7d4d60",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 168,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-344e9502e5abf0f8",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 167,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-a02f33f86fb8cc22",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 166,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-63aa8b4786d09c32",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 165,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-53e5155537e6dd63",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 164,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-704f0b38ad0b6c2f",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 163,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-4f29857e6d3347ad",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 162,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-983761166cec747d",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 161,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-16478958c73fd75e",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 160,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "yvObCsI0",
+      "trace_id": "yvObCsI0",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 159,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-584dc88d9cb46b1a",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "yvObCsI0",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 158,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "AOB2ANdG",
+      "trace_id": "AOB2ANdG",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 157,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-09e6b1bd56b1f33f",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "AOB2ANdG",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 156,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "bYIaw-ZM",
+      "trace_id": "bYIaw-ZM",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 155,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-8fe6c9e51d5c9f09",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "bYIaw-ZM",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 154,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "DM_SENT",
+      "request_id": null,
+      "trace_id": "TR-7517114841285592",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "length": 15,
+        "msg_id": 4,
+        "to": "B003"
+      }
+    },
+    {
+      "id": 153,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "YjBFnOCv",
+      "trace_id": "YjBFnOCv",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 152,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-fb81982eefdc3004",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "YjBFnOCv",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 151,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "8Z4f-j2i",
+      "trace_id": "8Z4f-j2i",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 150,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-26dc84167a04227c",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "8Z4f-j2i",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 149,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "DM_SENT",
+      "request_id": null,
+      "trace_id": "TR-cbee2619a32054fe",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "length": 9,
+        "msg_id": 3,
+        "to": "B002"
+      }
+    },
+    {
+      "id": 148,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "RZvqphcw",
+      "trace_id": "RZvqphcw",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 147,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "wOp2L6uq",
+      "trace_id": "wOp2L6uq",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 146,
+      "ts": "2026-11-17T16:56:37+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-f77c557325b6d136",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "wOp2L6uq",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 145,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "DM_SENT",
+      "request_id": null,
+      "trace_id": "TR-e0587b115e2c9a68",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "length": 10,
+        "msg_id": 2,
+        "to": "B001"
+      }
+    },
+    {
+      "id": 144,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "DM_SENT",
+      "request_id": null,
+      "trace_id": "TR-1cf3f960f5064e97",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "length": 14,
+        "msg_id": 1,
+        "to": "A001"
+      }
+    },
+    {
+      "id": 143,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "zfkfRe1y",
+      "trace_id": "zfkfRe1y",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 142,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-ceabbd3baeb3133d",
+      "actor": "B001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "zfkfRe1y",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 141,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "8Vi5MHpF",
+      "trace_id": "8Vi5MHpF",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 140,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-93bcf22d54cdffbb",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "8Vi5MHpF",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 139,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "NEtWnrD5",
+      "trace_id": "NEtWnrD5",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 138,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-94215809e7de07fd",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "NEtWnrD5",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 137,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "sFVC5lqf",
+      "trace_id": "sFVC5lqf",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 136,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-c565f1718a7a5a0c",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "sFVC5lqf",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 135,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "DRAFT_PUBLISHED",
+      "request_id": null,
+      "trace_id": "TR-e02c33097f287712",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-18673",
+        "gate_digest": "f7f9c035bbb3a824",
+        "version": "rule-v1"
+      }
+    },
+    {
+      "id": 134,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "GATE_CHECKED",
+      "request_id": null,
+      "trace_id": "TR-0a1658c2440ac938",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-18673",
+        "failed": [],
+        "passed": true
+      }
+    },
+    {
+      "id": 133,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "DRAFT_APPROVED",
+      "request_id": null,
+      "trace_id": "TR-3ce067d320cc84bd",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-18673",
+        "note": null
+      }
+    },
+    {
+      "id": 132,
+      "ts": "2026-11-17T16:56:36+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-3fd6e19bf63e0df4",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_rule_change_request"
+      }
+    },
+    {
+      "id": 131,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-7bdf422a13f587bf",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 130,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "DRAFT_TAMPERED",
+      "request_id": null,
+      "trace_id": "TR-2c9684eec21d8960",
+      "actor": "A001",
+      "severity": "critical",
+      "detail": {
+        "change_id": "CHG-04805"
+      }
+    },
+    {
+      "id": 129,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "GATE_CHECKED",
+      "request_id": null,
+      "trace_id": "TR-76075cb3752108eb",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-04805",
+        "failed": [],
+        "passed": true
+      }
+    },
+    {
+      "id": 128,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "DRAFT_APPROVED",
+      "request_id": null,
+      "trace_id": "TR-be4958d1a17308e1",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-04805",
+        "note": null
+      }
+    },
+    {
+      "id": 127,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-a006014ddda9817a",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 126,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-bdeee0832b035e1b",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "change_id": "CHG-SELF-A03846",
+        "reason": "self_approval"
+      }
+    },
+    {
+      "id": 125,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "GATE_CHECKED",
+      "request_id": null,
+      "trace_id": "TR-b8dc7ae30273e9c5",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-02163",
+        "failed": [
+          "NO_PROD_WRITE"
+        ],
+        "passed": false
+      }
+    },
+    {
+      "id": 124,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "DRAFT_APPROVED",
+      "request_id": null,
+      "trace_id": "TR-d46d222da74aab26",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-02163",
+        "note": null
+      }
+    },
+    {
+      "id": 123,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-e8b6bffbe7a07ad7",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases",
+          "write_production"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 122,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "inner",
+      "event": "GATE_CHECKED",
+      "request_id": null,
+      "trace_id": "TR-bae963d839eb125f",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-27456",
+        "failed": [
+          "DEPENDENCY_SCAN"
+        ],
+        "passed": false
+      }
+    },
+    {
+      "id": 121,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "DRAFT_APPROVED",
+      "request_id": null,
+      "trace_id": "TR-b8451b4b9f2c86ce",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-27456",
+        "note": null
+      }
+    },
+    {
+      "id": 120,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-46ed0f6ccb83fa89",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 119,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "DRAFT_APPROVED",
+      "request_id": null,
+      "trace_id": "TR-64e943e361933169",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-37399",
+        "note": null
+      }
+    },
+    {
+      "id": 118,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-f5ba98f5b0079f4b",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 117,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-068e3dc1ee7ef8bf",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 116,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "DRAFT_ROLLBACK",
+      "request_id": null,
+      "trace_id": "TR-aa059fe8667a7e5f",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "change_id": "CHG-57085",
+        "reason": "R7 回滚演练：验证可回退",
+        "version": "skill-v1"
+      }
+    },
+    {
+      "id": 115,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "DRAFT_PUBLISHED",
+      "request_id": null,
+      "trace_id": "TR-67ceb64ce30e234d",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-57085",
+        "gate_digest": "0b311389223467cd",
+        "version": "skill-v1"
+      }
+    },
+    {
+      "id": 114,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "GATE_CHECKED",
+      "request_id": null,
+      "trace_id": "TR-0ccc416f290ec5ab",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-57085",
+        "failed": [],
+        "passed": true
+      }
+    },
+    {
+      "id": 113,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "DRAFT_APPROVED",
+      "request_id": null,
+      "trace_id": "TR-62458c2a4914a0eb",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "change_id": "CHG-57085",
+        "note": "R7 审批"
+      }
+    },
+    {
+      "id": 112,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-09dc8a4c613a420f",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 111,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "QgDLR_Lo",
+      "trace_id": "QgDLR_Lo",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 110,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-49af7fb882089e5f",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "QgDLR_Lo",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 109,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "SESSION_DEVICE_MISMATCH",
+      "request_id": null,
+      "trace_id": "TR-b7f6d0bab2b530f4",
+      "actor": "E1005",
+      "severity": "high",
+      "detail": {
+        "bound": "DEVICE-A",
+        "sid": "qk3xOYuk"
+      }
+    },
+    {
+      "id": 108,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-5a092fe265648faf",
+      "actor": "e1005",
+      "severity": "critical",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "reason": "device_mismatch"
+      }
+    },
+    {
+      "id": 107,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-76b7a2fe854a1fe0",
+      "actor": "e1005",
+      "severity": "critical",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "reason": "device_mismatch"
+      }
+    },
+    {
+      "id": 106,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "qk3xOYuk",
+      "trace_id": "qk3xOYuk",
+      "actor": "E1005",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 105,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-506ef03d87ccd88d",
+      "actor": "E1005",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "qk3xOYuk",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 104,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "mOf8jSl1",
+      "trace_id": "mOf8jSl1",
+      "actor": "E1005",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 103,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-73d2a72194317b1f",
+      "actor": "E1005",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "mOf8jSl1",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 102,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "zGEDqu-V",
+      "trace_id": "zGEDqu-V",
+      "actor": "E1005",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 101,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "SPa9_Fph",
+      "trace_id": "SPa9_Fph",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 100,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-726494289dc4a431",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "SPa9_Fph",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 99,
+      "ts": "2026-11-17T16:56:33+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-49b14ad9fd3fe249",
+      "actor": "e1005",
+      "severity": "high",
+      "detail": {
+        "failed_n": 1,
+        "ip": "127.0.0.1",
+        "locked": false,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 98,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "PASSWORD_RESET",
+      "request_id": null,
+      "trace_id": "TR-10af2014d2b03908",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "must_change": true,
+        "sessions_revoked": true,
+        "target": "E1005"
+      }
+    },
+    {
+      "id": 97,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-bde6d14a611c9dd5",
+      "actor": "e1005",
+      "severity": "high",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "reason": "portal_mismatch",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 96,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "630g4bxc",
+      "trace_id": "630g4bxc",
+      "actor": "E1005",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 95,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "USER_CREATED",
+      "request_id": null,
+      "trace_id": "TR-4e10e94238feb368",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "portal": "client",
+        "role": "agent",
+        "target": "E1005"
+      }
+    },
+    {
+      "id": 94,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-eb312df99acb7e48",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/users",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 93,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "f8JiLhYc",
+      "trace_id": "f8JiLhYc",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 92,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-81df3f0f014e3c80",
+      "actor": "B001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "f8JiLhYc",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 91,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "ZlAdXIec",
+      "trace_id": "ZlAdXIec",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 90,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-8487ee5eb3bc86d2",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "ZlAdXIec",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 89,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "uoHiUHQA",
+      "trace_id": "uoHiUHQA",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 88,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-742e94dc68748109",
+      "actor": "B001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "uoHiUHQA",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 87,
+      "ts": "2026-11-17T16:56:32+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "wxyF0kDr",
+      "trace_id": "wxyF0kDr",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 86,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "mJRpAfU0",
+      "trace_id": "mJRpAfU0",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 85,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-c103e6700ecc9e06",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "mJRpAfU0",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 84,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGOUT",
+      "request_id": null,
+      "trace_id": "TR-7ec816436245c233",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "sid": "WbQ_N1Qo"
+      }
+    },
+    {
+      "id": 83,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "WbQ_N1Qo",
+      "trace_id": "WbQ_N1Qo",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 82,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "SESSION_REVOKED",
+      "request_id": null,
+      "trace_id": "TR-f5de25918825e9ca",
+      "actor": "A001",
+      "severity": "high",
+      "detail": {
+        "target_sid": "wU4A7bw4"
+      }
+    },
+    {
+      "id": 81,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "1ivVCIbp",
+      "trace_id": "1ivVCIbp",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 80,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-4c824743a45581e0",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "1ivVCIbp",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 79,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "wU4A7bw4",
+      "trace_id": "wU4A7bw4",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 78,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-debb216f6fdc8650",
+      "actor": "B001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "wU4A7bw4",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 77,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_LOCKED",
+      "request_id": null,
+      "trace_id": "TR-ca60ac6ffb8ad18e",
+      "actor": "b004",
+      "severity": "critical",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "remain_s": 299
+      }
+    },
+    {
+      "id": 76,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-3124d4bdf56283f6",
+      "actor": "b004",
+      "severity": "high",
+      "detail": {
+        "failed_n": 5,
+        "ip": "127.0.0.1",
+        "locked": true,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 75,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-44696e0089f280c8",
+      "actor": "b004",
+      "severity": "high",
+      "detail": {
+        "failed_n": 4,
+        "ip": "127.0.0.1",
+        "locked": false,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 74,
+      "ts": "2026-11-17T16:56:31+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-8cb5b7023a9b1d97",
+      "actor": "b004",
+      "severity": "high",
+      "detail": {
+        "failed_n": 3,
+        "ip": "127.0.0.1",
+        "locked": false,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 73,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-357096d1bd7f43ce",
+      "actor": "b004",
+      "severity": "high",
+      "detail": {
+        "failed_n": 2,
+        "ip": "127.0.0.1",
+        "locked": false,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 72,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-058b4f93e20b7081",
+      "actor": "b004",
+      "severity": "high",
+      "detail": {
+        "failed_n": 1,
+        "ip": "127.0.0.1",
+        "locked": false,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 71,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 70,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "RESTORED",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "fields": [
+          "PHONE_001",
+          "CARD_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 69,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "workbuddy-managed-agent-1.4.2",
+        "conflicts": [],
+        "decision": "SHOW_SUGGESTION",
+        "model": "partner-cloud/llm-b-2.1",
+        "reasons": []
+      }
+    },
+    {
+      "id": 68,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 67,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-54A608F4"
+      }
+    },
+    {
+      "id": 66,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "6DsPRAu2",
+      "trace_id": "6DsPRAu2",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 65,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-0577e62a951970f7",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "6DsPRAu2",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 64,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-d5f966f703e75092",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "claimed": "B002",
+        "reason": "impersonation"
+      }
+    },
+    {
+      "id": 63,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "JZEfcpws",
+      "trace_id": "JZEfcpws",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 62,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "SESSION_KICKED",
+      "request_id": null,
+      "trace_id": "TR-50f7fbb4fc7071cf",
+      "actor": "B001",
+      "severity": "medium",
+      "detail": {
+        "kicked": 1,
+        "new_sid": "JZEfcpws",
+        "reason": "single_session"
+      }
+    },
+    {
+      "id": 61,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-01545742fe18a477",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/users",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 60,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-46240bbc74135fea",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "auditor",
+          "developer",
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/stats",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 59,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-31e785aec436b37a",
+      "actor": "B001",
+      "severity": "high",
+      "detail": {
+        "need": [
+          "auditor",
+          "supervisor"
+        ],
+        "path": "/internal/api/v1/audit",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 58,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "Wp-o5z4C",
+      "trace_id": "Wp-o5z4C",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 57,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-21912f2bb9479c8c",
+      "actor": "no-such-user",
+      "severity": "high",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "reason": "unknown_user"
+      }
+    },
+    {
+      "id": 56,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "LOGIN_FAIL",
+      "request_id": null,
+      "trace_id": "TR-36b0862f2bfb8f65",
+      "actor": "b002",
+      "severity": "high",
+      "detail": {
+        "failed_n": 1,
+        "ip": "127.0.0.1",
+        "locked": false,
+        "portal": "client",
+        "reason": "bad_password"
+      }
+    },
+    {
+      "id": 55,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-e7ea66d07c34d168",
+      "actor": "a001",
+      "severity": "high",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "client",
+        "reason": "portal_mismatch",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 54,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "AUTHZ_DENIED",
+      "request_id": null,
+      "trace_id": "TR-9ac3ae784cb5317a",
+      "actor": "b001",
+      "severity": "high",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "reason": "portal_mismatch",
+        "role": "agent"
+      }
+    },
+    {
+      "id": 53,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-E30A53",
+      "trace_id": "REQ-20261117-E30A53",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 52,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-E30A53",
+      "trace_id": "REQ-20261117-E30A53",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "nms-agent-0.9.3",
+        "conflicts": [],
+        "decision": "HUMAN_HANDOFF",
+        "model": "internal-llm/Qwen3.5-9B-AWQ",
+        "reasons": [
+          "AGENT_REQUESTED_HUMAN",
+          "MANDATORY_HUMAN"
+        ]
+      }
+    },
+    {
+      "id": 51,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-E30A53",
+      "trace_id": "REQ-20261117-E30A53",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "AMOUNT": 1,
+          "CARD": 1,
+          "NAME": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "AMOUNT_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 50,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-E30A53",
+      "trace_id": "REQ-20261117-E30A53",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "B01",
+        "intent": "SUSPECTED_UNAUTHORIZED",
+        "session_id": "SES-748A74F4"
+      }
+    },
+    {
+      "id": 49,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-6B243B",
+      "trace_id": "REQ-20261117-6B243B",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 48,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-6B243B",
+      "trace_id": "REQ-20261117-6B243B",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "nms-agent-0.9.3",
+        "conflicts": [],
+        "decision": "HUMAN_HANDOFF",
+        "model": "internal-llm/Qwen3.5-9B-AWQ",
+        "reasons": [
+          "AGENT_REQUESTED_HUMAN",
+          "MANDATORY_HUMAN"
+        ]
+      }
+    },
+    {
+      "id": 47,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-6B243B",
+      "trace_id": "REQ-20261117-6B243B",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "AMOUNT": 1,
+          "CARD": 1,
+          "NAME": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "AMOUNT_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 46,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-6B243B",
+      "trace_id": "REQ-20261117-6B243B",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "B01",
+        "intent": "SUSPECTED_UNAUTHORIZED",
+        "session_id": "SES-839BA2F7"
+      }
+    },
+    {
+      "id": 45,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 44,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "RESTORED",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "fields": [
+          "CARD_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 43,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "workbuddy-managed-agent-1.4.2",
+        "conflicts": [],
+        "decision": "SHOW_SUGGESTION",
+        "model": "partner-cloud/llm-b-2.1",
+        "reasons": []
+      }
+    },
+    {
+      "id": 42,
+      "ts": "2026-11-17T16:56:28+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 41,
+      "ts": "2026-11-17T16:56:28+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A02",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-CEA78CA3"
+      }
+    },
+    {
+      "id": 40,
+      "ts": "2026-11-17T16:56:27+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-11A8B6",
+      "trace_id": "REQ-20261117-11A8B6",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 39,
+      "ts": "2026-11-17T16:56:27+08:00",
+      "zone": "inner",
+      "event": "DISPATCH_FAILED",
+      "request_id": "REQ-20261117-11A8B6",
+      "trace_id": "REQ-20261117-11A8B6",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "error": "All connection attempts failed"
+      }
+    },
+    {
+      "id": 38,
+      "ts": "2026-11-17T16:56:25+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-11A8B6",
+      "trace_id": "REQ-20261117-11A8B6",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 37,
+      "ts": "2026-11-17T16:56:25+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-11A8B6",
+      "trace_id": "REQ-20261117-11A8B6",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-B415AFEE"
+      }
+    },
+    {
+      "id": 36,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-cf312202838bfd5f",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "change_id"
+        ],
+        "role": "developer",
+        "tool": "get_change_status"
+      }
+    },
+    {
+      "id": 35,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-391a7d5467240b12",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "package",
+          "purpose"
+        ],
+        "role": "developer",
+        "tool": "submit_workflow_draft"
+      }
+    },
+    {
+      "id": 34,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "inner",
+      "event": "MCP_CALL",
+      "request_id": null,
+      "trace_id": "TR-c1337c65e851dde2",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "proposed_change",
+          "purpose",
+          "rule_id"
+        ],
+        "role": "developer",
+        "tool": "submit_rule_change_request"
+      }
+    },
+    {
+      "id": 33,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "inner",
+      "event": "MCP_DENIED",
+      "request_id": null,
+      "trace_id": "TR-f744c8ef873fbb2a",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "reason": "scope",
+        "role": "agent",
+        "tool": "submit_rule_change_request"
+      }
+    },
+    {
+      "id": 32,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 31,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "inner",
+      "event": "RESTORED",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "fields": [
+          "PHONE_001",
+          "CARD_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 30,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "workbuddy-managed-agent-1.4.2",
+        "conflicts": [],
+        "decision": "SHOW_SUGGESTION",
+        "model": "partner-cloud/llm-b-2.1",
+        "reasons": []
+      }
+    },
+    {
+      "id": 29,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-FD5C893D"
+      }
+    },
+    {
+      "id": 27,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-5071A3",
+      "trace_id": "REQ-20261117-5071A3",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 26,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-5071A3",
+      "trace_id": "REQ-20261117-5071A3",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "nms-agent-0.9.3",
+        "conflicts": [
+          "建议动作 GUIDE_APP_QUERY 与规则 R-PENDING-01 允许集不符"
+        ],
+        "decision": "HUMAN_HANDOFF",
+        "model": "internal-llm/Qwen3.5-9B-AWQ",
+        "reasons": [
+          "MANDATORY_HUMAN",
+          "RULE_ACTION_CONFLICT"
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-5071A3",
+      "trace_id": "REQ-20261117-5071A3",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "NAME": 1
+        },
+        "tokens": [
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-5071A3",
+      "trace_id": "REQ-20261117-5071A3",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "B04",
+        "intent": "PENDING_CONFIRM",
+        "session_id": "SES-D65C5BF4"
+      }
+    },
+    {
+      "id": 23,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-452207",
+      "trace_id": "REQ-20261117-452207",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 22,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-452207",
+      "trace_id": "REQ-20261117-452207",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "workbuddy-managed-agent-1.4.2",
+        "conflicts": [],
+        "decision": "HUMAN_HANDOFF",
+        "model": "partner-cloud/llm-b-2.1",
+        "reasons": [
+          "INVALID_ACTION_CODE"
+        ]
+      }
+    },
+    {
+      "id": 21,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-452207",
+      "trace_id": "REQ-20261117-452207",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-452207",
+      "trace_id": "REQ-20261117-452207",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-4E374E14"
+      }
+    },
+    {
+      "id": 19,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-78301B",
+      "trace_id": "REQ-20261117-78301B",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 18,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "inner",
+      "event": "RESPONSE_REJECTED",
+      "request_id": "REQ-20261117-78301B",
+      "trace_id": "REQ-20261117-78301B",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "violations": [
+          "Schema 校验失败: 2 validation errors for AgentResponse\nreasoning_summary\n  Field required [type=missing, input_value={'request_id': 'REQ-20261...f723c459f3e2b70483e45b'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing\nrecommended_next_step\n  Field required [type=missing, input_value={'request_id': 'REQ-20261...f723c459f3e2b70483e45b'}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.14/v/missing"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-78301B",
+      "trace_id": "REQ-20261117-78301B",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-78301B",
+      "trace_id": "REQ-20261117-78301B",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-755E49E9"
+      }
+    },
+    {
+      "id": 15,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-7443BA",
+      "trace_id": "REQ-20261117-7443BA",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 14,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-7443BA",
+      "trace_id": "REQ-20261117-7443BA",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-7443BA",
+      "trace_id": "REQ-20261117-7443BA",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-B85E58EC"
+      }
+    },
+    {
+      "id": 12,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "RESTORE_DENIED",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": "B001",
+      "severity": "critical",
+      "detail": {
+        "reason": "session_mismatch"
+      }
+    },
+    {
+      "id": 11,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 10,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "RESTORED",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "fields": [
+          "PHONE_001",
+          "CARD_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "workbuddy-managed-agent-1.4.2",
+        "conflicts": [],
+        "decision": "SHOW_SUGGESTION",
+        "model": "partner-cloud/llm-b-2.1",
+        "reasons": []
+      }
+    },
+    {
+      "id": 8,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "CARD": 1,
+          "NAME": 1,
+          "PHONE": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "PHONE_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "A01",
+        "intent": "DISPUTE_PROCESS",
+        "session_id": "SES-AAAB8D4F"
+      }
+    },
+    {
+      "id": 6,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "inner",
+      "event": "ON_BEHALF",
+      "request_id": "REQ-20261117-A45C19",
+      "trace_id": "REQ-20261117-A45C19",
+      "actor": "A001",
+      "severity": "medium",
+      "detail": {
+        "on_behalf_of": "B001"
+      }
+    },
+    {
+      "id": 5,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "inner",
+      "event": "ADJUDICATED",
+      "request_id": "REQ-20261117-A45C19",
+      "trace_id": "REQ-20261117-A45C19",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "agent_version": "nms-agent-0.9.3",
+        "conflicts": [],
+        "decision": "HUMAN_HANDOFF",
+        "model": "internal-llm/Qwen3.5-9B-AWQ",
+        "reasons": [
+          "AGENT_REQUESTED_HUMAN",
+          "MANDATORY_HUMAN"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "inner",
+      "event": "TOKENIZED",
+      "request_id": "REQ-20261117-A45C19",
+      "trace_id": "REQ-20261117-A45C19",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "counts": {
+          "AMOUNT": 1,
+          "CARD": 1,
+          "NAME": 1
+        },
+        "tokens": [
+          "CARD_001",
+          "AMOUNT_001",
+          "NAME_001"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "inner",
+      "event": "CASE_CREATED",
+      "request_id": "REQ-20261117-A45C19",
+      "trace_id": "REQ-20261117-A45C19",
+      "actor": "B001",
+      "severity": "info",
+      "detail": {
+        "case_id": "B01",
+        "intent": "SUSPECTED_UNAUTHORIZED",
+        "session_id": "SES-296F0165"
+      }
+    },
+    {
+      "id": 2,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "inner",
+      "event": "LOGIN_OK",
+      "request_id": "9_7hEats",
+      "trace_id": "9_7hEats",
+      "actor": "A001",
+      "severity": "info",
+      "detail": {
+        "ip": "127.0.0.1",
+        "portal": "admin",
+        "role": "supervisor"
+      }
+    },
+    {
+      "id": 1,
+      "ts": "2026-11-17T16:56:18+08:00",
+      "zone": "inner",
+      "event": "ZONE_START",
+      "request_id": null,
+      "trace_id": "INNER-START",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "zone": "inner"
+      }
+    },
+    {
+      "id": 134,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-20261117-21DF37",
+      "trace_id": "REQ-20261117-21DF37",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "code": "RESPONSE_MALICIOUS_CONTENT",
+        "patterns": [
+          "PROMPT_INJECTION",
+          "SCRIPT_INJECTION"
+        ]
+      }
+    },
+    {
+      "id": 133,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-21DF37",
+      "trace_id": "REQ-20261117-21DF37",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 79,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 132,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_DENIED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806925",
+      "actor": "RATE-TEST-BIG",
+      "severity": "high",
+      "detail": {
+        "len": 16125,
+        "reason": "args_too_large",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 131,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-R6-BIG",
+      "trace_id": "REQ-R6-BIG",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "code": "REQUEST_TOO_LARGE",
+        "len": 16473,
+        "max": 16000
+      }
+    },
+    {
+      "id": 130,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "RATE_LIMITED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806818",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "high",
+      "detail": {
+        "key": "mcp-actor:RATE-TEST-ACTOR",
+        "limit": 60,
+        "observed": 60,
+        "scope": "actor",
+        "tool": "get_rule_metadata",
+        "window_s": 60
+      }
+    },
+    {
+      "id": 129,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "RATE_LIMITED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806781",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "high",
+      "detail": {
+        "key": "mcp-actor:RATE-TEST-ACTOR",
+        "limit": 60,
+        "observed": 60,
+        "scope": "actor",
+        "tool": "list_rule_catalog",
+        "window_s": 60
+      }
+    },
+    {
+      "id": 128,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806708",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 127,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806599",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 126,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806504",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 125,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806415",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 124,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806321",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 123,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806227",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 122,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806135",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 121,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905806037",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 120,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805962",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 119,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805886",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 118,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805793",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 117,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805678",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 116,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805586",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 115,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805509",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 114,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805431",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 113,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805356",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 112,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805278",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 111,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805181",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 110,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805107",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 109,
+      "ts": "2026-11-17T16:56:45+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905805012",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 108,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804920",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 107,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804841",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 106,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804747",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 105,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804653",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 104,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804563",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 103,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804482",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 102,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804374",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 101,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804282",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 100,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804188",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 99,
+      "ts": "2026-11-17T16:56:44+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905804079",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 98,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803987",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 97,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803886",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 96,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803792",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 95,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803693",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 94,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803619",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 93,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803542",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 92,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803462",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 91,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803386",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 90,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803294",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 89,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803218",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 88,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803138",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 87,
+      "ts": "2026-11-17T16:56:43+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905803061",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 86,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802967",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 85,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802869",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 84,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802795",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 83,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802703",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 82,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802609",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 81,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802516",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 80,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802425",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 79,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802333",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 78,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802240",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 77,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802134",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 76,
+      "ts": "2026-11-17T16:56:42+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905802026",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 75,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801936",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 74,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801830",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 73,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801757",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_masked_sample_case"
+      }
+    },
+    {
+      "id": 72,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801652",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_aggregate_metrics"
+      }
+    },
+    {
+      "id": 71,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801572",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_synthetic_cases"
+      }
+    },
+    {
+      "id": 70,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801478",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "get_rule_metadata"
+      }
+    },
+    {
+      "id": 69,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801386",
+      "actor": "RATE-TEST-ACTOR",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 68,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "RATE_LIMITED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801291",
+      "actor": "RATE-TEST-429",
+      "severity": "high",
+      "detail": {
+        "key": "mcp:RATE-TEST-429:list_rule_catalog",
+        "limit": 30,
+        "observed": 30,
+        "scope": "actor+tool",
+        "tool": "list_rule_catalog",
+        "window_s": 60
+      }
+    },
+    {
+      "id": 67,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801181",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 66,
+      "ts": "2026-11-17T16:56:41+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905801087",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 65,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800978",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 64,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800880",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 63,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800780",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 62,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800696",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 61,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800586",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 60,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800477",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 59,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800370",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 58,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800261",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 57,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800153",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 56,
+      "ts": "2026-11-17T16:56:40+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905800032",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 55,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799949",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 54,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799859",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 53,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799769",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 52,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799681",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 51,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799573",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 50,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799462",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 49,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799354",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 48,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799260",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 47,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799140",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 46,
+      "ts": "2026-11-17T16:56:39+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905799049",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 45,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798955",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 44,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798864",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 43,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798777",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 42,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798686",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 41,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798577",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 40,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798484",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 39,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798380",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 38,
+      "ts": "2026-11-17T16:56:38+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905798291",
+      "actor": "RATE-TEST-429",
+      "severity": "info",
+      "detail": {
+        "args_keys": [],
+        "role": "developer",
+        "tool": "list_rule_catalog"
+      }
+    },
+    {
+      "id": 37,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905795961",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_rule_change_request"
+      }
+    },
+    {
+      "id": 36,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905795760",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 35,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905795464",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 34,
+      "ts": "2026-11-17T16:56:35+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905795106",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases",
+          "write_production"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 33,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905794829",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 32,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905794581",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 31,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905794422",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 30,
+      "ts": "2026-11-17T16:56:34+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905794010",
+      "actor": "T001",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "dependencies",
+          "purpose",
+          "synthetic_dataset_id",
+          "test_cases"
+        ],
+        "role": "developer",
+        "tool": "submit_skill_draft"
+      }
+    },
+    {
+      "id": 29,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "dmz",
+      "event": "RESPONSE_RELAYED",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 28,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 66,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 27,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "dmz",
+      "event": "RESPONSE_RELAYED",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 26,
+      "ts": "2026-11-17T16:56:28+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 41,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "ts": "2026-11-17T16:56:28+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-T-843fb704",
+      "trace_id": "REQ-T-843fb704",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "code": "TTL_EXPIRED",
+        "expires_at": "2026-11-17T16:55:28+08:00"
+      }
+    },
+    {
+      "id": 24,
+      "ts": "2026-11-17T16:56:28+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-T-ef1b76de",
+      "trace_id": "REQ-T-ef1b76de",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "code": "SIGNATURE_INVALID"
+      }
+    },
+    {
+      "id": 23,
+      "ts": "2026-11-17T16:56:28+08:00",
+      "zone": "dmz",
+      "event": "ZONE_START",
+      "request_id": null,
+      "trace_id": "DMZ-START",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "port": 18102,
+        "zone": "dmz"
+      }
+    },
+    {
+      "id": 22,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-T-6c4928da",
+      "trace_id": "REQ-T-6c4928da",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "code": "REPLAY_DETECTED"
+      }
+    },
+    {
+      "id": 21,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "RESPONSE_RELAYED",
+      "request_id": "REQ-T-6c4928da",
+      "trace_id": "REQ-T-6c4928da",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 20,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-T-6c4928da",
+      "trace_id": "REQ-T-6c4928da",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 18,
+        "intent": "TRANSACTION_QUERY",
+        "rules": [
+          "R-TXN-01"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905784625",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "change_id"
+        ],
+        "role": "developer",
+        "tool": "get_change_status"
+      }
+    },
+    {
+      "id": 18,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905784530",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "package",
+          "purpose"
+        ],
+        "role": "developer",
+        "tool": "submit_workflow_draft"
+      }
+    },
+    {
+      "id": 17,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905784376",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "proposed_change",
+          "purpose",
+          "rule_id"
+        ],
+        "role": "developer",
+        "tool": "submit_rule_change_request"
+      }
+    },
+    {
+      "id": 16,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "MCP_DENIED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905784284",
+      "actor": "B002",
+      "severity": "critical",
+      "detail": {
+        "reason": "denied_registry",
+        "tool": "get_raw_customer_record"
+      }
+    },
+    {
+      "id": 15,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "MCP_DENIED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905784226",
+      "actor": "B002",
+      "severity": "critical",
+      "detail": {
+        "reason": "denied_registry",
+        "tool": "execute_sql"
+      }
+    },
+    {
+      "id": 14,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "dmz",
+      "event": "MCP_FORWARDED",
+      "request_id": null,
+      "trace_id": "TR-DMZ-1794905784144",
+      "actor": "B002",
+      "severity": "info",
+      "detail": {
+        "args_keys": [
+          "proposed_change",
+          "rule_id"
+        ],
+        "role": "agent",
+        "tool": "submit_rule_change_request"
+      }
+    },
+    {
+      "id": 13,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "dmz",
+      "event": "RESPONSE_RELAYED",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 12,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 106,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "dmz",
+      "event": "RESPONSE_RELAYED",
+      "request_id": "REQ-20261117-452207",
+      "trace_id": "REQ-20261117-452207",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 10,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-452207",
+      "trace_id": "REQ-20261117-452207",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 66,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "dmz",
+      "event": "RESPONSE_RELAYED",
+      "request_id": "REQ-20261117-78301B",
+      "trace_id": "REQ-20261117-78301B",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 8,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-78301B",
+      "trace_id": "REQ-20261117-78301B",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 66,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-20261117-7443BA",
+      "trace_id": "REQ-20261117-7443BA",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "body": "{\"detail\":\"上游模型响应超时（模拟）\"}",
+        "code": "DOWNSTREAM_504"
+      }
+    },
+    {
+      "id": 6,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-7443BA",
+      "trace_id": "REQ-20261117-7443BA",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 66,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "dmz",
+      "event": "RESPONSE_RELAYED",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 4,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_ACCEPTED",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "context_len": 66,
+        "intent": "DISPUTE_PROCESS",
+        "rules": [
+          "R-DISPUTE-01",
+          "R-DISPUTE-02"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-T-f0ea6851",
+      "trace_id": "REQ-T-f0ea6851",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "code": "FIELD_NOT_WHITELISTED",
+        "extra": [
+          "token_map"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "dmz",
+      "event": "EGRESS_DENIED",
+      "request_id": "REQ-T-e7bcbcb8",
+      "trace_id": "REQ-T-e7bcbcb8",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "code": "CONTENT_INSPECTION_FAILED",
+        "patterns": [
+          "CARD_LIKE"
+        ]
+      }
+    },
+    {
+      "id": 1,
+      "ts": "2026-11-17T16:56:21+08:00",
+      "zone": "dmz",
+      "event": "ZONE_START",
+      "request_id": null,
+      "trace_id": "DMZ-START",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "port": 18102,
+        "zone": "dmz"
+      }
+    },
+    {
+      "id": 19,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905807392",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "ok"
+      }
+    },
+    {
+      "id": 18,
+      "ts": "2026-11-17T16:56:47+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-20261117-21DF37",
+      "trace_id": "REQ-20261117-21DF37",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "inject",
+        "intent": "DISPUTE_PROCESS",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 17,
+      "ts": "2026-11-17T16:56:46+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905806987",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "inject"
+      }
+    },
+    {
+      "id": 16,
+      "ts": "2026-11-17T16:56:30+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-20261117-41FB14",
+      "trace_id": "REQ-20261117-41FB14",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "ok",
+        "intent": "DISPUTE_PROCESS",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 15,
+      "ts": "2026-11-17T16:56:29+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-20261117-AE55DE",
+      "trace_id": "REQ-20261117-AE55DE",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "ok",
+        "intent": "DISPUTE_PROCESS",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 14,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-T-6c4928da",
+      "trace_id": "REQ-T-6c4928da",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "ok",
+        "intent": "TRANSACTION_QUERY",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 13,
+      "ts": "2026-11-17T16:56:24+08:00",
+      "zone": "outer",
+      "event": "EGRESS_BLOCKED",
+      "request_id": null,
+      "trace_id": "GUARD-5f111bbd",
+      "actor": null,
+      "severity": "critical",
+      "detail": {
+        "allowed_ports": [
+          18102
+        ],
+        "target": "http://127.0.0.1:18101/internal/api/v1/cases"
+      }
+    },
+    {
+      "id": 12,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-20261117-BC8560",
+      "trace_id": "REQ-20261117-BC8560",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "ok",
+        "intent": "DISPUTE_PROCESS",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 11,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905783521",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "ok"
+      }
+    },
+    {
+      "id": 10,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-20261117-452207",
+      "trace_id": "REQ-20261117-452207",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "unknown_intent",
+        "intent": "DISPUTE_PROCESS",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 9,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905783165",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "unknown_intent"
+      }
+    },
+    {
+      "id": 8,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905783128",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "ok"
+      }
+    },
+    {
+      "id": 7,
+      "ts": "2026-11-17T16:56:23+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-20261117-78301B",
+      "trace_id": "REQ-20261117-78301B",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "bad_json",
+        "intent": "DISPUTE_PROCESS",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 6,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905782832",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "bad_json"
+      }
+    },
+    {
+      "id": 5,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905782783",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "ok"
+      }
+    },
+    {
+      "id": 4,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "outer",
+      "event": "TASK_TIMEOUT_SIMULATED",
+      "request_id": "REQ-20261117-7443BA",
+      "trace_id": "REQ-20261117-7443BA",
+      "actor": null,
+      "severity": "high",
+      "detail": null
+    },
+    {
+      "id": 3,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "outer",
+      "event": "FAULT_MODE_SET",
+      "request_id": null,
+      "trace_id": "TR-OUTER-1794905782504",
+      "actor": null,
+      "severity": "high",
+      "detail": {
+        "mode": "timeout"
+      }
+    },
+    {
+      "id": 2,
+      "ts": "2026-11-17T16:56:22+08:00",
+      "zone": "outer",
+      "event": "TASK_DONE",
+      "request_id": "REQ-20261117-CD94CB",
+      "trace_id": "REQ-20261117-CD94CB",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "fault_mode": "ok",
+        "intent": "DISPUTE_PROCESS",
+        "latency_ms": 0,
+        "model": "partner-cloud/llm-b-2.1"
+      }
+    },
+    {
+      "id": 1,
+      "ts": "2026-11-17T16:56:19+08:00",
+      "zone": "outer",
+      "event": "ZONE_START",
+      "request_id": null,
+      "trace_id": "OUTER-START",
+      "actor": null,
+      "severity": "info",
+      "detail": {
+        "purged": 0,
+        "zone": "outer"
+      }
+    }
+  ]
+}

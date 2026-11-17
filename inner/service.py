@@ -11,7 +11,10 @@ from datetime import datetime, timedelta, timezone
 import httpx
 
 from common import audit
-from common.config import DATA_KEY, DMZ_URL, EGRESS_ENABLED, PAYLOAD_TTL_SECONDS, SECRET_INNER_DMZ
+from common.config import (
+    DATA_KEY, DMZ_URL, EGRESS_ENABLED, MAX_FIELD_CHARS, MAX_RESPONSE_CHARS,
+    PAYLOAD_TTL_SECONDS, SECRET_INNER_DMZ,
+)
 from common.crypto import sign, verify
 from common.egress import BlockedEgress, guard
 from common.logger import get as get_logger
@@ -231,7 +234,9 @@ async def _dispatch(task: dict) -> tuple[int, dict]:
     url = f"{DMZ_URL}/dmz/api/v1/dispatch"
     guard("inner", url)
     async with httpx.AsyncClient(timeout=10) as client:
-        r = await client.post(url, json=task)
+        # 透传 trace：DMZ 侧审计沿用同一个 trace_id，跨区事件才能串成一条链
+        r = await client.post(url, json=task,
+                              headers={"x-trace-id": str(task.get("trace_id") or "")})
         try:
             body = r.json()
         except Exception:
@@ -240,26 +245,64 @@ async def _dispatch(task: dict) -> tuple[int, dict]:
 
 
 def _validate_response(body: dict, task: dict) -> list[str]:
-    """五项校验：Schema / 字段白名单 / request_id / 版本 / 签名。任一不过即作废。"""
+    """回程校验（标准六项 + 签名，共七道，任一不过即作废）。
+
+    与甲方标准的对应关系（口径统一，文档与代码一致）：
+      ① Schema        —— AgentResponse 结构校验
+      ② 长度          —— 整体长度上限 + 单字段长度上限（防超长注入/撑爆存储）
+      ③ 字段白名单    —— 只允许 ALLOWED_OUTPUT_FIELDS + META_FIELDS
+      ④ 敏感内容      —— 复用出域扫描器复检（防外网把原文/新 PII 塞回来）
+      ⑤ request_id    —— 必须与本次请求一致（防串包）
+      ⑥ 版本          —— schema_version + agent_version + model_version 三者齐备且匹配
+      ⑦ 签名          —— HMAC 校验（PoC）；生产为 mTLS + JWS
+    """
     v: list[str] = []
     if not isinstance(body, dict):
         return ["响应不是 JSON 对象"]
 
+    # ② 长度：先量长度，再做结构解析——超长载荷不应进入任何解析器
+    try:
+        serialized = json.dumps(body, ensure_ascii=False)
+    except Exception as exc:
+        return [f"响应不可序列化: {exc}"]
+    if len(serialized) > MAX_RESPONSE_CHARS:
+        v.append(f"响应超长: {len(serialized)} > {MAX_RESPONSE_CHARS}")
+    for k, val in body.items():
+        if isinstance(val, str) and len(val) > MAX_FIELD_CHARS:
+            v.append(f"字段 {k} 超长: {len(val)} > {MAX_FIELD_CHARS}")
+
+    # ③ 字段白名单
     extra = set(body.keys()) - set(ALLOWED_OUTPUT_FIELDS) - META_FIELDS
     if extra:
         v.append(f"越权字段: {sorted(extra)}")
 
+    # ① Schema
     try:
         AgentResponse(**{k: body[k] for k in AgentResponse.model_fields if k in body})
     except Exception as exc:
         v.append(f"Schema 校验失败: {exc}")
 
+    # ④ 敏感内容复检：外网返回不得携带原文或新型 PII
+    #    先摘掉令牌形态再扫（模型可能复述令牌，令牌本身不是泄露），
+    #    命中即整包作废，不做"局部剔除后放行"——局部放行等于信任攻击者。
+    try:
+        sensitive = _privacy().scan_payload(body)
+    except Exception as exc:
+        sensitive = [f"敏感内容扫描异常: {exc}"]
+    if sensitive:
+        v.append(f"回程敏感内容: {sensitive}")
+
+    # ⑤ request_id
     if body.get("request_id") != task["request_id"]:
         v.append("request_id 不一致")
+
+    # ⑥ 版本
     if body.get("schema_version") != SCHEMA_VERSION:
         v.append("schema_version 不一致")
     if not body.get("agent_version") or not body.get("model_version"):
         v.append("缺少 Agent/模型版本指纹")
+
+    # ⑦ 签名
     if not verify(body, SECRET_INNER_DMZ):
         v.append("响应签名无效")
 

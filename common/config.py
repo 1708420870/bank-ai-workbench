@@ -23,7 +23,7 @@ LOG_DIR = Path(os.getenv("LOG_DIR", str(DATA_DIR / "logs")))
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # 应用版本：语义化版本（主.次.修订），发布时同步打 git tag（如 v1.1.0）
-APP_VERSION = os.getenv("APP_VERSION", "1.4.0")
+APP_VERSION = os.getenv("APP_VERSION", "1.4.3")
 
 HOST = os.getenv("ZONE_HOST", "127.0.0.1")
 INNER_PORT = int(os.getenv("INNER_PORT", "8101"))
@@ -45,6 +45,20 @@ DATA_KEY = os.getenv("DATA_KEY", "poc-data-encryption-key-2026")
 # 归档加密用（令牌映射表落盘前加密）
 SCHEMA_VERSION = "1.0"
 PAYLOAD_TTL_SECONDS = int(os.getenv("PAYLOAD_TTL_SECONDS", "300"))
+
+# 回程/入站载荷长度上限（标准第②项"长度"校验的判定阈值）。
+# 取值依据：正常 AgentResponse 序列化后约 1–2KB，给 4 倍余量；
+# 单字段上限用于防"一个字段塞 1MB 提示注入"绕过整体阈值。
+MAX_RESPONSE_CHARS = int(os.getenv("MAX_RESPONSE_CHARS", "8000"))
+MAX_FIELD_CHARS = int(os.getenv("MAX_FIELD_CHARS", "2000"))
+# DMZ 入站请求体上限（与回程阈值分开：出域方向是脱敏上下文，通常更短）
+MAX_REQUEST_CHARS = int(os.getenv("MAX_REQUEST_CHARS", "16000"))
+
+# DMZ MCP 网关限流（滑动窗口）。标准 C10 要求网关具备"认证/授权/限流/审计"四件套，
+# 限流不是性能优化，而是把"凭据泄露后被批量刷取"的影响面限死在窗口内。
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+RATE_LIMIT_MAX_CALLS = int(os.getenv("RATE_LIMIT_MAX_CALLS", "30"))
+RATE_LIMIT_MAX_PER_ACTOR = int(os.getenv("RATE_LIMIT_MAX_PER_ACTOR", "60"))
 
 # 出域端口白名单：架构约束在配置层固化
 ALLOWED_PORTS = {

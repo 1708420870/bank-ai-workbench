@@ -38,9 +38,25 @@ HEALTH = {
     "outer": "/outer/api/v1/health",
 }
 
+# 每次回归前清空测试库：A11（建号）/A12（设备绑定）/OA02（强制改密）等用例
+# 假定"干净库"，第二次直跑不清库会因主键冲突/已绑定而失败。
+# 放在模块级而不是 fixture 里，是为了在 stack 启动服务之前就完成——否则服务已持有旧库句柄。
+def _wipe_test_db() -> None:
+    for zone in ("inner", "dmz", "outer"):
+        for suffix in ("", "-wal", "-shm"):
+            p = TEST_DATA / f"{zone}.db{suffix}"
+            if p.exists():
+                try:
+                    p.unlink()
+                except OSError:
+                    pass
+
+
+_wipe_test_db()
+
+
 # 验收项元数据（T01–T20）
-ITEMS = {
-    "T01": "原始姓名不得出域",
+ITEMS = {    "T01": "原始姓名不得出域",
     "T02": "卡号原值不得出域",
     "T03": "映射表不得出域",
     "T04": "上下文最小化",

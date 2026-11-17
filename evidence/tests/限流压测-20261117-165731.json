@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-11-17T16:57:31",
+  "base": "http://127.0.0.1:8102",
+  "n": 45,
+  "concurrency": 5,
+  "actor": "DRILL-RATE-01",
+  "tool": "list_rule_catalog",
+  "cost_s": 1.4,
+  "qps": 32.1,
+  "codes": {
+    "200": 30,
+    "429": 15
+  },
+  "verdict": "PASS"
+}

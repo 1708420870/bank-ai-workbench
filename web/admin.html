@@ -189,6 +189,19 @@
     </section>
 
     <!-- 验收 -->
+    <!-- 运行观测（C9）：失败率/规则命中/人工驳回/MCP 拒绝/端点分布/出域统计 -->
+    <section class="page" id="page-observe" hidden>
+      <div class="kpis" id="ob-kpis"><div class="empty">加载中…</div></div>
+      <div class="sec-title">模型端点分布</div>
+      <div class="card"><div class="card-b" id="ob-endpoints"><div class="empty">加载中…</div></div></div>
+      <div class="sec-title">口径说明</div>
+      <div class="card"><div class="card-b" id="ob-note" style="font-size:12.5px;color:var(--ink2);line-height:1.8">—</div></div>
+      <div class="warnbox" style="margin-top:14px">
+        <b>观测数据全部来自既有审计库与工单表</b>，没有为观测新增任何埋点。
+        这意味着"能不能被观测"与"业务有没有被改写"是两件事——观测本身不会扩大数据面。
+      </div>
+    </section>
+
     <section class="page" id="page-acc" hidden>
       <div class="card" style="margin-bottom:16px">
         <div class="card-h"><h2>放行条件 · 数据边界（T）· 访问控制（A）· OA 化（OA）</h2><span class="muted" id="acc-sum">—</span></div>
@@ -229,6 +242,7 @@ const NAV = [
   ['accounts', '账号与会话', ['supervisor']],
   ['mcp', 'MCP 受控工具', ['supervisor','auditor','developer']],
   ['acc', '验收看板', ['supervisor','auditor','developer']],
+  ['observe', '运行观测', ['supervisor','auditor']],
 ];
 
 let me = null;
@@ -271,7 +285,7 @@ function go(id) {
   document.querySelectorAll('.page').forEach(p => p.hidden = p.id !== 'page-' + id);
   const fn = {overview: loadOverview, tickets: loadTickets, audit: loadAudit, rules: loadRules,
               changes: loadChanges, notices: loadNotices, leaves: loadLeaves,
-              accounts: loadAccounts, mcp: loadMcp, acc: loadAcc}[id];
+              accounts: loadAccounts, mcp: loadMcp, acc: loadAcc, observe: loadObserve}[id];
   if (fn && !loaded.has(id)) { loaded.add(id); fn().catch(showErr); }
 }
 
@@ -540,21 +554,121 @@ async function loadRules() {
     </tr>`).join('')}</table>`;
 }
 
-/* ---------- 变更 ---------- */
+/* ---------- 运行观测 ---------- */
+async function loadObserve() {
+  const d = await api('/internal/api/v1/observe');
+  const pct = v => (v * 100).toFixed(1) + '%';
+  const kpi = (label, value, sub, cls) => `
+    <div class="kpi ${cls || ''}"><div class="k">${label}</div>
+      <div class="v">${value}</div><div class="s">${sub}</div></div>`;
+  const t = d.tickets, r = d.rules, h = d.human, m = d.mcp, e = d.egress;
+  $('#ob-kpis').innerHTML =
+    kpi('工单总数', t.total, '全量口径', '') +
+    kpi('失败率', pct(t.fail_rate), `拒绝/超时/阻断 ${t.fail} 单`, t.fail_rate > 0.2 ? 'warn' : '') +
+    kpi('规则命中率', pct(r.hit_rate), `命中 ${r.hit} 单`, '') +
+    kpi('人工转接率', pct(h.handoff_rate), `已裁决 ${h.decided} 单`, '') +
+    kpi('MCP 拒绝数', m.denied, '角色越权/未注册工具', m.denied > 0 ? 'warn' : '') +
+    kpi('限流次数', m.rate_limited, '429 + RATE_LIMITED 审计', '') +
+    kpi('出域通过', e.accepted, `拒绝 ${e.denied}（拒绝率 ${pct(e.deny_rate)}）`, '') +
+    kpi('复原拒绝', d.restore_denied, '三元匹配不通过', d.restore_denied > 0 ? 'warn' : '');
+
+  const eps = Object.entries(d.endpoints || {});
+  $('#ob-endpoints').innerHTML = eps.length
+    ? `<table><tr><th>模型供应商</th><th style="width:100px">工单数</th><th>说明</th></tr>
+       ${eps.map(([k, v]) => `<tr><td class="mono">${esc(k)}</td><td>${v}</td>
+         <td style="font-size:12px;color:var(--ink2)">实际承载该供应商调用的工单数</td></tr>`).join('')}</table>`
+    : '<div class="empty">暂无需观测的模型调用（可能全为内网 Mock）</div>';
+
+  $('#ob-note').innerHTML = `生成时间 <span class="mono">${esc(d.generated_at)}</span><br>
+    统计窗口：${esc(d.window)}<br>${esc(d.note)}`;
+}
+
+/* ---------- 变更审批发布流水线 ----------
+   状态机：PENDING_REVIEW →(审批) APPROVED →(门槛) →(发布) PUBLISHED →(回滚) ROLLED_BACK
+   前端按钮只做"显示"，真正的闸门全在服务端（自审批/门槛/指纹三重校验）。
+   故意不做"一键全部通过"：每一步都要人点，因为每步都有不同的责任人。 */
+const CHG_STATE = {
+  PENDING_REVIEW: ['amber-bg', '待审批'],
+  APPROVED: ['blue-bg', '已批准'],
+  PUBLISHED: ['green-bg', '已发布'],
+  ROLLED_BACK: ['red-bg', '已回滚'],
+  REJECTED: ['gray-bg', '已驳回'],
+};
+
+function chgActions(c) {
+  const canReview = c.status === 'PENDING_REVIEW';
+  const canGate = ['PENDING_REVIEW', 'APPROVED'].includes(c.status);
+  const canPublish = c.status === 'APPROVED';
+  const canRollback = c.status === 'PUBLISHED';
+  let h = '';
+  if (canGate) h += `<button class="btn ghost xs" data-act="gate" data-id="${esc(c.change_id)}">门槛检查</button> `;
+  if (canReview) h += `<button class="btn primary xs" data-act="approve" data-id="${esc(c.change_id)}">通过</button>
+    <button class="btn ghost xs" data-act="reject" data-id="${esc(c.change_id)}">驳回</button> `;
+  if (canPublish) h += `<button class="btn primary xs" data-act="publish" data-id="${esc(c.change_id)}">发布</button> `;
+  if (canRollback) h += `<button class="btn ghost xs" data-act="rollback" data-id="${esc(c.change_id)}">回滚</button> `;
+  return h || '<span class="muted" style="font-size:11px">—</span>';
+}
+
 async function loadChanges() {
   const rows = await api('/internal/api/v1/changes');
   $('#change-count').textContent = rows.length + ' 条';
   if (!rows.length) { $('#change-body').innerHTML = '<div class="empty">暂无变更草稿</div>'; return; }
   $('#change-body').innerHTML = `<table>
-    <tr><th style="width:110px">变更号</th><th style="width:80px">类型</th><th style="width:80px">提交人</th>
-    <th style="width:130px">状态</th><th style="width:150px">时间</th><th>用途</th></tr>
-    ${rows.map(c => `<tr>
-      <td class="mono">${esc(c.change_id)}</td><td>${esc(c.kind)}</td>
-      <td class="mono">${esc(c.owner)}</td>
-      <td><span class="state st-lock">${esc(c.status)}</span></td>
-      <td class="mono" style="font-size:11px">${esc((c.created_at || '').replace('T', ' '))}</td>
-      <td style="font-size:12px">${esc(c.purpose || '—')}</td>
-    </tr>`).join('')}</table>`;
+    <tr><th style="width:96px">变更号</th><th style="width:66px">类型</th><th style="width:70px">提交人</th>
+    <th style="width:78px">状态</th><th style="width:70px">版本</th><th style="width:64px">门槛</th>
+    <th>用途 / 审批意见</th><th style="width:150px">操作</th></tr>
+    ${rows.map(c => {
+      const [bg, cn] = CHG_STATE[c.status] || ['gray-bg', c.status];
+      const gate = c.gate_passed === 1 ? '<span class="state green-bg">通过</span>'
+        : (c.gate_passed === 0 ? '<span class="state red-bg">未过</span>' : '<span class="muted">未检</span>');
+      const note = c.review_note ? ` · 审批意见：${esc(c.review_note)}` : '';
+      return `<tr>
+      <td class="mono" style="font-size:11px">${esc(c.change_id)}</td><td>${esc(c.kind)}</td>
+      <td class="mono" style="font-size:11px">${esc(c.owner)}</td>
+      <td><span class="state ${bg}">${cn}</span></td>
+      <td class="mono" style="font-size:11px">${esc(c.published_version || '—')}</td>
+      <td>${gate}</td>
+      <td style="font-size:12px">${esc(c.purpose || '—')}${note}</td>
+      <td>${chgActions(c)}</td>
+    </tr>`; }).join('')}</table>`;
+  // 事件委托：按钮动态生成，逐个绑定会漏
+  document.querySelectorAll('#change-body button[data-act]').forEach(b => {
+    b.onclick = () => chgAct(b.dataset.act, b.dataset.id, b);
+  });
+}
+
+async function chgAct(act, id, btn) {
+  const label = { gate: '门槛检查', approve: '审批通过', reject: '驳回', publish: '发布', rollback: '回滚' }[act];
+  try {
+    if (act === 'gate') {
+      btn.disabled = true; btn.textContent = '检查中…';
+      const g = await api(`/internal/api/v1/changes/${id}/gate`, {method: 'POST'});
+      const lines = g.checks.map(c => `${c.ok ? '✅' : '❌'} ${c.name}：${c.detail}`).join('\n');
+      alert(`门槛${g.passed ? '通过' : '未通过'}（${g.scope_note}）\n\n${lines}`);
+    } else if (act === 'approve' || act === 'reject') {
+      const note = prompt(act === 'approve' ? '审批意见（可空）' : '驳回理由（可空）', '') ?? '';
+      await api(`/internal/api/v1/changes/${id}/review`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({decision: act === 'approve' ? 'APPROVE' : 'REJECT', note}),
+      });
+    } else if (act === 'publish') {
+      const r = await api(`/internal/api/v1/changes/${id}/publish`, {method: 'POST'});
+      alert(`已发布：${r.version}`);
+    } else if (act === 'rollback') {
+      const reason = prompt('回滚原因（必填，≥4 字）', '');
+      if (!reason) return;
+      const r = await api(`/internal/api/v1/changes/${id}/rollback`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({reason}),
+      });
+      alert(`已回滚：${r.rolled_back_version}`);
+    }
+  } catch (e) {
+    alert(`${label}失败：${e.message}`);
+  } finally {
+    if (btn) { btn.disabled = false; }
+    loadChanges();
+  }
 }
 
 /* ---------- 通知公告 ---------- */

@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS cases (
 CREATE TABLE IF NOT EXISTS rules (
     rule_id TEXT PRIMARY KEY, version TEXT, domain TEXT, title TEXT,
     summary TEXT, full_text TEXT, mandatory_human INTEGER,
-    effective_from TEXT, status TEXT
+    effective_from TEXT, status TEXT, source TEXT
 );
 CREATE TABLE IF NOT EXISTS token_map (
     request_id TEXT, token TEXT, field_type TEXT, sealed_value TEXT,
@@ -52,11 +52,16 @@ CREATE TABLE IF NOT EXISTS restore_log (
 );
 CREATE TABLE IF NOT EXISTS changes (
     change_id TEXT PRIMARY KEY, kind TEXT, owner TEXT, purpose TEXT,
-    status TEXT, payload TEXT, created_at TEXT
+    status TEXT, payload TEXT, created_at TEXT,
+    reviewer TEXT, reviewed_at TEXT, review_note TEXT,
+    gate TEXT, gate_at TEXT, gate_passed INTEGER,
+    published_version TEXT, published_at TEXT,
+    rollback_reason TEXT, rolled_back_at TEXT
 );
 CREATE TABLE IF NOT EXISTS users (
     emp_id TEXT PRIMARY KEY, username TEXT UNIQUE NOT NULL, pwd_hash TEXT NOT NULL,
     role TEXT NOT NULL, portal TEXT NOT NULL, active INTEGER DEFAULT 1,
+    totp_secret TEXT, totp_pending TEXT, totp_enabled_at TEXT,
     failed_n INTEGER DEFAULT 0, locked_until TEXT, last_login TEXT,
     must_change_pwd INTEGER DEFAULT 0
 );
@@ -275,7 +280,11 @@ def init(reset: bool = False) -> None:
         c.executemany("INSERT INTO customers VALUES (?,?,?,?,?)", _CUSTOMERS)
         c.executemany("INSERT INTO transactions VALUES (?,?,?,?,?,?)", _TRANSACTIONS)
         c.executemany("INSERT INTO cases VALUES (?,?,?,?,?,?,?)", _CASES)
-        c.executemany("INSERT INTO rules VALUES (?,?,?,?,?,?,?,?,?)", _RULES)
+        c.executemany("INSERT INTO rules (rule_id, version, domain, title, summary, full_text,"
+                      " mandatory_human, effective_from, status) VALUES (?,?,?,?,?,?,?,?,?)", _RULES)
+        # 种子规则的出处（C2）：PoC 用合成规则，出处在 UI/接口里如实标注
+        c.execute("UPDATE rules SET source=? WHERE source IS NULL",
+                  ("行内业务规则库（PoC 合成件，非生产规则）",))
 
 
 def _ensure_columns(c: sqlite3.Connection) -> None:
@@ -285,9 +294,28 @@ def _ensure_columns(c: sqlite3.Connection) -> None:
         c.execute("ALTER TABLE users ADD COLUMN device_id TEXT")
     if "must_change_pwd" not in user_cols:
         c.execute("ALTER TABLE users ADD COLUMN must_change_pwd INTEGER DEFAULT 0")
+    for col in ("totp_secret", "totp_pending", "totp_enabled_at"):
+        if col not in user_cols:
+            c.execute(f"ALTER TABLE users ADD COLUMN {col} TEXT")
     sess_cols = {r["name"] for r in c.execute("PRAGMA table_info(sessions)")}
     if "device_id" not in sess_cols:
         c.execute("ALTER TABLE sessions ADD COLUMN device_id TEXT")
+    # 变更审批流水线（v1.4.3）：草稿从"只入库"升级为"可审批/发布/回滚"的状态机，
+    # 老库在此增量补列，不重建表（重建会丢历史草稿）。
+    rule_cols = {r["name"] for r in c.execute("PRAGMA table_info(rules)")}
+    if "source" not in rule_cols:
+        # C2 要求规则可"出处可查"：老库补列后，未填 source 的规则一律显示"出处未登记"，
+        # 而不是假装有出处——空缺本身也是审计要看的信息。
+        c.execute("ALTER TABLE rules ADD COLUMN source TEXT")
+    chg_cols = {r["name"] for r in c.execute("PRAGMA table_info(changes)")}
+    for col, ddl in (
+        ("reviewer", "TEXT"), ("reviewed_at", "TEXT"), ("review_note", "TEXT"),
+        ("gate", "TEXT"), ("gate_at", "TEXT"), ("gate_passed", "INTEGER"),
+        ("published_version", "TEXT"), ("published_at", "TEXT"),
+        ("rollback_reason", "TEXT"), ("rolled_back_at", "TEXT"),
+    ):
+        if col not in chg_cols:
+            c.execute(f"ALTER TABLE changes ADD COLUMN {col} {ddl}")
 
 
 # ---------- 读接口 ----------
@@ -417,7 +445,8 @@ def log_restore(request_id: str, session_id: str, emp_id: str, ts: str, fields: 
 def add_change(change_id: str, kind: str, owner: str, purpose: str, payload: dict, ts: str) -> None:
     with conn() as c:
         c.execute(
-            "INSERT INTO changes VALUES (?,?,?,?,?,?,?)",
+            "INSERT INTO changes (change_id, kind, owner, purpose, status, payload, created_at)"
+            " VALUES (?,?,?,?,?,?,?)",
             (change_id, kind, owner, purpose, "PENDING_REVIEW", json.dumps(payload, ensure_ascii=False), ts),
         )
 
@@ -426,6 +455,51 @@ def get_change(change_id: str) -> dict | None:
     with conn() as c:
         r = c.execute("SELECT * FROM changes WHERE change_id=?", (change_id,)).fetchone()
         return dict(r) if r else None
+
+
+def all_changes(limit: int = 100) -> list[dict]:
+    with conn() as c:
+        rows = c.execute("SELECT * FROM changes ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
+        return [dict(r) for r in rows]
+
+
+def set_change(change_id: str, **fields) -> None:
+    """状态迁移的唯一写入口。
+
+    刻意不提供"直接改 status"的通用接口——所有迁移都必须经过 app 层的
+    状态机校验（谁能改、从什么状态能到什么状态），DB 层只负责落字段。
+    """
+    if not fields:
+        return
+    cols = ", ".join(f"{k}=?" for k in fields)
+    with conn() as c:
+        c.execute(f"UPDATE changes SET {cols} WHERE change_id=?", (*fields.values(), change_id))
+
+
+def set_user_fields(emp_id: str, **fields) -> None:
+    """更新用户的安全属性（MFA 密钥等）。只允许白名单列，防止被拼 SQL 注入。"""
+    allowed = {"totp_secret", "totp_pending", "totp_enabled_at", "must_change_pwd",
+               "device_id", "active", "pwd_hash"}
+    cols = {k: v for k, v in fields.items() if k in allowed}
+    if not cols:
+        return
+    sql = ", ".join(f"{k}=?" for k in cols)
+    with conn() as c:
+        c.execute(f"UPDATE users SET {sql} WHERE emp_id=?", (*cols.values(), emp_id))
+
+
+def totp_state(emp_id: str) -> dict:
+    with conn() as c:
+        r = c.execute("SELECT totp_secret, totp_pending, totp_enabled_at FROM users WHERE emp_id=?",
+                      (emp_id,)).fetchone()
+        return dict(r) if r else {}
+
+
+def published_count(kind: str) -> int:
+    """已发布的同类型变更数：用于生成可追溯的版本号（v1/v2/...）。"""
+    with conn() as c:
+        r = c.execute("SELECT COUNT(*) n FROM changes WHERE kind=? AND status='PUBLISHED'", (kind,)).fetchone()
+        return int(r["n"]) if r else 0
 
 
 # ---------- 账号与会话 ----------

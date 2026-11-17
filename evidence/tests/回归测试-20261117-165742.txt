@@ -1,0 +1,10 @@
+........................................................................ [ 80%]
+..................                                                       [100%]
+============================== warnings summary ===============================
+tests/test_auth.py::test_a12_device_binding
+tests/test_auth.py::test_a12_device_binding
+  C:\Users\Liang\.workbuddy\binaries\python\versions\3.13.12\Lib\site-packages\httpx\_client.py:1053: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return self.request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+90 passed, 2 warnings in 36.12s

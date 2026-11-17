@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+import uuid
 from urllib.parse import urlparse
 
 from .config import ALLOWED_PORTS
@@ -41,9 +42,14 @@ def guard(zone: str, url: str) -> None:
         try:
             from .audit import log
 
+            from .audit import current_trace
+
             log(
                 zone,
                 event="EGRESS_BLOCKED",
+                # 护栏可能在无 HTTP 上下文的位置被调用（启动自检、后台任务），
+                # 此时给事件本身一个独立 trace，保证"每条审计都有 trace"这条不变量成立。
+                trace_id=current_trace() or f"GUARD-{uuid.uuid4().hex[:8]}",
                 severity="critical",
                 detail={"target": url, "allowed_ports": sorted(allowed)},
             )

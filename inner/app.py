@@ -28,11 +28,16 @@ from common import audit
 from common.config import (
     APP_VERSION, DMZ_URL, EGRESS_ENABLED, HERMES_MODEL, INNER_PORT,
     MIN_AGGREGATE_SAMPLE, MODEL_IMPL, ROOT, SERVICE_TOKEN, SESSION_COOKIE,
+    SESSION_SECRET,
 )
+from common import totp
+from common.crypto import sign
 from common.egress import guard
 from common.logger import get as get_logger
 from common.schema import (
-    ChangePasswordRequest, ConfirmRequest, CreateCaseRequest, CreateUserRequest,
+    ChangePasswordRequest, ChangeReviewRequest, ChangeRollbackRequest,
+    MfaConfirmRequest, MfaDisableRequest,
+    ConfirmRequest, CreateCaseRequest, CreateUserRequest,
     DmSendRequest, FeedbackDeliverRequest, FeedbackIngestRequest,
     FeedbackSeatReplyRequest, LeaveReviewRequest, LeaveSubmitRequest, LoginRequest,
     McpProxyRequest, MustChangePwdRequest, NoticeRequest, PasswordResetRequest,
@@ -53,10 +58,24 @@ WEB = ROOT / "web"
 AGENT, SUPERVISOR, AUDITOR, DEVELOPER = "agent", "supervisor", "auditor", "developer"
 
 
+@app.middleware("http")
+async def _trace_middleware(request: Request, call_next):
+    """全链路 trace：入口生成 trace_id（或沿用上游传入），写入审计上下文并回写响应头。
+
+    这样即使某个事件没有 request_id（如登录失败、健康检查），审计里也有 trace_id，
+    排障时可以按一次 HTTP 请求把跨区事件串起来。
+    """
+    tid = (request.headers.get("x-trace-id") or "").strip() or f"TR-{secrets.token_hex(8)}"
+    audit.set_trace(tid)
+    response = await call_next(request)
+    response.headers["X-Trace-Id"] = tid
+    return response
+
+
 @app.on_event("startup")
 def _startup() -> None:
     db.init()
-    audit.log("inner", "ZONE_START", detail={"zone": "inner"})
+    audit.log("inner", "ZONE_START", trace_id="INNER-START", detail={"zone": "inner"})
     # 运行日志记录启动快照：只记配置指纹，不记任何密钥明文
     runlog.info("inner_zone_started", extra={"extra_data": {
         "inner_port": INNER_PORT, "egress_enabled": EGRESS_ENABLED,
@@ -136,13 +155,72 @@ def login(req: LoginRequest, request: Request):
     ua = request.headers.get("user-agent", "")
     device_id = request.headers.get(auth.DEVICE_HEADER, "").strip()
     try:
-        token, emp = auth.login(req.username, req.password, req.portal, ip, ua, device_id)
+        token, emp = auth.login(req.username, req.password, req.portal, ip, ua, device_id,
+                                otp=req.otp or "")
     except auth.AuthError as exc:
-        raise HTTPException(exc.status, str(exc))
+        # 带 code 返回：前端据此决定"提示口令错"还是"弹出第二因子输入框"
+        return JSONResponse({"detail": str(exc), "code": getattr(exc, "code", None)},
+                            status_code=exc.status)
     emp.pop("sid", None)
     resp = JSONResponse({"ok": True, "user": emp})
     auth.set_cookie(resp, token)
     return resp
+
+
+# ---------------- 第二因子（TOTP） enrol / disable ----------------
+#
+# 定位：PoC 期可演示的**标准 TOTP**，不是行内 SSO。生产接行内统一身份
+# （OIDC/SAML）＋行内 MFA，见 docs/22-SSO与MFA对接方案.md。
+# 启用流程刻意要两步：生成密钥 → 用一次验证码确认，防止"扫错码被锁在外面"。
+
+@app.get("/internal/api/v1/auth/mfa")
+def mfa_state(user: dict = Depends(auth.current_user)) -> dict:
+    st = db.totp_state(user["emp_id"])
+    return {"enabled": bool(st.get("totp_secret")),
+            "enabled_at": st.get("totp_enabled_at"),
+            "pending": bool(st.get("totp_pending"))}
+
+
+@app.post("/internal/api/v1/auth/mfa/enable")
+def mfa_enable(user: dict = Depends(auth.current_user)) -> dict:
+    if db.totp_state(user["emp_id"]).get("totp_secret"):
+        raise HTTPException(409, "二次验证已启用，如需更换请先关闭")
+    secret = totp.new_secret()
+    db.set_user_fields(user["emp_id"], totp_pending=secret)
+    audit.log("inner", "MFA_ENROLL_STARTED", actor=user["emp_id"])
+    return {"secret": secret,
+            "uri": totp.provisioning_uri(secret, user["emp_id"]),
+            "note": "用认证器扫码后，输入当前 6 位验证码确认（POST /auth/mfa/confirm）"}
+
+
+@app.post("/internal/api/v1/auth/mfa/confirm")
+def mfa_confirm(req: MfaConfirmRequest, user: dict = Depends(auth.current_user)) -> dict:
+    st = db.totp_state(user["emp_id"])
+    pending = (st.get("totp_pending") or "").strip()
+    if not pending:
+        raise HTTPException(409, "没有待确认的密钥，请先调用 /auth/mfa/enable")
+    if not totp.verify(pending, req.otp):
+        audit.log("inner", "MFA_ENROLL_FAILED", actor=user["emp_id"], severity="medium")
+        raise HTTPException(401, "验证码不正确，请检查设备时间后重试")
+    ts = service._iso(service._now())
+    db.set_user_fields(user["emp_id"], totp_secret=pending, totp_pending=None,
+                       totp_enabled_at=ts)
+    audit.log("inner", "MFA_ENABLED", actor=user["emp_id"], severity="medium",
+              detail={"enabled_at": ts})
+    return {"enabled": True, "enabled_at": ts,
+            "warning": "请妥善保存恢复方式；PoC 环境遗失需管理员在库中清空 totp_secret"}
+
+
+@app.post("/internal/api/v1/auth/mfa/disable")
+def mfa_disable(req: MfaDisableRequest, user: dict = Depends(auth.current_user)) -> dict:
+    u = db.user_by_emp_id(user["emp_id"]) or {}
+    if not auth.verify_password(req.password, u.get("pwd_hash", "")):
+        audit.log("inner", "AUTHZ_DENIED", actor=user["emp_id"], severity="high",
+                  detail={"reason": "mfa_disable_bad_password"})
+        raise HTTPException(401, "口令不正确，无法关闭二次验证")
+    db.set_user_fields(user["emp_id"], totp_secret=None, totp_pending=None)
+    audit.log("inner", "MFA_DISABLED", actor=user["emp_id"], severity="high")
+    return {"enabled": False}
 
 
 @app.post("/internal/api/v1/auth/logout")
@@ -523,6 +601,70 @@ def audit_trail(request_id: str | None = None, limit: int = Query(200, le=500),
     }
 
 
+@app.get("/internal/api/v1/observe")
+def observe(user: dict = Depends(auth.require(SUPERVISOR, AUDITOR))) -> dict:
+    """运行观测（C9）：失败率、规则命中、人工驳回率、MCP 拒绝、端点分布、出域统计。
+
+    数据全部来自**已有的审计库与工单表**，不新增埋点、不改业务路径——
+    观测不应成为"为了被观测而多写一遍"的负担，也不应成为新的泄露面。
+    """
+    with db.connect() as c:
+        total = c.execute("SELECT COUNT(*) n FROM tickets").fetchone()["n"] or 0
+        by_status = {r["status"]: r["n"] for r in
+                     c.execute("SELECT status, COUNT(*) n FROM tickets GROUP BY status")}
+        by_supplier = {r["model_supplier"] or "未记录": r["n"] for r in
+                       c.execute("SELECT model_supplier, COUNT(*) n FROM tickets "
+                                 "WHERE model_supplier IS NOT NULL GROUP BY model_supplier")}
+        ruled = c.execute("SELECT COUNT(*) n FROM tickets WHERE rule_ids IS NOT NULL "
+                          "AND rule_ids NOT IN ('[]','')").fetchone()["n"] or 0
+        decided = c.execute("SELECT COUNT(*) n FROM tickets WHERE decision IS NOT NULL").fetchone()["n"] or 0
+        human = c.execute("SELECT COUNT(*) n FROM tickets WHERE decision='HUMAN_HANDOFF'").fetchone()["n"] or 0
+
+    fail_states = ("REJECTED", "TIMEOUT", "BLOCKED")
+    fail_n = sum(by_status.get(k, 0) for k in fail_states)
+
+    def _count(zone: str, event: str) -> int:
+        return sum(1 for e in audit.query(zone, None, 500) if e.get("event") == event)
+
+    mcp_denied = _count("dmz", "MCP_DENIED") + _count("inner", "MCP_DENIED")
+    rate_limited = _count("dmz", "RATE_LIMITED")
+    egress_ok = _count("dmz", "EGRESS_ACCEPTED")
+    egress_deny = _count("dmz", "EGRESS_DENIED")
+    restore_deny = _count("inner", "RESTORE_DENIED")
+
+    return {
+        "generated_at": service._iso(service._now()),
+        "window": "审计库近 500 条事件 + 全部工单",
+        "tickets": {"total": total, "by_status": by_status,
+                    "fail": fail_n,
+                    "fail_rate": round(fail_n / total, 4) if total else 0.0},
+        "rules": {"hit": ruled, "hit_rate": round(ruled / total, 4) if total else 0.0},
+        "human": {"decided": decided, "handoff": human,
+                  "handoff_rate": round(human / decided, 4) if decided else 0.0},
+        "mcp": {"denied": mcp_denied, "rate_limited": rate_limited},
+        "egress": {"accepted": egress_ok, "denied": egress_deny,
+                   "deny_rate": round(egress_deny / (egress_ok + egress_deny), 4)
+                   if (egress_ok + egress_deny) else 0.0},
+        "restore_denied": restore_deny,
+        "endpoints": by_supplier,
+        "note": "失败率=REJECTED/TIMEOUT/BLOCKED 占比；拒绝数为审计事件计数（近 500 条窗口）",
+    }
+
+
+@app.get("/internal/api/v1/model-endpoints")
+def model_endpoints(user: dict = Depends(auth.require(SUPERVISOR, AUDITOR, DEVELOPER))) -> list[dict]:
+    """模型端点登记表（运行态）。与 docs/17 逐字对应，供审计核对"代码里真正能调哪些端点"。"""
+    from .agent import ENDPOINTS
+
+    return [{
+        "endpoint_id": ep.endpoint_id, "supplier": ep.supplier, "version": ep.version,
+        "egress": ep.egress, "tier": ep.tier, "region": ep.region, "auth": ep.auth,
+        "max_data_level": ep.max_data_level, "approved_by": ep.approved_by,
+        "effective_from": ep.effective_from,
+        "callable": (not ep.egress) or bool(ep.approved_by),
+    } for ep in ENDPOINTS.values()]
+
+
 @app.get("/internal/api/v1/stats")
 def stats(user: dict = Depends(auth.require(SUPERVISOR, AUDITOR, DEVELOPER))) -> dict:
     with db.connect() as c:
@@ -553,9 +695,207 @@ def acceptance(user: dict = Depends(auth.require(SUPERVISOR, AUDITOR, DEVELOPER)
 
 @app.get("/internal/api/v1/changes")
 def changes(user: dict = Depends(auth.require(SUPERVISOR, AUDITOR, DEVELOPER))) -> list[dict]:
-    with db.connect() as c:
-        rows = c.execute("SELECT * FROM changes ORDER BY created_at DESC LIMIT 100").fetchall()
-        return [dict(r) for r in rows]
+    rows = db.all_changes(100)
+    for r in rows:
+        # gate / payload 是 JSON 文本：下发前解析，避免前端二次字符串处理出错
+        for k in ("gate", "payload"):
+            if r.get(k):
+                try:
+                    r[k] = json.loads(r[k])
+                except Exception:
+                    pass
+    return rows
+
+
+# ---------------- 变更审批发布流水线（R7 / C10 / A4） ----------------
+#
+# 状态机（唯一合法迁移路径，其它组合一律 409）：
+#   PENDING_REVIEW --APPROVE--> APPROVED --PUBLISH--> PUBLISHED --ROLLBACK--> ROLLED_BACK
+#   PENDING_REVIEW --REJECT---> REJECTED
+#
+# 三道硬闸门：
+#   ① 不得自审批（提交人 ≠ 审批人，服务端判定，不靠前端隐藏按钮）
+#   ② 未过回归门槛不得发布（APPROVED 只是"同意"，不是"可以上线"）
+#   ③ 发布前重算草稿指纹，与审批时不一致 → 拒绝（防"审批后被改内容"）
+
+# 依赖黑名单：这些包一旦出现在草稿依赖里，直接判不通过（PoC 级静态检查）
+_GATE_BANNED_DEPS = {
+    "pyautogui", "keyboard", "pynput",      # 输入注入类，客服场景无正当用途
+    "pickle", "dill",                        # 反序列化执行
+    "telnetlib", "ftplib",                   # 明文协议
+}
+# 草稿载荷里出现这些键 = 试图把"生产写/原始查询"包装成 Skill
+_GATE_FORBIDDEN_KEYS = {
+    "sql", "raw_sql", "execute_sql", "write_production", "update_production",
+    "query_customer", "raw_customer", "export_full_dataset", "disable_audit",
+}
+
+
+def _change_or_404(cid: str) -> dict:
+    ch = db.get_change(cid)
+    if not ch:
+        raise HTTPException(404, "变更不存在")
+    return ch
+
+
+def _payload_of(ch: dict) -> dict:
+    try:
+        p = json.loads(ch.get("payload") or "{}")
+        return p if isinstance(p, dict) else {}
+    except Exception:
+        return {}
+
+
+def _fingerprint(cid: str, payload: dict) -> str:
+    """草稿内容指纹：审批时记下，发布时重算比对。"""
+    return sign({"change_id": cid, "payload": payload}, SESSION_SECRET)
+
+
+def _run_gate(ch: dict) -> dict:
+    """回归门槛：四项检查全过才允许发布。
+
+    诚实说明：这是 **PoC 级确定性门槛**，不是完整 CI。它检查的是
+    "草稿有没有越权声明、依赖有没有黑名单、有没有测试用例、提交人有没有权限"，
+    而不是"跑一套真实回归套件"。生产接入应替换为流水线（见 docs/21）。
+    """
+    payload = _payload_of(ch)
+    checks: list[dict] = []
+
+    # ① 结构完整性
+    checks.append({
+        "id": "SCHEMA", "name": "草稿结构完整性",
+        "ok": bool(payload) and bool(ch.get("purpose")),
+        "detail": f"payload 键 {sorted(payload)}，用途长度 {len(ch.get('purpose') or '')}",
+    })
+
+    # ② 越权声明扫描
+    hit = sorted(_GATE_FORBIDDEN_KEYS & set(payload))
+    checks.append({
+        "id": "NO_PROD_WRITE", "name": "禁止生产写/原始查询声明",
+        "ok": not hit, "detail": f"命中 {hit}" if hit else "无越权键",
+    })
+
+    # ③ 依赖黑名单扫描
+    deps = [str(d).split("==")[0].split(">=")[0].strip().lower()
+            for d in (payload.get("dependencies") or [])]
+    banned = sorted(set(deps) & _GATE_BANNED_DEPS)
+    checks.append({
+        "id": "DEPENDENCY_SCAN", "name": "依赖黑名单扫描",
+        "ok": not banned, "detail": f"命中 {banned}" if banned else f"依赖 {len(deps)} 个均通过",
+    })
+
+    # ④ 权限检查：提交人必须是科技人员角色（业务/审核不能直接提代码类变更）
+    u = db.user_by_emp_id(ch.get("owner") or "")
+    role = (u or {}).get("role")
+    need_dev = ch.get("kind") in ("skill", "workflow")
+    ok_perm = (role == DEVELOPER) if need_dev else (role in (DEVELOPER, SUPERVISOR))
+    checks.append({
+        "id": "PERMISSION", "name": "提交人权限匹配",
+        "ok": ok_perm,
+        "detail": f"owner={ch.get('owner')} role={role} kind={ch.get('kind')}",
+    })
+
+    # ⑤ 回归用例（沙箱）：必须声明 ≥3 条合成用例，且只用合成数据
+    cases = payload.get("test_cases") or []
+    if isinstance(cases, str):
+        cases = [c for c in cases.splitlines() if c.strip()]
+    dataset = str(payload.get("synthetic_dataset_id") or payload.get("dataset") or "")
+    ok_reg = len(cases) >= 3 and (not dataset or "synthetic" in dataset.lower() or "合成" in dataset)
+    checks.append({
+        "id": "REGRESSION", "name": "沙箱回归（合成数据）",
+        "ok": ok_reg,
+        "detail": f"用例 {len(cases)} 条，数据集={dataset or '默认合成集'}",
+    })
+
+    passed = all(c["ok"] for c in checks)
+    return {
+        "passed": passed,
+        "checks": checks,
+        "ran_at": service._iso(service._now()),
+        "digest": _fingerprint(ch["change_id"], payload),
+        "scope_note": "PoC 级确定性门槛，非完整 CI 流水线",
+    }
+
+
+@app.post("/internal/api/v1/changes/{cid}/gate")
+def change_gate(cid: str, user: dict = Depends(auth.require(SUPERVISOR, DEVELOPER))) -> dict:
+    ch = _change_or_404(cid)
+    if ch["status"] not in ("PENDING_REVIEW", "APPROVED"):
+        raise HTTPException(409, f"当前状态 {ch['status']} 不可执行门槛检查")
+    gate = _run_gate(ch)
+    db.set_change(cid, gate=json.dumps(gate, ensure_ascii=False), gate_at=gate["ran_at"],
+                  gate_passed=1 if gate["passed"] else 0)
+    audit.log("inner", "GATE_CHECKED", actor=user["emp_id"],
+              detail={"change_id": cid, "passed": gate["passed"],
+                      "failed": [c["id"] for c in gate["checks"] if not c["ok"]]})
+    return gate
+
+
+@app.post("/internal/api/v1/changes/{cid}/review")
+def change_review(cid: str, req: ChangeReviewRequest,
+                  user: dict = Depends(auth.require(SUPERVISOR))) -> dict:
+    ch = _change_or_404(cid)
+    if ch["status"] != "PENDING_REVIEW":
+        raise HTTPException(409, f"当前状态 {ch['status']} 不可审批")
+    # ① 不得自审批：服务端判定，与前端是否显示按钮无关
+    if ch["owner"] == user["emp_id"]:
+        audit.log("inner", "AUTHZ_DENIED", actor=user["emp_id"], severity="high",
+                  detail={"reason": "self_approval", "change_id": cid})
+        raise HTTPException(403, "不得审批自己提交的变更")
+    ts = service._iso(service._now())
+    if req.decision == "REJECT":
+        db.set_change(cid, status="REJECTED", reviewer=user["emp_id"], reviewed_at=ts,
+                      review_note=req.note or "")
+        audit.log("inner", "DRAFT_REJECTED", actor=user["emp_id"],
+                  detail={"change_id": cid, "note": req.note})
+        return {"change_id": cid, "status": "REJECTED"}
+    db.set_change(cid, status="APPROVED", reviewer=user["emp_id"], reviewed_at=ts,
+                  review_note=req.note or "")
+    audit.log("inner", "DRAFT_APPROVED", actor=user["emp_id"],
+              detail={"change_id": cid, "note": req.note})
+    return {"change_id": cid, "status": "APPROVED",
+            "next": "需先通过门槛检查（/gate）再发布"}
+
+
+@app.post("/internal/api/v1/changes/{cid}/publish")
+def change_publish(cid: str, user: dict = Depends(auth.require(SUPERVISOR))) -> dict:
+    ch = _change_or_404(cid)
+    if ch["status"] != "APPROVED":
+        raise HTTPException(409, f"当前状态 {ch['status']} 不可发布（须先审批通过）")
+    if not ch.get("gate_passed"):
+        raise HTTPException(409, "回归门槛未通过，禁止发布")
+    # ③ 指纹比对：审批后被改内容一律拒绝
+    stored = {}
+    try:
+        stored = json.loads(ch.get("gate") or "{}")
+    except Exception:
+        pass
+    if stored.get("digest") != _fingerprint(cid, _payload_of(ch)):
+        audit.log("inner", "DRAFT_TAMPERED", actor=user["emp_id"], severity="critical",
+                  detail={"change_id": cid})
+        raise HTTPException(409, "草稿内容与审批时不一致，禁止发布")
+    ver = f"{ch['kind']}-v{db.published_count(ch['kind']) + 1}"
+    ts = service._iso(service._now())
+    db.set_change(cid, status="PUBLISHED", published_version=ver, published_at=ts)
+    audit.log("inner", "DRAFT_PUBLISHED", actor=user["emp_id"],
+              detail={"change_id": cid, "version": ver,
+                      "gate_digest": stored.get("digest", "")[:16]})
+    return {"change_id": cid, "status": "PUBLISHED", "version": ver, "published_at": ts}
+
+
+@app.post("/internal/api/v1/changes/{cid}/rollback")
+def change_rollback(cid: str, req: ChangeRollbackRequest,
+                    user: dict = Depends(auth.require(SUPERVISOR))) -> dict:
+    ch = _change_or_404(cid)
+    if ch["status"] != "PUBLISHED":
+        raise HTTPException(409, f"当前状态 {ch['status']} 不可回滚（仅已发布可回滚）")
+    ts = service._iso(service._now())
+    db.set_change(cid, status="ROLLED_BACK", rollback_reason=req.reason, rolled_back_at=ts)
+    audit.log("inner", "DRAFT_ROLLBACK", actor=user["emp_id"], severity="high",
+              detail={"change_id": cid, "reason": req.reason,
+                      "version": ch.get("published_version")})
+    return {"change_id": cid, "status": "ROLLED_BACK",
+            "rolled_back_version": ch.get("published_version"), "reason": req.reason}
 
 
 # ---------------- MCP Facade ----------------
@@ -635,12 +975,15 @@ def mcp(tool: str, request: Request, body: dict = Body(...)) -> JSONResponse:
         if args.get("domain"):
             rows = [r for r in rows if r["domain"] == args["domain"]]
         out = [{"rule_id": r["rule_id"], "domain": r["domain"], "title": r["title"],
-                "version": r["version"], "status": r["status"]} for r in rows]
+                "version": r["version"], "status": r["status"],
+                "effective_from": r["effective_from"],
+                "source": r.get("source") or "出处未登记"} for r in rows]
     elif tool == "get_rule_metadata":
         r = db.rule(args.get("rule_id", ""))
         if not r:
             raise HTTPException(404, "规则不存在")
-        out = {k: r[k] for k in ("rule_id", "version", "domain", "title", "effective_from", "status")}
+        out = {k: r[k] for k in ("rule_id", "version", "domain", "title",
+                                 "effective_from", "status", "source")}
     elif tool == "get_approved_rule_summary":
         r = db.rule(args.get("rule_id", ""))
         if not r:
@@ -671,10 +1014,17 @@ def mcp(tool: str, request: Request, body: dict = Body(...)) -> JSONResponse:
         kind = {"submit_skill_draft": "skill", "submit_workflow_draft": "workflow",
                 "submit_rule_change_request": "rule"}[tool]
         cid = f"CHG-{abs(hash((tool, actor, json.dumps(args, sort_keys=True)))) % 100000:05d}"
-        db.add_change(cid, kind, actor, str(args.get("purpose", ""))[:200],
-                      args, service._iso(service._now()))
-        out = {"change_id": cid, "status": "PENDING_REVIEW",
-               "note": "已进入待审批区，未影响生产环境"}
+        # 幂等：同一份草稿重复提交（同样的 tool/actor/args）不新建、不报错，
+        # 直接返回既有条目。否则重试会撞主键变成 500，把"重试"变成"故障"。
+        existing = db.get_change(cid)
+        if existing:
+            out = {"change_id": cid, "status": existing["status"],
+                   "note": "重复提交，返回既有草稿（未新建）"}
+        else:
+            db.add_change(cid, kind, actor, str(args.get("purpose", ""))[:200],
+                          args, service._iso(service._now()))
+            out = {"change_id": cid, "status": "PENDING_REVIEW",
+                   "note": "已进入待审批区，未影响生产环境"}
     elif tool == "run_sandbox_test":
         out = {"package_id": args.get("package_id"), "dataset": args.get("synthetic_dataset_id"),
                "result": "PASS", "cases": 12, "failed": 0, "isolation": "sandbox"}

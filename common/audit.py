@@ -5,6 +5,8 @@
 """
 from __future__ import annotations
 
+import contextvars
+
 import json
 import re
 import sqlite3
@@ -68,6 +70,19 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
 
+# 当前请求的 trace_id：由各区的 HTTP 中间件写入，审计事件自动继承。
+# 没有它，一次跨区调用会产生"N 条各说各话"的日志——排障时只能靠猜。
+_TRACE: contextvars.ContextVar[str | None] = contextvars.ContextVar("wb_trace_id", default=None)
+
+
+def set_trace(tid: str | None) -> None:
+    _TRACE.set(tid)
+
+
+def current_trace() -> str | None:
+    return _TRACE.get()
+
+
 def log(
     zone: str,
     event: str,
@@ -84,7 +99,8 @@ def log(
         c.execute(
             "INSERT INTO events (ts, zone, event, request_id, trace_id, actor, severity, detail)"
             " VALUES (?,?,?,?,?,?,?,?)",
-            (now_iso(), zone, event, request_id, trace_id or request_id, actor, severity, payload),
+            (now_iso(), zone, event, request_id,
+             trace_id or request_id or current_trace(), actor, severity, payload),
         )
     return eid
 
