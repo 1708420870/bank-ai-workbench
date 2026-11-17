@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>客服工作台 · 内网可信域</title>
-<link rel="stylesheet" href="/assets/app.css?v=1.4.4">
+<link rel="stylesheet" href="/assets/app.css?v=1.4.5">
 </head>
-<body>
+<body class="app-agent">
 
 <div class="topbar">
   <div class="brand">
     <div class="mark">光</div>
-    <h1>银行客服 AI 工作台</h1>
+    <h1><span class="t-full">银行客服 AI 工作台</span><span class="t-short">客服工作台</span></h1>
     <span>坐席端 · 内网可信域</span>
   </div>
   <div class="zones">
@@ -111,7 +111,8 @@ async function boot() {
   if (!r.ok) { location.href = '/login?reason=expire'; return; }
   me = await r.json();
   if (me.must_change_pwd) { location.href = '/change-password'; return; }
-  $('#me-name').textContent = `${me.name}（${me.emp_id}）`;
+  // 工号单独包一层：手机上窄顶栏只留姓名（.who .nm .emp 在移动端隐藏）
+  $('#me-name').innerHTML = `${esc(me.name)}<span class="emp">（${esc(me.emp_id)}）</span>`;
   $('#me-role').textContent = {agent:'客服坐席', supervisor:'客服主管', auditor:'审计员', developer:'科技开发'}[me.role] || me.role;
   loadCases();
   loadMyTickets();
@@ -353,6 +354,31 @@ function showPage(pid, title, html, opts = {}) {
     </div>`;
 }
 
+/**
+ * 手机端「列表 → 会话」两级切换（微信式）。
+ * 宽屏下两个 class 都不改变布局：CSS 只在 max-width:760px 里才隐藏另一栏。
+ */
+function paneSwitch(wrapId, mode) {
+  const w = $('#' + wrapId);
+  if (!w) return;
+  w.classList.toggle('is-chat', mode === 'chat');
+  w.classList.toggle('is-list', mode === 'list');
+}
+function fbBack() {
+  fbPeer = null;
+  paneSwitch('fb-body', 'list');
+  const chat = $('#fb-chat');
+  if (chat) chat.innerHTML = '<div class="dm-empty">从左侧选择反馈工单</div>';
+  document.querySelectorAll('#fb-list .fb-item').forEach(x => x.classList.remove('on'));
+}
+function dmBack() {
+  dmPeer = null;
+  paneSwitch('dm-wrap', 'list');
+  const chat = $('#dm-chat');
+  if (chat) chat.innerHTML = '<div class="dm-empty">从左侧选择同事开始私信</div>';
+  document.querySelectorAll('#dm-list .dm-item').forEach(x => x.classList.remove('on'));
+}
+
 /* ---------- 左侧导航 ---------- */
 const NAV_PAGES = {
   'nav-home': 'page-home', 'nav-notices': 'page-notices', 'nav-dm': 'page-dm',
@@ -364,6 +390,8 @@ function navOn(id) {
   // 离开轮询页面时停掉对应定时器，避免后台空转
   if (id !== 'nav-dm' && dmTimer) { clearInterval(dmTimer); dmTimer = null; dmPeer = null; }
   if (id !== 'nav-feedback' && fbTimer) { clearInterval(fbTimer); fbTimer = null; fbPeer = null; }
+  // 切页回到顶部：手机上滚到列表底部再点导航，新页面不该停在半截
+  window.scrollTo({top: 0, behavior: 'instant'})
 }
 $('#nav-home').onclick = () => navOn('nav-home');
 $('#nav-notices').onclick = () => { navOn('nav-notices'); showNotices(); };
@@ -501,7 +529,7 @@ const ROLE_CN2 = {agent: '客服坐席', supervisor: '客服主管', auditor: '�
 
 function dmOpen() {
   showPage('page-dm', '通讯录 · 站内私信', `
-    <div class="dm-wrap">
+    <div class="dm-wrap is-list" id="dm-wrap">
       <div class="dm-list" id="dm-list"><div class="empty">加载中…</div></div>
       <div class="dm-chat" id="dm-chat">
         <div class="dm-empty">从左侧选择同事开始私信</div>
@@ -556,12 +584,14 @@ async function loadDmThread(empId, silent = false) {
   if (switching || !$('#dm-msgs')) {
     // 全量重建：仅切换会话 / 首次打开时执行
     $('#dm-chat').innerHTML = `
-      <div class="dm-head">${esc(d.peer.name)}（${esc(d.peer.emp_id)}） · ${ROLE_CN2[d.peer.role] || esc(d.peer.role)}</div>
+      <div class="dm-head"><button class="dm-back" id="dm-back" type="button">← 列表</button><span class="dm-head-t">${esc(d.peer.name)}（${esc(d.peer.emp_id)}） · ${ROLE_CN2[d.peer.role] || esc(d.peer.role)}</span></div>
       <div class="dm-msgs" id="dm-msgs">${dmMsgHtml(msgs, meId)}</div>
       <div class="dm-input">
         <textarea id="dm-text" maxlength="500" rows="2" placeholder="输入消息，Enter 发送，Shift+Enter 换行（500 字以内）"></textarea>
         <button class="btn primary sm" id="dm-send">发送</button>
       </div>`;
+    paneSwitch('dm-wrap', 'chat');
+    $('#dm-back') && ($('#dm-back').onclick = dmBack);
     const box = $('#dm-msgs');
     box.scrollTop = box.scrollHeight;
     const send = async () => {
@@ -727,7 +757,7 @@ async function loadFbThread(fbId, silent = false) {
 
   if (switching || !$('#fb-msgs')) {
     $('#fb-chat').innerHTML = `
-      <div class="dm-head">${esc(t.fb_id)} · ${FB_CAT_CN[t.category] || esc(t.category)} ${fbChip(t.status)}</div>
+      <div class="dm-head"><button class="dm-back" id="fb-back" type="button">← 列表</button><span class="dm-head-t">${esc(t.fb_id)} · ${FB_CAT_CN[t.category] || esc(t.category)} ${fbChip(t.status)}</span></div>
       <div class="dm-msgs" id="fb-msgs">${fbMsgHtml(replies)}</div>
       <div class="dm-input" id="fb-inputbar" ${['PENDING_HUMAN', 'HUMAN_ANSWERING', 'AI_ANSWERING'].includes(t.status) ? '' : 'hidden'}>
         <textarea id="fb-text" maxlength="500" rows="2" placeholder="回复客户（回复即接管；内容经 DMZ 规则裁决后下发）"></textarea>
@@ -738,12 +768,15 @@ async function loadFbThread(fbId, silent = false) {
     const box = $('#fb-msgs');
     box.scrollTop = box.scrollHeight;
     fbWire(fbId, t);
+    // 手机端：列表 → 会话两级切换（宽屏下两个 class 都不影响布局）
+    paneSwitch('fb-body', 'chat');
+    $('#fb-back') && ($('#fb-back').onclick = fbBack);
   } else {
     const box = $('#fb-msgs');
     const nearBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
     box.innerHTML = fbMsgHtml(replies);
     if (nearBottom) box.scrollTop = box.scrollHeight;
-    const head = $('#fb-chat .dm-head');
+    const head = $('#fb-chat .dm-head-t');
     if (head) head.innerHTML = `${esc(t.fb_id)} · ${FB_CAT_CN[t.category] || esc(t.category)} ${fbChip(t.status)}`;
     const bar = $('#fb-bar');
     if (bar) { bar.outerHTML = fbActionBar(t); fbWire(fbId, t); }
@@ -756,7 +789,7 @@ function fbOpen() {
   showPage('page-feedback', '客户反馈 · 工单处理', `
     <div class="fb-layout">
       <div class="fb-tabs" id="fb-tabs"></div>
-      <div class="fb-body">
+      <div class="fb-body is-list" id="fb-body">
         <div class="dm-list" id="fb-list"><div class="empty">加载中…</div></div>
         <div class="dm-chat" id="fb-chat"><div class="dm-empty">从左侧选择反馈工单</div></div>
       </div>

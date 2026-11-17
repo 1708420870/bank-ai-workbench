@@ -250,27 +250,9 @@ td.mono{font-family:var(--mono);font-size:11.5px}
   .split{grid-template-columns:1fr;min-height:0}
   .split>.card .case-list{max-height:300px;min-height:0}
 }
-/* 手机端：压缩留白、顶栏可换行、弹窗全屏、列表自适应 */
-@media (max-width:760px){
-  main{padding:14px 12px 40px}
-  .topbar{padding:0 12px;height:auto;min-height:54px;flex-wrap:wrap;padding-top:6px;padding-bottom:6px;gap:4px}
-  .topbar .brand h1{font-size:14px}
-  .topbar .brand span{display:none}
-  .topbar .who{padding-left:8px;margin-left:4px;border-left:none;flex-wrap:wrap;row-gap:2px}
-  .topbar .linkbtn{padding:4px 7px;font-size:12px}
-  .card-h,.card-b{padding:10px 12px}
-  .compare{grid-template-columns:1fr}
-  .side+.side{border-left:none;border-top:1px dashed var(--line2)}
-  .modal-card{width:96vw;max-height:92vh}
-  .modal-card.wide{width:100vw;height:92vh;height:92dvh}
-  .dm-wrap{flex-direction:column}
-  .fb-body{flex-direction:column}
-  .dm-list{width:100%;max-height:150px;border-right:none;border-bottom:1px solid var(--line)}
-  .fb-tabs button{padding:4px 9px}
-  pre.json{max-height:220px}
-  table{font-size:12px}
-  th,td{padding:6px 8px}
-}
+/* 顶栏标题：宽屏显示全称，手机显示简称（避免挤掉三区指示灯） */
+.brand h1 .t-short{display:none}
+
 
 /* ================= OA：通知 / 请假 / 弹窗 ================= */
 
@@ -318,7 +300,12 @@ td.mono{font-family:var(--mono);font-size:11.5px}
 .di-row2{font-size:11px;color:var(--ink3);margin-top:2px}
 .di-last{font-size:11.5px;color:var(--ink2);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dm-chat{flex:1;display:flex;flex-direction:column;min-width:0}
-.dm-head{flex:none;padding:11px 14px;border-bottom:1px solid var(--line);font-weight:600;font-size:13.5px;color:var(--navy);background:var(--panel)}
+.dm-head{flex:none;padding:11px 14px;border-bottom:1px solid var(--line);font-weight:600;font-size:13.5px;color:var(--navy);background:var(--panel);display:flex;align-items:center;gap:8px}
+.dm-head-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 手机端「列表 → 会话」返回键：宽屏下不显示 */
+.dm-back{display:none;align-items:center;gap:4px;flex:none;padding:3px 9px;border:1px solid var(--line2);
+  border-radius:6px;background:var(--panel);color:var(--ink2);font-size:12px;font-weight:500}
+.dm-back:active{background:var(--panel2)}
 .dm-msgs{flex:1;min-height:0;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:9px;background:var(--bg)}
 .dm-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--ink3);font-size:12.5px}
 .bubble{max-width:min(72%,680px);padding:8px 12px;border-radius:12px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
@@ -369,3 +356,96 @@ td.mono{font-family:var(--mono);font-size:11.5px}
 .ar-stat b{color:var(--navy,#1a237e);margin-right:6px}
 #ar-list table{margin-top:4px}
 #ar-list td{font-size:12px}
+
+
+/* ================= 手机端（≤760px）：现场用手机打开 =================
+   设计取舍：
+   1) 顶栏固定 56px 单行——三区状态只留指示灯（现场看灯就行，字挤成竖排更糟）；
+   2) 侧栏变横向 chip 条并隐藏滚动条，可滑动切换；
+   3) 工单/私信改「列表 → 会话」两级（微信式），不再上下各切一半；
+   4) 输入框字号提到 16px，iOS 不会因 <16px 自动放大页面；
+   5) 表格改为容器内横向滚动，宁可滑也不裁列。 */
+@media (max-width:760px){
+  /* ---- 顶栏 ---- */
+  .topbar{height:56px;min-height:56px;padding:0 10px;flex-wrap:nowrap;gap:10px}
+  .brand{gap:8px;min-width:0;flex:1 1 auto}
+  .brand .mark{width:26px;height:26px;font-size:13px;border-radius:7px}
+  .brand h1{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand h1 .t-full{display:none}
+  .brand h1 .t-short{display:inline}
+  .brand>span{display:none}
+  .zones{gap:7px;flex:none}
+  .zone{font-size:0;gap:0}
+  .zone .dot{width:6px;height:6px;box-shadow:none}
+  .who{padding-left:0;margin-left:0;border-left:none;gap:6px;flex-wrap:nowrap}
+  .who .nm{font-size:12px;max-width:5.5em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .who .nm .emp{display:none}
+  .who .role{display:none}
+  .linkbtn{font-size:12px;padding:5px 7px}
+
+  /* ---- 侧栏：横滑 chip 条 ---- */
+  .sidenav{padding:0;scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}
+  .sidenav::-webkit-scrollbar{display:none}
+  #ar-list::-webkit-scrollbar,.card-b::-webkit-scrollbar{height:4px}
+  #ar-list::-webkit-scrollbar-thumb,.card-b::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+  .sidenav button{padding:10px 12px;font-size:12.5px}
+
+  /* ---- 页面骨架 ---- */
+  main{padding:12px 10px 28px}
+  .page-card{min-height:calc(100vh - 148px);min-height:calc(100dvh - 148px);border-radius:8px}
+  .page-body{padding:12px}
+  .page-body.fill{height:calc(100vh - 148px);height:calc(100dvh - 148px);min-height:320px;padding:0}
+  .card-h,.card-b{padding:10px 12px}
+  .card-h h2{font-size:12.5px}
+  .card-h .muted{font-size:11px}
+
+  /* ---- 触控与输入 ---- */
+  input,textarea,select{font-size:16px}
+  .btn{padding:9px 14px;font-size:13px}
+  .btn.sm{padding:8px 12px;font-size:12.5px}
+  .dm-input .btn,.btn-row .btn{min-height:40px}
+  .field textarea{min-height:64px}
+
+  /* ---- 双栏堆叠 ---- */
+  .split{grid-template-columns:1fr;gap:12px;min-height:0}
+  .split>.card .case-list{max-height:42vh;min-height:0}
+
+  /* ---- 工单 / 私信：两级切换 ---- */
+  .fb-body,.dm-wrap{flex-direction:column}
+  .page-body .dm-list,.fb-body .dm-list{width:100%;min-width:0;height:100%;max-height:none;
+    border-right:none;border-bottom:none}
+  .fb-body.is-chat .dm-list,.dm-wrap.is-chat .dm-list{display:none}
+  .fb-body.is-list .dm-chat,.dm-wrap.is-list .dm-chat{display:none}
+  /* 选择器加权：基础样式里 .dm-back{display:none} 在本文件更后面，不加权会被盖掉 */
+  .dm-head .dm-back{display:inline-flex}
+  .dm-head{padding:9px 12px;font-size:13px}
+  .dm-input{padding:8px 10px;gap:6px}
+  .bubble{max-width:84%;font-size:13px}
+  .fb-tabs{padding:6px 8px;gap:4px}
+  .fb-tabs button{padding:4px 9px;font-size:11.5px}
+
+  /* ---- 表格：横向滚动，不裁列 ---- */
+  #ar-list,.card-b,.admin-main .card{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+  table{min-width:560px;font-size:12px}
+  th,td{padding:7px 8px}
+
+  /* ---- 其他 ---- */
+  .compare{grid-template-columns:1fr}
+  .side+.side{border-left:none;border-top:1px dashed var(--line2)}
+  .modal-card{width:94vw;max-height:88vh;max-height:88dvh}
+  .modal-card.wide{width:100vw;height:90vh;height:90dvh}
+  .meta-grid{grid-template-columns:1fr 1fr}
+  pre.json{max-height:200px}
+  .sec-title{margin:16px 0 8px}
+  .footbar{margin-top:20px}
+  .footbar .fin{padding:12px 14px;font-size:11px;gap:8px}
+  main,.admin-main{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+}
+
+/* 管理端手机：顶部操作按钮换到第二行，别在 390px 里挤成一坨 */
+@media (max-width:760px){
+  .app-admin .topbar{height:auto;min-height:56px;flex-wrap:wrap;padding:6px 10px;row-gap:4px}
+  .app-admin .who{width:100%;justify-content:flex-end;gap:4px;padding-top:4px;
+    border-top:1px solid rgba(255,255,255,.12)}
+  .app-admin .who .nm{max-width:9em}
+}

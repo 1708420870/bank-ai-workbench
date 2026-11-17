@@ -23,7 +23,7 @@ LOG_DIR = Path(os.getenv("LOG_DIR", str(DATA_DIR / "logs")))
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 # 应用版本：语义化版本（主.次.修订），发布时同步打 git tag（如 v1.1.0）
-APP_VERSION = os.getenv("APP_VERSION", "1.4.4")
+APP_VERSION = os.getenv("APP_VERSION", "1.4.5")
 
 HOST = os.getenv("ZONE_HOST", "127.0.0.1")
 INNER_PORT = int(os.getenv("INNER_PORT", "8101"))

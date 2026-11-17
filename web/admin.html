@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>管理控制台 · 内网可信域</title>
-<link rel="stylesheet" href="/assets/app.css?v=1.4.4">
+<link rel="stylesheet" href="/assets/app.css?v=1.4.5">
 </head>
-<body>
+<body class="app-admin">
 
 <div class="topbar">
   <div class="brand">
     <div class="mark">光</div>
-    <h1>管理控制台</h1>
+    <h1><span class="t-full">管理控制台</span><span class="t-short">管理台</span></h1>
     <span>内网可信域 · 运营与合规</span>
   </div>
   <div class="zones">
@@ -263,7 +263,7 @@ async function boot() {
   me = await r.json();
   if (me.portal !== 'admin') { location.href = '/client'; return; }
   if (me.must_change_pwd) { location.href = '/change-password'; return; }
-  $('#me-name').textContent = `${me.name}（${me.emp_id}）`;
+  $('#me-name').innerHTML = `${me.name}<span class="emp">（${me.emp_id}）</span>`;
   const tag = $('#me-role');
   tag.textContent = ROLE_CN[me.role] || me.role;
   tag.className = 'role r-' + me.role;
