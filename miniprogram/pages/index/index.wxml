@@ -1,0 +1,16 @@
+<view class="card">
+  <view class="card-title">提交反馈</view>
+  <view class="label">业务类型</view>
+  <picker mode="selector" range="{{cats}}" range-key="name" value="{{catIndex}}" bindchange="onCatChange">
+    <view class="picker">{{cats[catIndex].name}}</view>
+  </picker>
+  <view class="label">问题描述</view>
+  <textarea class="body-input" placeholder="请描述您遇到的问题（500 字以内）" maxlength="{{maxLen}}" bindinput="onInput" value="{{body}}"></textarea>
+  <view class="muted count">{{body.length}}/{{maxLen}}</view>
+  <view class="hint muted">请勿在反馈中填写卡号、密码、证件号等敏感信息；系统将自动脱敏处理。</view>
+  <button class="btn-primary submit" bindtap="submit" disabled="{{submitting}}">{{submitting ? '提交中…' : '提交反馈'}}</button>
+</view>
+<view class="card">
+  <button class="btn-primary ghost" bindtap="goList">查询我的反馈</button>
+</view>
+<view class="foot muted">网关 {{gateway}} · 微光工作室 PoC</view>

@@ -1,0 +1,15 @@
+<view class="card">
+  <view class="card-title">按单号查询</view>
+  <view class="row">
+    <input class="qid" placeholder="输入反馈单号（FB 开头）" value="{{queryId}}" bindinput="onQueryInput" />
+    <button class="btn-primary qbtn" size="mini" bindtap="queryOne">查询</button>
+  </view>
+</view>
+<view class="card">
+  <view class="card-title">我的反馈</view>
+  <view wx:if="{{!items.length}}" class="muted">还没有反馈记录，去首页提交一条吧。</view>
+  <view wx:for="{{items}}" wx:key="fb_id" class="fb-item" data-fb="{{item.fb_id}}" bindtap="open">
+    <view class="fb-row1"><text class="fbid">{{item.fb_id}}</text><text class="st st-{{item.status}}">{{item.status}}</text></view>
+    <view class="muted" wx:if="{{item.replies.length}}">最新回复：{{item.replies[item.replies.length - 1].body}}</view>
+  </view>
+</view>

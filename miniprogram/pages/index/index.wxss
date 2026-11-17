@@ -1,0 +1,25 @@
+.label {
+  font-size: 26rpx;
+  color: #616161;
+  margin: 16rpx 0 8rpx;
+}
+.picker {
+  border: 1rpx solid #e0e0e0;
+  border-radius: 10rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+}
+.body-input {
+  width: 100%;
+  height: 220rpx;
+  border: 1rpx solid #e0e0e0;
+  border-radius: 10rpx;
+  padding: 16rpx 20rpx;
+  box-sizing: border-box;
+  font-size: 28rpx;
+}
+.count { text-align: right; margin-top: 6rpx; }
+.hint { margin-top: 16rpx; line-height: 1.5; }
+.submit { margin-top: 24rpx; }
+.ghost { background: #fff; color: #1565c0; border: 1rpx solid #1565c0; }
+.foot { text-align: center; padding: 24rpx 0 48rpx; }

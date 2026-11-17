@@ -1,0 +1,26 @@
+.head { display: flex; justify-content: space-between; border-bottom: 1rpx solid #eceff1; padding-bottom: 16rpx; margin-bottom: 20rpx; }
+.fbid { font-size: 30rpx; font-weight: 600; color: #1a237e; }
+.msgs { padding-bottom: 12rpx; }
+.msg { margin-bottom: 20rpx; }
+.msg.mine { text-align: right; }
+.who { margin-bottom: 6rpx; }
+.bubble {
+  display: inline-block;
+  max-width: 86%;
+  padding: 16rpx 20rpx;
+  border-radius: 14rpx;
+  font-size: 28rpx;
+  line-height: 1.5;
+  text-align: left;
+  word-break: break-all;
+}
+.b-they { background: #eef4fb; color: #212121; }
+.b-mine { background: #1565c0; color: #fff; }
+.center { text-align: center; padding: 20rpx 0; }
+.rate { border-top: 1rpx solid #eceff1; padding-top: 16rpx; display: flex; align-items: center; gap: 16rpx; }
+.rate-btn.good { background: #00897b; color: #fff; }
+.rate-btn.bad { background: #e53935; color: #fff; }
+.rated { padding-top: 8rpx; }
+.inputbar { border-top: 1rpx solid #eceff1; padding-top: 16rpx; display: flex; gap: 16rpx; align-items: flex-end; }
+.ta { flex: 1; height: 120rpx; border: 1rpx solid #e0e0e0; border-radius: 10rpx; padding: 12rpx 16rpx; box-sizing: border-box; font-size: 28rpx; }
+.send { flex-shrink: 0; }

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>微光银行 · 员工入口</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#eef1f5;color:#26303a;display:flex;align-items:center;justify-content:center;padding:20px}
+  .wrap{width:100%;max-width:420px}
+  .hd{text-align:center;margin-bottom:22px}
+  .hd .logo{width:52px;height:52px;border-radius:14px;background:#16243d;color:#fff;font-size:22px;
+    line-height:52px;margin:0 auto 12px;font-weight:700}
+  .hd h1{font-size:19px;font-weight:600;color:#16243d;letter-spacing:.5px}
+  .hd p{font-size:12px;color:#7b8794;margin-top:5px}
+  .card{background:#fff;border-radius:14px;padding:22px 20px;box-shadow:0 2px 8px rgba(22,36,61,.08)}
+  .portal-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;
+    border-radius:10px;padding:14px 0;font-size:15px;font-weight:600;background:#16243d;color:#fff;
+    text-decoration:none;cursor:pointer;transition:.15s}
+  .portal-btn+.portal-btn{margin-top:12px}
+  .portal-btn:active{opacity:.85}
+  .portal-btn.admin{background:#fff;color:#16243d;border:1.5px solid #16243d}
+  .note{margin-top:16px;font-size:11px;color:#9aa6b2;line-height:1.7;text-align:center}
+  .toast{position:fixed;left:50%;top:38%;transform:translateX(-50%);background:rgba(22,36,61,.92);
+    color:#fff;padding:10px 18px;border-radius:9px;font-size:13px;z-index:99;display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div class="logo">微</div>
+    <h1>微光银行 · 员工入口</h1>
+    <p>坐席工作台 / 管理控制台 统一登录</p>
+  </div>
+  <div class="card">
+    <a id="link-agent" class="portal-btn" href="/login?portal=client&force=1">🏦 坐席工作台登录</a>
+    <a id="link-admin" class="portal-btn admin" href="/login?portal=admin&force=1">📋 管理控制台登录</a>
+    <div class="note">
+      请使用行内配发的工号登录（账号密码由管理员统一发放）。<br>
+      登录后即可处理客户反馈、查看 AI 建议与个人工作档案。
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// 链接指向登录页（force=1：已有会话也强制显示登录表单，不自动进控制台），
+// 自动携带当前 sharecode，避免站内跳转丢鉴权；
+// 主项目局域网部署（outer 直接暴露 8103）时，控制台在 inner:8101。
+(function () {
+  const isLanOuter = location.port === '8103';
+  const innerBase = isLanOuter ? location.protocol + '//' + location.hostname + ':8101' : '';
+  ['link-agent', 'link-admin'].forEach(id => {
+    const a = document.getElementById(id);
+    const usp = new URLSearchParams(a.search);            // portal / force
+    if (!isLanOuter) {
+      const sc = new URLSearchParams(location.search).get('sharecode');
+      if (sc) usp.set('sharecode', sc);
+    }
+    a.href = innerBase + a.pathname + '?' + usp.toString();
+  });
+})();
+</script>
+</body>
+</html>

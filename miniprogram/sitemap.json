@@ -1,0 +1,1 @@
+{ "desc": "PoC 演示，禁止被搜索收录", "rules": [{ "action": "disallow", "page": "*" }] }

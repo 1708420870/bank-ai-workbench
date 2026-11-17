@@ -1,0 +1,73 @@
+# 教学 PoC：用三个 Docker 网络模拟"内网 / DMZ / 外网"三个安全域。
+# 关键约束靠拓扑实现，而不是靠代码约定：
+#   - outer 只接入 outer_net，物理上没有到 inner_net 的路由
+#   - inner 只接入 inner_net + dmz_net，无法直达外网
+#   - dmz 同时接入两张网，是唯一咽喉点
+# 生产部署必须替换为银行批准的安全交换设施。
+
+services:
+  inner:
+    build: .
+    command: uvicorn inner.app:app --host 0.0.0.0 --port 8101 --log-level warning
+    environment:
+      DATA_DIR: /app/data
+      ZONE_HOST: dmz
+      INNER_PORT: "8101"
+      DMZ_PORT: "8102"
+      OUTER_PORT: "8103"
+      DMZ_URL: http://dmz:8102
+    ports:
+      - "8101:8101"
+    networks:
+      - inner_net
+      - dmz_net
+    volumes:
+      - inner_data:/app/data
+
+  dmz:
+    build: .
+    command: uvicorn dmz.app:app --host 0.0.0.0 --port 8102 --log-level warning
+    environment:
+      DATA_DIR: /app/data
+      ZONE_HOST: 127.0.0.1
+      INNER_URL: http://inner:8101
+      OUTER_URL: http://outer:8103
+      INNER_PORT: "8101"
+      DMZ_PORT: "8102"
+      OUTER_PORT: "8103"
+    ports:
+      - "8102:8102"
+    networks:
+      - dmz_net
+      - outer_net
+    volumes:
+      - dmz_data:/app/data
+
+  outer:
+    build: .
+    command: uvicorn outer.app:app --host 0.0.0.0 --port 8103 --log-level warning
+    environment:
+      DATA_DIR: /app/data
+      INNER_PORT: "8101"
+      DMZ_PORT: "8102"
+      OUTER_PORT: "8103"
+    ports:
+      - "8103:8103"
+    networks:
+      - outer_net
+    volumes:
+      - outer_data:/app/data
+
+networks:
+  inner_net:
+    driver: bridge
+    internal: true
+  dmz_net:
+    driver: bridge
+  outer_net:
+    driver: bridge
+
+volumes:
+  inner_data:
+  dmz_data:
+  outer_data:

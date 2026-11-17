@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>银行客服 AI 工作台 — 系统体系结构草图 v1.0</title>
+<style>
+:root{
+  --ink:#1a1a18; --ink2:#4a4a45; --ink3:#7a7a72;
+  --line:#e2e0d8; --line2:#c9c7be;
+  --bg:#fbfaf7; --panel:#ffffff; --panel2:#f5f4ef;
+  --teal:#0f6e56; --teal-bg:#e1f5ee; --teal-line:#9fe1cb;
+  --blue:#185fa5; --blue-bg:#e6f1fb; --blue-line:#b5d4f4;
+  --amber:#854f0b; --amber-bg:#faeeda; --amber-line:#fac775;
+  --red:#a32d2d; --red-bg:#fcebeb; --red-line:#f7c1c1;
+  --gray:#5f5e5a; --gray-bg:#f1efe8;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15px; line-height:1.75; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:940px; margin:0 auto; padding:56px 32px 120px}
+
+/* header */
+header.top{border-bottom:2px solid var(--ink); padding-bottom:28px; margin-bottom:8px}
+.eyebrow{font-size:12px; letter-spacing:.14em; color:var(--ink3); text-transform:uppercase; margin-bottom:14px}
+h1{font-size:32px; line-height:1.3; font-weight:600; margin:0 0 12px; letter-spacing:-.01em}
+.sub{font-size:17px; color:var(--ink2); margin:0 0 22px; font-weight:400}
+.meta{display:flex; flex-wrap:wrap; gap:8px 28px; font-size:13px; color:var(--ink3)}
+.meta b{color:var(--ink2); font-weight:500}
+
+/* toc */
+nav.toc{background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:20px 24px; margin:32px 0 48px; columns:2; column-gap:36px}
+nav.toc a{display:block; font-size:13.5px; color:var(--ink2); text-decoration:none; padding:3px 0; break-inside:avoid}
+nav.toc a:hover{color:var(--teal)}
+nav.toc span{color:var(--ink3); display:inline-block; width:26px; font-variant-numeric:tabular-nums}
+
+/* sections */
+section{margin:0 0 64px; scroll-margin-top:24px}
+h2{font-size:22px; font-weight:600; margin:0 0 8px; padding-top:20px; border-top:1px solid var(--line); letter-spacing:-.01em}
+h2 .num{color:var(--ink3); font-weight:400; margin-right:12px; font-variant-numeric:tabular-nums}
+h3{font-size:17px; font-weight:600; margin:36px 0 12px}
+h4{font-size:15px; font-weight:600; margin:24px 0 8px; color:var(--ink)}
+p{margin:0 0 16px; color:var(--ink2)}
+p.lead{font-size:16px; color:var(--ink); line-height:1.7}
+strong{color:var(--ink); font-weight:600}
+code{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:13px; background:var(--panel2); padding:1.5px 5px; border-radius:3px; border:1px solid var(--line); color:var(--ink)}
+a{color:var(--teal)}
+
+/* callout */
+.note{border-left:3px solid var(--teal); background:var(--teal-bg); padding:16px 20px; border-radius:0 6px 6px 0; margin:20px 0}
+.note.warn{border-color:var(--amber); background:var(--amber-bg)}
+.note.stop{border-color:var(--red); background:var(--red-bg)}
+.note p{margin:0; font-size:14.5px; color:var(--ink)}
+.note p+p{margin-top:10px}
+.note .tag{font-size:11.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--teal); font-weight:600; display:block; margin-bottom:6px}
+.note.warn .tag{color:var(--amber)}
+.note.stop .tag{color:var(--red)}
+
+/* table */
+table{width:100%; border-collapse:collapse; margin:16px 0 24px; font-size:13.5px}
+th{text-align:left; font-weight:600; color:var(--ink); background:var(--panel2); padding:10px 12px; border-bottom:1.5px solid var(--line2); font-size:13px; vertical-align:top}
+td{padding:10px 12px; border-bottom:1px solid var(--line); color:var(--ink2); vertical-align:top; line-height:1.6}
+tr:last-child td{border-bottom:1px solid var(--line2)}
+td code{font-size:12px}
+td b{color:var(--ink); font-weight:500}
+.tight td,.tight th{padding:7px 10px; font-size:13px}
+
+/* figure */
+figure{margin:28px 0; padding:24px; background:var(--panel); border:1px solid var(--line); border-radius:10px}
+figure svg{display:block; width:100%; height:auto}
+figcaption{font-size:12.5px; color:var(--ink3); margin-top:16px; padding-top:12px; border-top:1px solid var(--line); line-height:1.6}
+
+/* pills */
+.pill{display:inline-block; font-size:11.5px; padding:1px 8px; border-radius:10px; font-weight:500; white-space:nowrap; border:1px solid}
+.p-t{background:var(--teal-bg); color:var(--teal); border-color:var(--teal-line)}
+.p-b{background:var(--blue-bg); color:var(--blue); border-color:var(--blue-line)}
+.p-a{background:var(--amber-bg); color:var(--amber); border-color:var(--amber-line)}
+.p-r{background:var(--red-bg); color:var(--red); border-color:var(--red-line)}
+.p-g{background:var(--gray-bg); color:var(--gray); border-color:var(--line2)}
+
+/* adr */
+.adr{border:1px solid var(--line); border-radius:8px; padding:16px 20px; margin:12px 0; background:var(--panel)}
+.adr h4{margin:0 0 6px; font-size:14.5px}
+.adr h4 .id{font-family:ui-monospace,monospace; font-size:12px; color:var(--ink3); margin-right:8px}
+.adr p{margin:0; font-size:13.5px; color:var(--ink2)}
+.adr .why{color:var(--ink); font-size:13.5px}
+
+/* steps */
+ol.steps{list-style:none; counter-reset:s; padding:0; margin:20px 0}
+ol.steps li{counter-increment:s; position:relative; padding:0 0 18px 46px; font-size:14px; color:var(--ink2); border-left:1px solid var(--line); margin-left:14px}
+ol.steps li:last-child{border-left-color:transparent; padding-bottom:0}
+ol.steps li::before{content:counter(s); position:absolute; left:-14px; top:0; width:28px; height:28px; border-radius:50%; background:var(--panel); border:1px solid var(--line2); color:var(--ink2); font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; font-variant-numeric:tabular-nums}
+ol.steps li b{color:var(--ink); font-weight:500}
+ol.steps li .zone{font-size:11.5px; color:var(--ink3); margin-left:6px}
+
+/* two col */
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0}
+.grid2 > div{background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:18px 20px}
+.grid2 h4{margin:0 0 8px; font-size:14.5px}
+.grid2 ul{margin:0; padding-left:18px; font-size:13.5px; color:var(--ink2)}
+.grid2 li{margin-bottom:5px}
+
+footer{border-top:1px solid var(--line); padding-top:24px; font-size:12.5px; color:var(--ink3)}
+
+@media (max-width:720px){
+  .wrap{padding:36px 20px 80px}
+  h1{font-size:25px}
+  nav.toc{columns:1}
+  .grid2{grid-template-columns:1fr}
+  table{font-size:12.5px}
+  th,td{padding:8px}
+}
+@media print{
+  body{background:#fff; font-size:11pt}
+  .wrap{max-width:100%; padding:0}
+  nav.toc{display:none}
+  section{page-break-inside:auto; margin-bottom:32px}
+  figure,table,.adr,.note{page-break-inside:avoid}
+  h2{page-break-after:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Architecture Sketch · 架构草图 · 评审稿</div>
+  <h1>银行客服 AI 工作台<br>系统体系结构草图</h1>
+  <p class="sub">内外网分区协同 · 智能体与模型分层 · MCP 受控工具 · 全链路可审计</p>
+  <div class="meta">
+    <span><b>版本</b>　v1.0 冻结候选</span>
+    <span><b>日期</b>　2026-11-15</span>
+    <span><b>依据</b>　《微光-银行客服 AI 工作台-任务书》</span>
+    <span><b>参照</b>　《斯坦福 51 个成功的企业级 AI 案例 · 大型零售银行面向客户的服务》</span>
+    <span><b>数据</b>　仅使用虚构客户与合成交易</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#s1"><span>01</span>结论与设计立场</a>
+  <a href="#s2"><span>02</span>必须先澄清的架构悖论</a>
+  <a href="#s3"><span>03</span>三区总体结构</a>
+  <a href="#s4"><span>04</span>组件清单与职责边界</a>
+  <a href="#s5"><span>05</span>两条核心链路</a>
+  <a href="#s6"><span>06</span>四段式数据护盾</a>
+  <a href="#s7"><span>07</span>数据分级与出域判定</a>
+  <a href="#s8"><span>08</span>请求状态机与失败策略</a>
+  <a href="#s9"><span>09</span>接口契约</a>
+  <a href="#s10"><span>10</span>MCP 工具目录与拒绝清单</a>
+  <a href="#s11"><span>11</span>关键设计决策 ADR</a>
+  <a href="#s12"><span>12</span>测试与验收映射</a>
+  <a href="#s13"><span>13</span>五天实施与工程节奏</a>
+  <a href="#s14"><span>14</span>待决事项</a>
+</nav>
+
+<!-- ============ 1 ============ -->
+<section id="s1">
+<h2><span class="num">01</span>结论与设计立场</h2>
+
+<p class="lead">本项目的技术实质不是"做一个客服问答机器人"，而是<strong>在一个不可信的信任边界上安全搬运数据</strong>。所有架构复杂度都来自这一个事实，客服业务只是它的第一个负载。</p>
+
+<p>斯坦福案例给出了这个判断的原始证据：一家受联邦银行监管、曾有合规处罚记录的大型零售银行，其技术政策禁止在企业防火墙之外使用任何软件或硬件，但业务又要求部署基于云的 AI 虚拟助手。团队没有去推翻政策，而是设计了四件套——出域清洗、合成数据替换、意图处理外置、返回时重装——把"云计算能力"和"客户数据"在空间上彻底解耦。结果是渠道成本降至最低服务等级、呼叫处理时长下降 48–72 小时。<sup>①</sup></p>
+
+<p>本方案把这四件套工程化为一条可测试、可审计、可回滚的链路，并补充案例中没有展开的三件事：<strong>裁决权归属</strong>、<strong>工具权限边界</strong>、<strong>失败时的默认行为</strong>。</p>
+
+<div class="note">
+<span class="tag">三条不可让渡的原则</span>
+<p><b>其一，裁决权恒定在内网。</b>模型与智能体只产出"候选建议"（candidate suggestion），不产出业务结论。是否展示、如何分流、工单状态、任何业务动作，由内网规则引擎与授权人员决定。这条原则一旦松动，整个架构的合规基础就没了。</p>
+<p><b>其二，脱敏不可交给生成式模型。</b>模型会漏识别、会误改写、会被提示注入操纵。字段识别、令牌化、出域扫描、映射复原必须由独立的内网确定性服务执行，与智能体完全解耦。</p>
+<p><b>其三，一切失败默认关闭。</b>校验不过、超时、会话不匹配、模型返回非法结构——默认动作是转人工，不是"尽力而为地继续"。安全边界不因可用性压力而让步。</p>
+</div>
+
+<h3>架构一览</h3>
+<table class="tight">
+<tr><th style="width:20%">维度</th><th style="width:36%">本方案选择</th><th>理由</th></tr>
+<tr><td><b>分区</b></td><td>内网可信域 / 安全交换区 DMZ / 外网 AI 协同域</td><td>三区而非两区。DMZ 是唯一可被审计的咽喉点，缺了它，内外网之间就只剩"能通"或"不通"两种状态，无法做字段级管控。</td></tr>
+<tr><td><b>智能体</b></td><td>微光「牛马仕」作为内网 Agent 平台<br><span class="pill p-g">Agent ≠ 模型</span></td><td>Agent 负责理解、规划、编排；模型端点独立配置。两者分层，才能做到"换模型不改 Agent、换 Agent 不改网络"。</td></tr>
+<tr><td><b>外网 Agent</b></td><td>WorkBuddy Enterprise / Managed Agents</td><td>只承担办公协同产物（交接卡、摘要、简报），不进入客服裁决链路，不接触原始数据。</td></tr>
+<tr><td><b>工具面</b></td><td>MCP 受控网关 + 内网 Facade 白名单</td><td>MCP 只解决"怎么调"，不解决"谁能调、能调什么"。授权必须由后端独立验证。</td></tr>
+<tr><td><b>隔离强度</b></td><td>模式 B：物理分区 + 受控跨域交换</td><td>严格气隙下不存在实时外呼，这是物理事实，不能靠措辞回避。详见第 02 节。</td></tr>
+</table>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="s2">
+<h2><span class="num">02</span>必须先澄清的架构悖论</h2>
+
+<div class="note warn">
+<span class="tag">这是立项前必须由银行书面确认的第一件事</span>
+<p>"内网与外网严格物理隔离"与"实时调用外网大模型 / 外网通过 MCP 访问内网工具"<b>不能同时无条件成立</b>。如果两张网络之间不存在任何跨域通道，实时 API 调用在物理上不可能发生，MCP 也只是一个应用层协议，不会自动打通网络。</p>
+</div>
+
+<p>把这件事前置澄清，不是技术洁癖，而是因为后续所有工作量都取决于这个答案。三种可能形态对应三套完全不同的实现：</p>
+
+<table>
+<tr><th style="width:16%">形态</th><th style="width:24%">网络特征</th><th style="width:26%">能否实时外呼</th><th>对本项目的影响</th></tr>
+<tr>
+  <td><b>A 严格物理气隙</b></td>
+  <td>内外网无任何在线链路，仅人工审批的介质交换</td>
+  <td>不能</td>
+  <td>智能体只能连接内网可达且获批的模型端点；外网 WorkBuddy 退化为离线草稿包处理。客服链路的"外置意图"环节需改为批处理。</td>
+</tr>
+<tr>
+  <td><b>B 物理分区＋受控跨域交换</b><br><span class="pill p-t">本方案采用</span></td>
+  <td>独立网络，边界经银行批准的安全交换平台/DMZ 网关做白名单交换，不提供任意路由</td>
+  <td>可以，<b>但仅限批准字段、方向、接口</b></td>
+  <td>可完整实现四段式护盾与 MCP 受控访问，保留可审计的数据路径。代价是必须通过网络安全、数据合规两道审批。</td>
+</tr>
+<tr>
+  <td><b>C 内网 Agent ＋ 内网模型</b></td>
+  <td>Agent 与模型端点均在内网，外网不进入链路</td>
+  <td>不需要</td>
+  <td>合规压力最小，但放弃外部模型能力，且需另行核算 GPU。可作为 B 被否决时的降级基线。</td>
+</tr>
+</table>
+
+<div class="note">
+<span class="tag">措辞建议</span>
+<p>正式技术文档中应使用准确表述：<b>"内外网独立部署、网络分区隔离，跨域数据通过银行批准的安全交换设施受控传递"</b>。只有在两网之间完全没有任何数据通道时，才使用"严格物理气隙"这一表述。用词失准会在安全评审阶段直接触发返工。</p>
+</div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="s3">
+<h2><span class="num">03</span>三区总体结构</h2>
+
+<p>三区的划分依据不是"部署位置"，而是<strong>该区域内允许存在什么形态的数据、以及谁拥有裁决权</strong>。这是本架构最核心的一条：<em>区域是按数据权限定义的，不是按机房位置定义的。</em></p>
+
+<figure>
+<svg viewBox="0 0 680 470" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>银行客服 AI 工作台三区协同总体架构</title>
+<desc>内网可信域、安全交换区 DMZ、外网 AI 协同域三层分区，含跨域交换网关与 MCP 受控网关两条受控通路。</desc>
+<defs>
+<marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<rect x="40" y="20" width="600" height="124" rx="20" fill="#f5f4ef" stroke="#e2e0d8" stroke-width="0.5"/>
+<text x="60" y="42" font-size="12" fill="#7a7a72" dominant-baseline="central">外网 AI 协同域</text>
+<rect x="60" y="54" width="172" height="74" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="146" y="82" font-size="14" font-weight="500" fill="#042C53" text-anchor="middle" dominant-baseline="central">外网任务服务</text>
+<text x="146" y="104" font-size="12" fill="#185FA5" text-anchor="middle" dominant-baseline="central">队列 · 幂等 · 重试</text>
+<rect x="254" y="54" width="172" height="74" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="340" y="82" font-size="14" font-weight="500" fill="#042C53" text-anchor="middle" dominant-baseline="central">外部模型端点</text>
+<text x="340" y="104" font-size="12" fill="#185FA5" text-anchor="middle" dominant-baseline="central">仅收脱敏上下文</text>
+<rect x="448" y="54" width="172" height="74" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="534" y="82" font-size="14" font-weight="500" fill="#042C53" text-anchor="middle" dominant-baseline="central">WorkBuddy 适配器</text>
+<text x="534" y="104" font-size="12" fill="#185FA5" text-anchor="middle" dominant-baseline="central">办公 Agent · 材料生成</text>
+<rect x="40" y="178" width="600" height="100" rx="20" fill="#f5f4ef" stroke="#e2e0d8" stroke-width="0.5"/>
+<text x="60" y="200" font-size="12" fill="#7a7a72" dominant-baseline="central">安全交换区 / DMZ　—　默认拒绝，仅白名单方向与字段</text>
+<rect x="60" y="212" width="272" height="52" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="196" y="230" font-size="14" font-weight="500" fill="#2C2C2A" text-anchor="middle" dominant-baseline="central">跨域交换网关</text>
+<text x="196" y="250" font-size="12" fill="#5F5E5A" text-anchor="middle" dominant-baseline="central">字段白名单 · DLP 扫描 · 签名 · TTL</text>
+<rect x="348" y="212" width="272" height="52" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="484" y="230" font-size="14" font-weight="500" fill="#2C2C2A" text-anchor="middle" dominant-baseline="central">MCP 受控网关</text>
+<text x="484" y="250" font-size="12" fill="#5F5E5A" text-anchor="middle" dominant-baseline="central">工具授权 · 限流 · 身份透传 · 审计</text>
+<rect x="40" y="312" width="600" height="138" rx="20" fill="#f5f4ef" stroke="#e2e0d8" stroke-width="0.5"/>
+<text x="60" y="334" font-size="12" fill="#7a7a72" dominant-baseline="central">内网可信域　—　数据、身份、规则、裁决权均在此</text>
+<rect x="60" y="346" width="128" height="76" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="124" y="370" font-size="14" font-weight="500" fill="#04342C" text-anchor="middle" dominant-baseline="central">内网工作台</text>
+<text x="124" y="390" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">员工入口</text>
+<text x="124" y="406" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">业务编排</text>
+<rect x="204" y="346" width="128" height="76" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="268" y="370" font-size="14" font-weight="500" fill="#04342C" text-anchor="middle" dominant-baseline="central">隐私脱敏</text>
+<text x="268" y="390" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">令牌与映射</text>
+<text x="268" y="406" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">复原校验</text>
+<rect x="348" y="346" width="128" height="76" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="412" y="370" font-size="14" font-weight="500" fill="#04342C" text-anchor="middle" dominant-baseline="central">牛马仕智能体</text>
+<text x="412" y="390" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">任务规划</text>
+<text x="412" y="406" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">模型连接器</text>
+<rect x="492" y="346" width="128" height="76" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="556" y="370" font-size="14" font-weight="500" fill="#04342C" text-anchor="middle" dominant-baseline="central">规则引擎</text>
+<text x="556" y="390" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">最终裁决权</text>
+<text x="556" y="406" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">审计留痕</text>
+<path d="M268 312V280" fill="none" stroke="#888780" stroke-width="1.5" marker-start="url(#a1)" marker-end="url(#a1)"/>
+<text x="276" y="296" font-size="11" fill="#7a7a72" dominant-baseline="central">脱敏上下文 ⇅ 候选建议</text>
+<path d="M146 178V146" fill="none" stroke="#888780" stroke-width="1.5" marker-start="url(#a1)" marker-end="url(#a1)"/>
+<text x="154" y="162" font-size="11" fill="#7a7a72" dominant-baseline="central">出域任务 ⇅ 结果</text>
+<path d="M534 144V176" fill="none" stroke="#888780" stroke-width="1.5" marker-start="url(#a1)" marker-end="url(#a1)"/>
+<text x="542" y="162" font-size="11" fill="#7a7a72" dominant-baseline="central">MCP 调用</text>
+<path d="M556 278V310" fill="none" stroke="#888780" stroke-width="1.5" marker-start="url(#a1)" marker-end="url(#a1)"/>
+<text x="564" y="296" font-size="11" fill="#7a7a72" dominant-baseline="central">白名单业务 API</text>
+</svg>
+<figcaption><b>图 3-1</b>　三区协同总体架构（逻辑示意）。实线双箭头表示受控双向通路，但两个方向的字段白名单不同：出域只放行 D2 级令牌化上下文，入域只放行 D3 级候选建议。实际跨域设施须按银行网络安全规范确定。</figcaption>
+</figure>
+
+<h3>各区的不变量（Invariant）</h3>
+<p>下面四条是架构级约束，任何实现都必须满足；后续所有代码、测试、验收都围绕它们展开：</p>
+
+<table>
+<tr><th style="width:16%">区域</th><th style="width:40%">允许存在的数据</th><th>绝对不能出现的东西</th></tr>
+<tr>
+  <td><span class="pill p-t">内网</span></td>
+  <td>D0 原始客户数据、令牌映射表、权威规则库、密钥、完整审计日志、员工身份</td>
+  <td>无（内网是信任根）</td>
+</tr>
+<tr>
+  <td><span class="pill p-g">DMZ</span></td>
+  <td>过境中的 D2 级令牌化载荷；临时缓存必须带 TTL 与自动清理</td>
+  <td>客户原始数据、令牌映射表、完整业务库、可长期驻留的任何业务数据</td>
+</tr>
+<tr>
+  <td><span class="pill p-b">外网</span></td>
+  <td>D2/D3 级脱敏上下文、任务元数据（编号、状态、耗时、模型版本）、办公产物</td>
+  <td>原始身份字段、令牌映射、可复原的客户档案、内网数据库的任意直连路径</td>
+</tr>
+</table>
+
+<h3>关于"为什么外网服务器不需要 GPU"</h3>
+<p>这一点在评审中经常被误解，需要写明：外网节点的职责是接收脱敏任务、管理会话队列、组装提示词、调用托管 Agent API、校验响应、记录审计元数据。<strong>模型推理发生在托管服务或外部模型平台，不在该节点上。</strong>因此外网节点的配置指标是 CPU、内存、网络带宽与高可用，不是 GPU。把模型权重算进 Agent 节点是常见的资源规划错误。</p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="s4">
+<h2><span class="num">04</span>组件清单与职责边界</h2>
+
+<p>下表是可直接映射为代码模块的组件清单。每个组件标注了<em>唯一职责</em>与<em>明确不做的事</em>——后者比前者更能防止架构腐化。</p>
+
+<h3>内网可信域</h3>
+<table>
+<tr><th style="width:20%">组件</th><th style="width:38%">职责</th><th>明确不做</th></tr>
+<tr><td><b>员工工作台</b><br><code>inner/staff-portal</code></td><td>登录、提交咨询、查看建议、采纳/修改/转人工/驳回、工单列表</td><td>不直连任何外部服务；不做业务裁决</td></tr>
+<tr><td><b>业务编排 API</b><br><code>inner/inner-api</code></td><td>统一入口，串联隐私服务、规则服务、Agent、跨域调用、结果回写</td><td>不持有脱敏逻辑本身（调用隐私服务）；不拼接原始字段到外发请求</td></tr>
+<tr><td><b>隐私脱敏服务</b><br><code>inner/privacy-service</code></td><td>字段识别、令牌化、映射持久化、出域扫描</td><td>不调用任何模型；不与 Agent 共享进程</td></tr>
+<tr><td><b>复原服务</b><br><code>inner/restore-service</code></td><td>三元匹配校验后按会话回填最少字段</td><td>不回传外网；不复原未授权字段</td></tr>
+<tr><td><b>牛马仕 Agent 适配</b><br><code>inner/agent-adapter</code></td><td>任务理解、步骤规划、模型选择、MCP 工具编排、结果组织</td><td>不承担脱敏；不做最终裁决；不直连客户库</td></tr>
+<tr><td><b>模型连接器</b><br><code>inner/model-connector</code></td><td>按端点清单路由到内网模型或经批准的external端点，记录供应商/版本/区域</td><td>不硬编码密钥；不越过已登记端点清单</td></tr>
+<tr><td><b>规则与知识服务</b><br><code>inner/rule-service</code></td><td>权威规则、命中判定、冲突检测、最终路由与转人工决策</td><td>不被模型输出覆盖；不直接修改生产规则</td></tr>
+<tr><td><b>审计服务</b><br><code>inner/audit-service</code></td><td>全链路事件落地：人员、request_id、Agent 版本、模型版本、工具、规则版本</td><td>不记录明文敏感值</td></tr>
+</table>
+
+<h3>安全交换区 / DMZ</h3>
+<table>
+<tr><th style="width:20%">组件</th><th style="width:38%">职责</th><th>明确不做</th></tr>
+<tr><td><b>跨域交换网关</b><br><code>dmz/exchange-gateway</code></td><td>方向/协议/目标/字段四重白名单；出域前 DLP 扫描；签名与 request_id 校验；有效期检查；重放检测；限流</td><td>不长期保存业务数据；不做业务判断；不是双网卡转发服务器</td></tr>
+<tr><td><b>内容检查</b><br><code>dmz/content-inspection</code></td><td>残留原值扫描、敏感实体扫描、内容长度与结构校验</td><td>不依赖模型判定"是否敏感"</td></tr>
+<tr><td><b>MCP 受控网关</b><br><code>dmz/mcp-gateway</code></td><td>调用方认证、工具级授权、参数 Schema 校验、速率限制、审计</td><td>不提供通用 SQL、shell、任意 URL 抓取</td></tr>
+</table>
+
+<h3>外网 AI 协同域</h3>
+<table>
+<tr><th style="width:20%">组件</th><th style="width:38%">职责</th><th>明确不做</th></tr>
+<tr><td><b>外网任务服务</b><br><code>outer/workbench-api</code></td><td>接收脱敏任务、会话与队列管理、提示词模板、超时重试、幂等</td><td>不存客户原始数据；不承担模型推理</td></tr>
+<tr><td><b>WorkBuddy 适配器</b><br><code>outer/workbuddy-adapter</code></td><td>封装 Managed Agents API：Agent 选择、会话创建、事件查询、响应校验</td><td>不直连内网；不执行银行业务动作</td></tr>
+<tr><td><b>任务元数据存储</b><br><code>outer/metadata-store</code></td><td>任务编号、状态、耗时、模型版本、脱敏上下文（TTL 清理）</td><td>不存 token 映射、完整客户档案</td></tr>
+</table>
+
+<h3>MCP 工具层</h3>
+<table>
+<tr><th style="width:20%">组件</th><th style="width:38%">职责</th><th>明确不做</th></tr>
+<tr><td><b>MCP Facade</b><br><code>mcp/server</code></td><td>把 MCP 工具映射为内网白名单业务 API，透传调用者身份</td><td>不是数据库直连代理；不提供 <code>execute_sql</code></td></tr>
+<tr><td><b>工具与策略</b><br><code>mcp/tools</code> <code>mcp/policies</code></td><td>11 个白名单工具的定义、Scope、Schema</td><td>不实现任何原始客户数据查询</td></tr>
+</table>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="s5">
+<h2><span class="num">05</span>两条核心链路</h2>
+
+<p>任务书把两条链路混在一起叙述，容易在实现时把"客服主链路"和"办公辅助链路"写成一条。它们是<strong>两条独立的跨域路径，字段白名单与审批口径都不同</strong>，必须分开建模。</p>
+
+<div class="grid2">
+<div>
+<h4><span class="pill p-t">链路 A</span>　客服辅助主链路</h4>
+<ul>
+<li>触发：客服员工提交咨询</li>
+<li>跨域次数：1 次（去）＋1 次（回）</li>
+<li>外发内容：令牌化上下文 + 规则摘要</li>
+<li>回传内容：候选建议 + 风险标记</li>
+<li>终态：员工确认后入工单</li>
+<li>模型归属：牛马仕 → 模型连接器 → 内网/外模型端点</li>
+</ul>
+</div>
+<div>
+<h4><span class="pill p-b">链路 B</span>　科技人员办公辅助链路</h4>
+<ul>
+<li>触发：科技人员或工作台请求生成材料</li>
+<li>跨域次数：1 次（出域生成）</li>
+<li>外发内容：已批准的工单摘要（D3 级）</li>
+<li>回传内容：交接卡、待办、简报文本</li>
+<li>终态：人工审核后归档</li>
+<li>模型归属：外网任务服务 → WorkBuddy Managed Agent</li>
+</ul>
+</div>
+</div>
+
+<h3>链路 A：客服辅助主链路（12 步）</h3>
+<p>逐步标注了<em>执行区域</em>与<em>该步的失败动作</em>。后者是设计的一部分，不是异常处理补丁。</p>
+
+<ol class="steps">
+<li><b>身份识别</b><span class="zone">内网</span><br>SSO/MFA 认证，按岗位授予客服 / 主管 / 审核员权限。失败 → 拒绝进入，不降级为匿名。</li>
+<li><b>任务创建</b><span class="zone">内网</span><br>员工输入咨询或选择已授权的客户/交易；生成全局唯一 <code>request_id</code> 与 <code>session_id</code>，绑定操作者身份。失败 → 不生成请求，不进入后续环节。</li>
+<li><b>最小取数</b><span class="zone">内网</span><br>按最小权限读取必要字段。原始字段不拼接进任何外部请求，也不交给未授权 Agent。</li>
+<li><b>字段识别与令牌化</b><span class="zone">内网 · 独立服务</span><br>结构化字段走规则/正则确定性替换；非结构化文本用经评估的 NER 辅助。生成 <code>NAME_001</code>、<code>CARD_001</code> 等不可逆外部标识，映射加密写入内网存储。<b>失败 → 阻断出域</b>，不允许"跳过脱敏继续"。</li>
+<li><b>规则摘要提取</b><span class="zone">内网</span><br>提取允许外发的意图类别、规则编号与摘要。禁止整库知识、完整流水、内部敏感策略外发。</li>
+<li><b>出域扫描</b><span class="zone">内网 → DMZ</span><br>白名单字段校验 + 原值残留扫描 + 敏感实体扫描 + 附件检查。<b>任何命中原始敏感值 → 阻断</b>并记录审计事件。</li>
+<li><b>Agent 编排</b><span class="zone">内网</span><br>牛马仕接收最小化上下文，按任务配置选择已登记模型端点，通过白名单 MCP 工具调用必要服务。不允许出域时只能走内网端点。</li>
+<li><b>模型调用</b><span class="zone">内网 / 经 DMZ 至外网</span><br>调用已获批端点，返回结构化候选建议、依据摘要、待确认事项、风险标记。<b>端点不可达或未获批 → 停止调用，转人工或内网降级。</b></li>
+<li><b>响应校验</b><span class="zone">内网 + 外网两侧</span><br>Schema、长度、字段白名单、敏感内容、<code>request_id</code>、Agent/模型版本五项校验。非法响应直接丢弃。</li>
+<li><b>规则裁决</b><span class="zone">内网 · 规则引擎</span><br>本地规则引擎重新决定是否可展示建议、是否必须转人工。外部建议与内网规则冲突时<strong>以内网规则为准</strong>。</li>
+<li><b>字段复原</b><span class="zone">内网 · 复原服务</span><br>仅在 <code>request_id</code> ≡ <code>session_id</code> ≡ 当前员工身份三者匹配，且响应签名、来源、版本均通过时，按当前会话回填最少字段。复原后的文本不再外发。</li>
+<li><b>人工确认</b><span class="zone">内网</span><br>员工采纳 / 修改 / 转人工 / 驳回；系统记录确认结果，形成可追溯审计记录。</li>
+</ol>
+
+<div class="note stop">
+<span class="tag">最关键的一句</span>
+<p>第 10 步是整条链路的重心：<b>外部大模型给出的是"建议"，不是"决定"。</b>任何把这个判断权交给模型输出的实现——哪怕只是"高置信度时自动回复"——都会直接导致验收不通过。</p>
+</div>
+
+<h3>链路 B：办公辅助链路（8 步）</h3>
+<ol class="steps">
+<li><b>发起</b><span class="zone">外网</span><br>获授权的科技人员或工作台在 WorkBuddy Enterprise 发起任务。</li>
+<li><b>MCP 连接</b><span class="zone">外网 → DMZ</span><br>经 MCP Connector 连接 DMZ 的 MCP 网关，完成认证、工具授权、限流、审计。</li>
+<li><b>白名单转发</b><span class="zone">DMZ → 内网</span><br>网关仅把允许的请求转发给内网 Facade；Facade 不是数据库直连代理。</li>
+<li><b>只读取数</b><span class="zone">内网</span><br>可读规则目录、规则元数据、已审批的脱敏规则摘要、合成案例、聚合指标。</li>
+<li><b>草稿提交</b><span class="zone">内网</span><br>可提交新 Skill / Workflow / Agent 配置 / 规则变更草稿，进入待审批区，<b>不直接改变生产</b>。</li>
+<li><b>沙箱验证</b><span class="zone">内网</span><br>用合成数据或批准样例在隔离环境跑自动化测试。</li>
+<li><b>三方审批</b><span class="zone">内网</span><br>业务负责人确认语义，科技确认权限与数据流向，安全确认日志与工具范围。</li>
+<li><b>版本化发布</b><span class="zone">内网</span><br>签名、依赖扫描、权限检查、回归测试后按变更流程发布；保留前一版本与回滚路径。</li>
+</ol>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="s6">
+<h2><span class="num">06</span>四段式数据护盾</h2>
+
+<p>这是斯坦福案例的直接工程化。四个环节各自解决一个独立问题，缺一环则整条链路失效：</p>
+
+<figure>
+<svg viewBox="0 0 680 296" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>四段式数据护盾：出域清洗、令牌替换、意图外置、复原重装</title>
+<desc>客户咨询在内网被清洗与令牌化，仅抽象意图进入外网模型，返回后在内网按会话复原真实值。</desc>
+<defs>
+<marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<text x="140" y="24" font-size="11" fill="#7a7a72" text-anchor="middle" dominant-baseline="central">内网可信域</text>
+<text x="330" y="24" font-size="11" fill="#a8a89f" text-anchor="middle" dominant-baseline="central">网络边界</text>
+<text x="470" y="24" font-size="11" fill="#7a7a72" text-anchor="middle" dominant-baseline="central">外网协同域</text>
+<path d="M330 38V248" fill="none" stroke="#c9c7be" stroke-width="0.5" stroke-dasharray="4 4"/>
+<rect x="76" y="58" width="102" height="58" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="127" y="80" font-size="14" font-weight="500" fill="#04342C" text-anchor="middle" dominant-baseline="central">出域清洗</text>
+<text x="127" y="100" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">剥离姓名与卡号</text>
+<rect x="198" y="58" width="102" height="58" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="249" y="80" font-size="14" font-weight="500" fill="#04342C" text-anchor="middle" dominant-baseline="central">令牌替换</text>
+<text x="249" y="100" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">不可逆占位符</text>
+<rect x="352" y="58" width="102" height="58" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+<text x="403" y="80" font-size="14" font-weight="500" fill="#042C53" text-anchor="middle" dominant-baseline="central">意图外置</text>
+<text x="403" y="100" font-size="12" fill="#185FA5" text-anchor="middle" dominant-baseline="central">识别意图选流程</text>
+<rect x="198" y="178" width="102" height="58" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="249" y="200" font-size="14" font-weight="500" fill="#04342C" text-anchor="middle" dominant-baseline="central">复原重装</text>
+<text x="249" y="220" font-size="12" fill="#0F6E56" text-anchor="middle" dominant-baseline="central">按会话回填真值</text>
+<path d="M180 87H196" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#a2)"/>
+<path d="M302 87H350" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#a2)"/>
+<text x="326" y="76" font-size="11" fill="#a8a89f" text-anchor="middle" dominant-baseline="central">仅白名单</text>
+<path d="M403 116V207H302" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#a2)"/>
+<path d="M196 207H124" fill="none" stroke="#888780" stroke-width="1.5" marker-end="url(#a2)"/>
+<text x="116" y="207" font-size="11" fill="#7a7a72" text-anchor="end" dominant-baseline="central">已复原建议</text>
+</svg>
+<figcaption><b>图 6-1</b>　四段式数据护盾。去程三步在内网完成，第四步在外网，回程复原重新回到内网。注意：复原是<b>单向终点</b>——复原后的文本不得再次拼接进任何外发请求。</figcaption>
+</figure>
+
+<table>
+<tr><th style="width:14%">环节</th><th style="width:20%">解决的问题</th><th style="width:22%">实现方式</th><th>失败动作</th></tr>
+<tr>
+  <td><b>① 出域清洗</b></td>
+  <td>原始标识符不得跨边界</td>
+  <td>结构化字段直接取白名单；非结构化文本用正则、词典与经验证的 NER 辅助</td>
+  <td>识别置信度低、出现未知敏感字段 → <b>阻断出域</b></td>
+</tr>
+<tr>
+  <td><b>② 令牌替换</b></td>
+  <td>不能靠"看不出来"来保护，需要可复原的确定性映射</td>
+  <td>真实值替换为 <code>NAME_001</code> 类外部标识，映射加密存储于内网</td>
+  <td>映射写入失败 → 终止流程，不发送任何内容</td>
+</tr>
+<tr>
+  <td><b>③ 意图外置</b></td>
+  <td>语义理解必须用外部算力，但不能带走事实</td>
+  <td>外网模型只做意图分类、归纳、方案建议；输入是抽象意图 + 令牌化上下文</td>
+  <td>模型返回未知意图码 → 拒绝自动处理，转人工</td>
+</tr>
+<tr>
+  <td><b>④ 复原重装</b></td>
+  <td>员工需要看到真实信息才能工作</td>
+  <td>内网按会话、请求编号、操作者三元匹配后回填最少字段</td>
+  <td>三者任一不匹配、会话过期、签名异常 → <b>拒绝复原</b></td>
+</tr>
+</table>
+
+<h3>出域载荷的真实形态</h3>
+<p>下面这个结构是链路 A 第 6 步之后实际穿过边界的对象。<strong>它没有金额、没有商户、没有时间戳</strong>——这不是遗漏，是刻意的：不要让模型"回答得更像真实客服"而多发送一个字节。</p>
+
+<table class="tight">
+<tr><th style="width:26%">字段</th><th style="width:14%">级别</th><th>说明</th></tr>
+<tr><td><code>request_id</code></td><td><span class="pill p-g">D3</span></td><td>全局唯一，用于幂等、关联与重放检测</td></tr>
+<tr><td><code>schema_version</code></td><td><span class="pill p-g">D3</span></td><td>契约版本，不匹配则拒收</td></tr>
+<tr><td><code>intent_hint</code></td><td><span class="pill p-g">D3</span></td><td>枚举值，例 <code>SUSPECTED_UNAUTHORIZED</code></td></tr>
+<tr><td><code>sanitized_context</code></td><td><span class="pill p-b">D2</span></td><td>仅含令牌的文本，例「&lt;NAME_001&gt;报告模拟卡&lt;CARD_001&gt;存在一笔疑似未授权交易」</td></tr>
+<tr><td><code>approved_rule_context</code></td><td><span class="pill p-g">D3</span></td><td>规则编号 + 摘要，不含完整规则文本</td></tr>
+<tr><td><code>allowed_output</code></td><td><span class="pill p-g">D3</span></td><td>限定模型可返回的字段名，白名单机制</td></tr>
+<tr><td><code>expires_at</code></td><td><span class="pill p-g">D3</span></td><td>有效期，过期拒收（防重放）</td></tr>
+</table>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="s7">
+<h2><span class="num">07</span>数据分级与出域判定</h2>
+
+<p>分级不是为了分类好看，而是为了<strong>把"能不能出域"变成一条可执行、可审计的判定规则</strong>。四级的划分依据是"重识别风险"，不是"字段是否被替换过"。</p>
+
+<table>
+<tr><th style="width:12%">级别</th><th style="width:34%">数据示例</th><th style="width:26%">默认策略</th><th>出域判定</th></tr>
+<tr>
+  <td><b>D0</b><br><span class="pill p-r">原始敏感</span></td>
+  <td>姓名、证件号、手机号、银行卡号、账号、精确客户标识、令牌映射表</td>
+  <td>只在内网</td>
+  <td><b>禁止</b>。无例外路径，不存在"特批出域"通道</td>
+</tr>
+<tr>
+  <td><b>D1</b><br><span class="pill p-a">可关联明细</span></td>
+  <td>具体交易时间、金额、商户、地理位置、个案描述等组合后可识别客户的信息</td>
+  <td>默认内网</td>
+  <td><b>需逐案审批</b>：数据负责人审批 + 充分最小化后才可评估</td>
+</tr>
+<tr>
+  <td><b>D2</b><br><span class="pill p-b">脱敏上下文</span></td>
+  <td>令牌化客户标识、泛化金额/时间、压缩后的咨询意图、无直接身份信息的摘要</td>
+  <td>可申请外发</td>
+  <td><b>可出域</b>：须逐类评估重识别风险、用途、保留期、供应商处理条款</td>
+</tr>
+<tr>
+  <td><b>D3</b><br><span class="pill p-t">通用/合成</span></td>
+  <td>公开或已批准的通用流程、虚构案例、合成测试集、聚合统计</td>
+  <td>批准范围内可用</td>
+  <td><b>可用</b>：用于外网 Agent 开发、测试、办公产物生成</td>
+</tr>
+</table>
+
+<div class="note warn">
+<span class="tag">一个必须写进文档的判断</span>
+<p><b>"脱敏"不必然等于"匿名化"。</b>只要内网仍保留映射表，或者存在可关联字段、外部辅助数据，脱敏数据就仍然可能被重新识别，因此仍具敏感性。出域审批必须按重识别风险判断，<b>不能只凭"字段被替换了"就认定可出域</b>。这条判断决定了审批流程的严格程度，也决定了系统必须记录"这次外发了什么级别、依据哪条审批"。</p>
+</div>
+
+<h3>聚合数据的反推风险</h3>
+<p>任务书在 MCP 工具里设了 <code>get_aggregate_metrics</code>，这个工具的风险容易被低估：小样本聚合可以反推个人。实现上必须强制最小样本阈值（建议 ≥ 20），并对同一调用方在时间窗内的查询组合做累积风险检测——三次看似无害的切片，合起来可能定位到一个人。</p>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="s8">
+<h2><span class="num">08</span>请求状态机与失败策略</h2>
+
+<p>状态机用一张表写清楚，比画图更精确，也更容易直接映射为代码里的枚举与断言。</p>
+
+<table class="tight">
+<tr><th style="width:20%">状态</th><th style="width:22%">进入条件</th><th style="width:24%">允许的下一状态</th><th>失败 / 异常出口</th></tr>
+<tr><td><code>CREATED</code></td><td>身份通过，request_id 生成</td><td>MASKING</td><td>—</td></tr>
+<tr><td><code>MASKING</code></td><td>开始字段识别与令牌化</td><td>SCANNING</td><td>识别失败 → <code>BLOCKED</code></td></tr>
+<tr><td><code>SCANNING</code></td><td>令牌化完成，准备出域</td><td>DISPATCHED</td><td>残留命中 → <code>BLOCKED</code></td></tr>
+<tr><td><code>DISPATCHED</code></td><td>经 DMZ 送出</td><td>RESPONDED</td><td>超时 → <code>TIMEOUT</code>；网关拒绝 → <code>BLOCKED</code></td></tr>
+<tr><td><code>RESPONDED</code></td><td>收到响应</td><td>VALIDATED</td><td>Schema 失败 → <code>REJECTED</code></td></tr>
+<tr><td><code>VALIDATED</code></td><td>五项校验通过</td><td>ADJUDICATED</td><td>版本/request_id 不符 → <code>REJECTED</code></td></tr>
+<tr><td><code>ADJUDICATED</code></td><td>规则引擎作出裁决</td><td>RESTORED / <code>HUMAN_HANDOFF</code></td><td>规则冲突 → <code>HUMAN_HANDOFF</code></td></tr>
+<tr><td><code>RESTORED</code></td><td>三元匹配通过，字段回填</td><td>CONFIRMED</td><td>匹配失败 → <code>HUMAN_HANDOFF</code></td></tr>
+<tr><td><code>CONFIRMED</code></td><td>员工采纳/修改</td><td>CLOSED</td><td>驳回 → <code>CLOSED</code>（带驳回原因）</td></tr>
+<tr><td><code>BLOCKED</code></td><td>安全拦截</td><td>终态</td><td>生成可追溯错误记录，<b>不可重试同一 request_id</b></td></tr>
+<tr><td><code>REJECTED</code></td><td>校验不通过</td><td>终态</td><td>丢弃响应，转人工</td></tr>
+<tr><td><code>TIMEOUT</code></td><td>跨域或模型超时</td><td><code>HUMAN_HANDOFF</code></td><td>有限次重试后转人工</td></tr>
+<tr><td><code>HUMAN_HANDOFF</code></td><td>需人工介入</td><td>CONFIRMED / CLOSED</td><td>—</td></tr>
+<tr><td><code>CLOSED</code></td><td>流程完成</td><td>终态</td><td>—</td></tr>
+</table>
+
+<h3>Fail-closed 的具体含义</h3>
+<p>很多方案在文档里写"安全失败"，但代码里写的是 <code>except: pass</code>。本方案把 fail-closed 落成三条可测试的断言：</p>
+<div class="grid2">
+<div>
+<h4>断言 1：校验失败即断裂</h4>
+<ul>
+<li>任一校验环节抛异常，状态强制进入 <code>BLOCKED</code> 或 <code>REJECTED</code></li>
+<li>不存在"降级到宽松模式"的分支</li>
+<li>测试方式：注入畸形响应，断言不产生工单</li>
+</ul>
+</div>
+<div>
+<h4>断言 2：边界不可绕过</h4>
+<ul>
+<li>外发请求只能由跨域网关构造，业务代码无法直接发包</li>
+<li>网关不可用时请求排队或失败关闭，<b>绝不直连外网</b></li>
+<li>测试方式：停掉网关，断言无外联流量</li>
+</ul>
+</div>
+</div>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="s9">
+<h2><span class="num">09</span>接口契约</h2>
+
+<p>接口契约在 D1 阶段就要冻结，因为五组共用同一套。下表是草案，实现时以代码中的 Schema 为准，本表同步更新。</p>
+
+<h3>内网业务接口</h3>
+<table class="tight">
+<tr><th style="width:34%">路径</th><th style="width:8%">方法</th><th style="width:26%">用途</th><th>权限约束</th></tr>
+<tr><td><code>/internal/api/v1/cases</code></td><td>POST</td><td>创建客服辅助任务</td><td>仅内网员工，按岗位授权取数</td></tr>
+<tr><td><code>/internal/api/v1/cases/{id}</code></td><td>GET</td><td>查看任务、规则命中、处理状态</td><td>按客户/工单权限过滤</td></tr>
+<tr><td><code>/internal/api/v1/anonymize</code></td><td>POST</td><td>脱敏并生成令牌映射</td><td>仅内网服务账号，禁止外网调用</td></tr>
+<tr><td><code>/internal/api/v1/restore</code></td><td>POST</td><td>按 request_id/session 复原字段</td><td>仅内网，校验当前用户与会话</td></tr>
+<tr><td><code>/internal/api/v1/rules/evaluate</code></td><td>POST</td><td>本地规则校验与业务路由</td><td>规则引擎拥有最终裁决权</td></tr>
+<tr><td><code>/internal/api/v1/changes</code></td><td>POST</td><td>接收 Skill/规则/Workflow 草稿</td><td>只写待审区，不直写生产</td></tr>
+</table>
+
+<h3>外网接口</h3>
+<table class="tight">
+<tr><th style="width:34%">路径</th><th style="width:8%">方法</th><th style="width:26%">用途</th><th>限制</th></tr>
+<tr><td><code>/outer/api/v1/tasks</code></td><td>POST</td><td>接收跨域网关转来的脱敏任务</td><td>仅接受白名单字段、签名、有效期内请求</td></tr>
+<tr><td><code>/outer/api/v1/tasks/{request_id}</code></td><td>GET</td><td>查询任务状态与结果</td><td>只返回脱敏结果</td></tr>
+<tr><td><code>/outer/api/v1/health</code></td><td>GET</td><td>健康检查</td><td>不泄露配置、密钥、网络拓扑</td></tr>
+<tr><td><code>/outer/api/v1/mcp/connector-health</code></td><td>GET</td><td>MCP 连接状态</td><td>仅运维角色可见</td></tr>
+</table>
+
+<h3>Agent 输出结构（模型必须遵守的 Schema）</h3>
+<table class="tight">
+<tr><th style="width:26%">字段</th><th style="width:14%">必需</th><th>约束</th></tr>
+<tr><td><code>request_id</code></td><td>是</td><td>必须与入参一致，否则整条响应作废</td></tr>
+<tr><td><code>intent_summary</code></td><td>是</td><td>≤ 200 字，不得包含令牌以外的标识</td></tr>
+<tr><td><code>reasoning_summary</code></td><td>是</td><td>归纳性说明，<b>不作为裁决依据</b></td></tr>
+<tr><td><code>missing_information</code></td><td>是</td><td>数组，可为空；用于追问</td></tr>
+<tr><td><code>recommended_next_step</code></td><td>是</td><td>建议动作，须映射到已登记的动作码</td></tr>
+<tr><td><code>risk_flags</code></td><td>是</td><td>枚举数组；<code>HUMAN_REVIEW_REQUIRED</code> 为强制转人工标记</td></tr>
+<tr><td><code>source_rule_ids</code></td><td>是</td><td>必须能在内网规则库中查到，否则引用无效</td></tr>
+</table>
+<p>输出中<strong>不应包含</strong>真实客户字段、已复原的姓名/卡号、执行动作状态、未经批准的政策承诺。内网必须重新验证规则引用与风险标记——不信任模型自报的合规性。</p>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="s10">
+<h2><span class="num">10</span>MCP 工具目录与拒绝清单</h2>
+
+<p>MCP 的定位必须说清：它只解决"Agent 怎么调工具"，<strong>不提供网络隔离、身份认证或数据授权</strong>。把它当成安全机制是这类方案最常见的误判。</p>
+
+<h3>白名单工具（11 个）</h3>
+<table class="tight">
+<tr><th style="width:34%">工具</th><th style="width:12%">类型</th><th>权限与约束</th></tr>
+<tr><td><code>list_rule_catalog(domain, status)</code></td><td><span class="pill p-g">只读</span></td><td>按角色限制业务域</td></tr>
+<tr><td><code>get_rule_metadata(rule_id, version)</code></td><td><span class="pill p-g">只读</span></td><td>仅元数据，不含完整规则文本</td></tr>
+<tr><td><code>get_approved_rule_summary(rule_id)</code></td><td><span class="pill p-g">只读</span></td><td>仅返回已审批摘要</td></tr>
+<tr><td><code>list_synthetic_cases(category)</code></td><td><span class="pill p-g">只读</span></td><td>仅合成案例目录</td></tr>
+<tr><td><code>get_masked_sample_case(case_id)</code></td><td><span class="pill p-g">只读</span></td><td>仅脱敏样例</td></tr>
+<tr><td><code>get_aggregate_metrics(period, category)</code></td><td><span class="pill p-g">只读</span></td><td>强制最小样本阈值 ≥ 20</td></tr>
+<tr><td><code>submit_skill_draft(package, owner, purpose)</code></td><td><span class="pill p-a">写草稿</span></td><td>只写待审区</td></tr>
+<tr><td><code>submit_workflow_draft(package, owner, purpose)</code></td><td><span class="pill p-a">写草稿</span></td><td>只写待审区</td></tr>
+<tr><td><code>submit_rule_change_request(rule_id, change, rationale)</code></td><td><span class="pill p-a">写草稿</span></td><td>生成工单，不生效</td></tr>
+<tr><td><code>run_sandbox_test(package_id, dataset_id)</code></td><td><span class="pill p-a">沙箱</span></td><td>隔离环境，合成数据</td></tr>
+<tr><td><code>get_change_status(change_id)</code></td><td><span class="pill p-g">只读</span></td><td>仅本人提交的变更</td></tr>
+</table>
+
+<h3>明确不提供的工具</h3>
+<p>以下能力<strong>不存在于工具注册表</strong>，而不是"存在但拒绝调用"。这个区别很重要：注册表里没有，就不存在配置失误导致误开放的可能。</p>
+<table class="tight">
+<tr><th style="width:44%">禁止能力</th><th>原因</th></tr>
+<tr><td><code>get_raw_customer_record(...)</code></td><td>直接违反数据不出域</td></tr>
+<tr><td><code>query_customer_account(...)</code></td><td>同上，且属于生产数据访问</td></tr>
+<tr><td><code>execute_sql(...)</code></td><td>任意 SQL 等于放弃所有字段级管控</td></tr>
+<tr><td><code>export_full_customer_dataset(...)</code></td><td>批量泄露风险，无法审计用途</td></tr>
+<tr><td><code>update_production_rule(...)</code></td><td>绕过测试与审批，规则变更必须走流水线</td></tr>
+<tr><td><code>execute_refund_or_freeze(...)</code></td><td>业务动作不得由 Agent 触发</td></tr>
+</table>
+
+<h3>MCP 调用链</h3>
+<p><code>WorkBuddy Connector → DMZ MCP Gateway → 内网 MCP Facade → 内部业务 API</code></p>
+<p>每一跳都有独立职责：Connector 持凭证，Gateway 做认证与限流，Facade 做工具到业务 API 的映射与参数校验，业务 API 做最终的数据权限判断。<strong>把授权判断放在 Gateway 是不够的</strong>——Gateway 只知道"这个角色能不能调这个工具"，不知道"这个客户是否属于这个工号"。</p>
+</section>
+
+<!-- ============ 11 ============ -->
+<section id="s11">
+<h2><span class="num">11</span>关键设计决策 ADR</h2>
+
+<p>每条决策都记录了"选了什么、为什么、放弃了什么"。这一节是给后来者（以及换人接手时的接手人）看的——比结论更重要的是被否决的选项。</p>
+
+<div class="adr">
+<h4><span class="id">ADR-01</span>三进程物理分离，每区独立数据库</h4>
+<p class="why">内网、DMZ、外网各自独立进程与独立 SQLite 文件，外网服务代码中不存在访问内网库的连接串。</p>
+<p><b>理由：</b>靠代码规范"不要查客户库"是不可验证的约束；靠进程与网络隔离是可验证的。测试可以直接断言"外网容器到内网库的 TCP 连接被拒绝"。<br><b>放弃：</b>单体应用加逻辑分层的简单实现——它无法通过 T12 网络隔离测试。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-02</span>脱敏是独立确定性服务，不与 Agent 同进程</h4>
+<p class="why">隐私服务只做规则/正则/词典匹配与令牌化，不调用任何模型。</p>
+<p><b>理由：</b>把脱敏交给生成式模型等于把安全控制权交给一个会被提示注入影响的组件。斯坦福案例里这一步也是确定性清洗，不是"让 AI 判断哪些是 PII"。<br><b>放弃：</b>"让大模型顺便脱敏"——省一个服务，但 T01/T02/T11 全部无法保证。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-03</span>Agent 与模型连接器分离，双 Mock 可独立替换</h4>
+<p class="why">牛马仕适配器与模型 Connector 是两个独立可替换组件，各有 Mock 实现。</p>
+<p><b>理由：</b>任务书明确"不能把两者合并成一个模型 Mock"。分离后可以证明"换模型不改 Agent、换 Agent 不改网络"，这是验收项之一。<br><b>放弃：</b>单层封装——演示更快，但无法展示分层价值。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-04</span>裁决权唯一归属内网规则引擎</h4>
+<p class="why">模型输出的 <code>recommended_next_step</code> 只是候选，最终路由由 <code>rules/evaluate</code> 决定。</p>
+<p><b>理由：</b>合规要求"Agent 与模型不做最终裁决"。实现上必须让规则引擎在模型之后运行，而不是校验模型的结论。<br><b>放弃：</b>"高置信度直接回复"——看似体验更好，实则 T10 规则冲突测试必然失败。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-05</span>出域双闸：Schema 白名单 + 残留扫描</h4>
+<p class="why">第一道只允许声明过的字段通过；第二道对序列化后的完整载荷做原值/实体扫描。</p>
+<p><b>理由：</b>单靠白名单会被"白名单字段里塞了敏感值"绕过（例如 <code>sanitized_context</code> 里混入真名）。两道闸的失效模式不同，可以互补。<br><b>放弃：</b>只做正则扫描——误报率高且无法防止新增字段。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-06</span>复原需三元匹配 + 会话绑定，跨会话一次性阻断</h4>
+<p class="why"><code>request_id</code>、<code>session_id</code>、当前员工身份三者同时匹配才允许回填；同一操作者重复查看幂等，任一维度不符即永久阻断。</p>
+<p><b>理由：</b>T05（request_id 不一致）与 T06（跨会话恢复）是本项目最容易出问题的两个用例。三元匹配把"猜中一个标识符"的攻击面扩大到需要同时伪造三个且身份合法。<br><b>放弃：</b>仅凭 request_id 复原——实现简单，但 T06 直接失败。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-07</span>全链路指纹：request_id + trace_id + 版本三元组</h4>
+<p class="why">每个事件同时记录 Agent 版本、模型供应商/版本、规则版本。</p>
+<p><b>理由：</b>没有版本指纹，出错时无法判断"是模型换版本导致的，还是规则改错了"。这是事故复盘的唯一抓手。<br><b>放弃：</b>只记 request_id——日志好看，但不可归因。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-08</span>审计只记元数据，不记明文</h4>
+<p class="why">审计表记录字段类别、令牌、规则编号、耗时、结果，不记录明文姓名/卡号/金额。</p>
+<p><b>理由：</b>审计日志本身是新的一等敏感数据源。如果日志里有明文，前面所有脱敏都白做。<br><b>放弃：</b>"记录完整请求便于排查"——排查方便，但日志库变成最大的泄露面。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-09</span>幂等键 = request_id，网关与内外网双层校验</h4>
+<p class="why">同一 request_id 重复提交只处理一次，重复请求返回首次结果。</p>
+<p><b>理由：</b>T19 重放攻击测试要求"不重复创建业务动作"。跨域调用天然会重试，没有幂等就会重复建单。<br><b>放弃：</b>仅在入口去重——网关重试会绕过入口。</p>
+</div>
+
+<div class="adr">
+<h4><span class="id">ADR-10</span>跨域网关不可用时失败关闭，不做直连降级</h4>
+<p class="why">网关故障时请求排队或失败，业务代码无"绕过网关直连外网"的分支。</p>
+<p><b>理由：</b>T20 明确要求"不绕过网关直连外网"。架构上只要存在这条降级路径，它就一定会在某次线上故障中被触发。<br><b>放弃：</b>可用性优先的自动降级——短期指标好看，长期是合规事故。</p>
+<div class="adr">
+<h4><span class="id">ADR-11</span>身份权威只在内网；会话可吊销优先于无状态令牌</h4>
+<p class="why">登录、角色、锁定、会话全部由内网完成，DMZ 与外网不设账号。令牌只携带会话编号，状态在 sessions 表中，因此停用账号、重置密码、单会话互踢都能立即生效。</p>
+<p><b>理由：</b>无状态 JWT 的最大卖点（免查库）恰好是合规场景的弱点——"吊销立即生效"做不到，离职坐席的令牌要活到过期。辅助控制：PBKDF2-200k 口令派生、失败 5 次锁 300 秒、失败提示与未知账号一致（防枚举）、登录失败响应统一 401 而入口不匹配为 403、设备绑定与登录网段白名单作为可选开关。<br><b>放弃：</b>JWT 化——换来的是每次请求多一次本地库查询，SQLite 场景下成本可忽略。</p>
+</div>
+<div class="adr">
+<h4><span class="id">ADR-12</span>账号只能由管理员发放，没有公开注册</h4>
+<p class="why">管理端提供创建账号与重置密码；角色决定入口（agent→坐席端，其余→管理端），入口不匹配在登录环节就拒绝。</p>
+<p><b>理由：</b>"隐藏菜单不是访问控制"。坐席端与管理端是两个物理入口，越权尝试（含冒用他人 emp_id 提交）全部落 AUTHZ_DENIED 审计。分发流程是线下信任链的一部分：口令经私下渠道告知，不进日志、不进报文。<br><b>放弃：</b>自助注册与自助改密——在银行语境里，账号生命周期必须有人担责。</p>
+</div>
+</section>
+
+<!-- ============ 12 ============ -->
+<section id="s12">
+<h2><span class="num">12</span>测试与验收映射</h2>
+
+<p>20 项测试按"攻击面"而非"功能模块"组织，这样能保证每个安全断言都有对应用例。下表把任务书的 T01–T20 映射到具体断言和验证方式。</p>
+
+<table class="tight">
+<tr><th style="width:8%">编号</th><th style="width:16%">攻击面</th><th style="width:38%">注入内容</th><th>断言</th></tr>
+<tr><td>T01</td><td>数据泄漏</td><td>出域请求含原始姓名</td><td>扫描命中并阻断，状态 <code>BLOCKED</code></td></tr>
+<tr><td>T02</td><td>数据泄漏</td><td>出域请求含卡号原值</td><td>扫描命中并阻断</td></tr>
+<tr><td>T03</td><td>数据泄漏</td><td>映射表文件放入外发目录</td><td>网关拒绝传输并记审计</td></tr>
+<tr><td>T04</td><td>数据最小化</td><td>上下文含无关交易历史</td><td>策略删除非必要字段或阻断</td></tr>
+<tr><td>T05</td><td>会话关联</td><td>返回 request_id 与当前不一致</td><td>拒绝关联、拒绝复原、转人工</td></tr>
+<tr><td>T06</td><td>会话隔离</td><td>会话 A 令牌在会话 B 请求复原</td><td>复原服务拒绝</td></tr>
+<tr><td>T07</td><td>模型异常</td><td>WorkBuddy API 超时</td><td>标记超时并走内网人工兜底</td></tr>
+<tr><td>T08</td><td>模型异常</td><td>Agent 返回非 JSON / 缺字段</td><td>Schema 校验失败，不进入自动回复</td></tr>
+<tr><td>T09</td><td>模型异常</td><td>模型输出未知意图码</td><td>拒绝自动处理，转人工</td></tr>
+<tr><td>T10</td><td>规则冲突</td><td>外部建议与内网规则矛盾</td><td>以内网规则为准，标记冲突</td></tr>
+<tr><td>T11</td><td>提示注入</td><td>客户文本要求忽略脱敏并外传</td><td>不改变白名单与工具权限</td></tr>
+<tr><td>T12</td><td>网络隔离</td><td>外网服务尝试直连内网库</td><td>网络层拒绝并告警</td></tr>
+<tr><td>T13</td><td>MCP 权限</td><td>普通角色调用生产规则写入</td><td>拒绝访问</td></tr>
+<tr><td>T14</td><td>MCP 权限</td><td>调用任意 SQL / 批量导出</td><td>工具不存在（非"存在但拒绝"）</td></tr>
+<tr><td>T15</td><td>MCP 数据</td><td>请求原始客户明细</td><td>只返回拒绝结果，不泄露字段</td></tr>
+<tr><td>T16</td><td>规则变更</td><td>提交新规则草稿</td><td>只进待审区，不影响生产</td></tr>
+<tr><td>T17</td><td>发布回滚</td><td>审批发布后再触发回滚</td><td>版本与审批链完整可查</td></tr>
+<tr><td>T18</td><td>日志审计</td><td>检查日志与 Trace</td><td>可追踪人员/工具/版本；<b>不含原始敏感值</b></td></tr>
+<tr><td>T19</td><td>重放攻击</td><td>重复提交同一 request_id</td><td>幂等处理，不重复建单</td></tr>
+<tr><td>T20</td><td>跨域故障</td><td>交换服务不可用</td><td>排队或失败关闭，不绕过网关</td></tr>
+</table>
+
+<h3>五项验收门槛</h3>
+<table>
+<tr><th style="width:16%">门槛</th><th style="width:46%">通过标准</th><th>证据形式</th></tr>
+<tr><td><b>数据边界</b></td><td>原始信息、映射表、未批准字段不出内网；外网库无原始客户数据</td><td>出域请求快照、扫描报告、数据库抽查</td></tr>
+<tr><td><b>网络边界</b></td><td>无任意互通；所有跨域调用经批准网关；外网不能直连内网库</td><td>网络策略、连通性测试、网关日志</td></tr>
+<tr><td><b>客服业务</b></td><td>低风险可给批准指引；疑似未授权/规则冲突/未知意图/模型异常必须转人工</td><td>逐案测试记录、工单证据</td></tr>
+<tr><td><b>MCP 权限</b></td><td>只允许白名单工具；无任意 SQL、原始查询、生产直写</td><td>工具清单、权限测试、拒绝日志</td></tr>
+<tr><td><b>审计</b></td><td>每个任务有 request_id / trace_id，可追踪全要素</td><td>审计查询截图或导出报告</td></tr>
+</table>
+
+<div class="note stop">
+<span class="tag">关键放行条件</span>
+<p>以下任一项发生，即视为<b>关键缺陷</b>，未修复并通过独立复测前不得作为演示版本：原始客户信息出域、MCP 越权访问、跨会话恢复、外网直连内网数据库、未经审批的生产规则修改。</p>
+</div>
+</section>
+
+<!-- ============ 13 ============ -->
+<section id="s13">
+<h2><span class="num">13</span>五天实施与工程节奏</h2>
+
+<table>
+<tr><th style="width:10%">日程</th><th style="width:22%">核心目标</th><th style="width:40%">主要动作</th><th>当日可验证产物</th></tr>
+<tr>
+  <td><b>D1</b></td>
+  <td>冻结范围、契约、案例</td>
+  <td>架构评审通过；分工与岗位卡；四类意图与转人工规则；仓库与环境；<b>冻结 API Schema 与数据字典</b>；12 例合成案例</td>
+  <td>架构图、接口契约、数据字典、错误码表、案例清单</td>
+</tr>
+<tr>
+  <td><b>D2</b></td>
+  <td>基础功能可运行</td>
+  <td>工作台录入与展示；request_id / session_id；SQLite 表；脱敏与令牌映射；Agent Adapter 与 Model Connector 分别接入（可 Mock）；四类意图枚举与规则表</td>
+  <td>可比对的基础版；12 例可录入；原始字段不进外发请求</td>
+</tr>
+<tr>
+  <td><b>D3</b></td>
+  <td>端到端打通</td>
+  <td>录入→脱敏→Agent 规划→模型调用→MCP 白名单→规则校验→展示；接入 WorkBuddy（或 Mock）；生成交接卡/摘要</td>
+  <td>端到端 v0.8；Agent 与模型调用记录；MCP 工具清单；审计日志</td>
+</tr>
+<tr>
+  <td><b>D4</b></td>
+  <td>安全测试与换人接手</td>
+  <td>执行 20 项测试；注入提示绕过、原值泄漏、跨会话、超时、非法 JSON；错误卡；回归；交接卡换人独立启动</td>
+  <td>v0.9；测试报告；错误卡；回归记录；交接签收单</td>
+</tr>
+<tr>
+  <td><b>D5</b></td>
+  <td>盲测与验收</td>
+  <td>抽 ≥4 张盲测卡；计时测试；演示正常/疑似未授权/故障回退/办公辅助；说明三个组件的职责边界</td>
+  <td>最终版本；完整提交包；盲测成绩；演示脚本</td>
+</tr>
+</table>
+
+<h3>本项目在 D1 阶段的特殊安排</h3>
+<p>本架构草图即 D1 的"架构评审通过"产物。D1 剩余工作聚焦三件事：<strong>把第 09 节的契约写成代码里的 Pydantic/JSON Schema</strong>、<strong>把第 07 节的分级写成可执行的判定配置</strong>、<strong>把第 12 节的 20 条断言写成空的 test 函数骨架</strong>。测试先写骨架后写实现，可以避免"最后补测试"的常见失败。</p>
+</section>
+
+<!-- ============ 14 ============ -->
+<section id="s14">
+<h2><span class="num">14</span>待决事项</h2>
+
+<p>下列问题<strong>不由技术团队单方面决定</strong>，需要导师或模拟的银行角色给出书面口径。在获得答复前，实现按"最严假设"进行——即按严格隔离、不允许 D1 出域、WorkBuddy 无 OpenAPI 能力来设计，并保留开关。</p>
+
+<table>
+<tr><th style="width:36%">待确认事项</th><th style="width:28%">影响</th><th>本项目的临时假设</th></tr>
+<tr><td>"物理隔离"的具体定义（气隙/分区/受控互通）</td><td>决定能否实时外呼与 MCP 访问</td><td>按模式 B 实现，但保留关闭外呼的开关</td></tr>
+<tr><td>D1 级客户衍生信息是否允许出域</td><td>决定 WorkBuddy 与外部模型能否使用</td><td>假设不允许；仅 D2 令牌化 + D3 可用于外网</td></tr>
+<tr><td>牛马仕的正式版本、部署形态、Agent API/SDK</td><td>决定内网 Agent 接入方式</td><td>以 Adapter + Mock 实现，接口按最保守能力设计</td></tr>
+<tr><td>WorkBuddy 实际采购版本与租户能力</td><td>可能无 OpenAPI / MCP 能力</td><td>以 Mock 实现，真实接入作为可选开关</td></tr>
+<tr><td>MCP 跨域网络路径由何种设施提供</td><td>无 DMZ 则 MCP 实时访问不可行</td><td>以 DMZ 独立网络模拟</td></tr>
+<tr><td>规则知识库的权威来源与 Owner</td><td>规则冲突时无法裁决</td><td>自建最小规则库，标注版本与出处</td></tr>
+</table>
+
+<div class="note">
+<span class="tag">实现状态</span>
+<p>本草案已完成工程落地：三区以三个独立进程（8101 / 8102 / 8103）与三份独立数据库实现，另提供 Docker Compose 三网络编排版本。20 项验收用例 T01–T20 全部通过，测试真实启动三进程、真实走跨区 HTTP 调用，不使用进程内 mock。实现对照表与 PoC 边界见仓库 <code>README.md</code>。</p>
+<p>下一步：把"待决事项"逐条替换为银行书面口径。当前实现按最严假设编码，并保留关闭外呼的开关。</p>
+</div>
+</section>
+
+<footer>
+<p><b>文档说明</b>　本文件为架构设计草图 v1.0，用于评审与实现依据。文中所有客户数据、交易、案例均为虚构或合成，不含任何真实客户信息与生产系统凭证。</p>
+<p><b>设计参照</b>　《微光-银行客服 AI 工作台-任务书》（架构方案/教学 PoC 实施与验收依据）；《斯坦福 51 个成功的企业级 AI 案例 · 大型零售银行面向客户的服务》（出域清洗、合成替换、意图处理、返回恢复的案例原型）。</p>
+<p><sup>①</sup> 案例原始数据：渠道成本降至最低服务等级，呼叫处理时长下降 48–72 小时。案例同时指出，"规避风险的文化是最难逾越的障碍"——技术方案本身并不复杂，难的是在既有合规文化中找到可行路径。</p>
+</footer>
+
+</div>
+</body>
+</html>

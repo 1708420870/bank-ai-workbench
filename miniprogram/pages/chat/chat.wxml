@@ -1,0 +1,28 @@
+<view class="card" wx:if="{{ticket}}">
+  <view class="head">
+    <view>
+      <view class="fbid">{{fbId}}</view>
+      <view class="muted">{{catText}} · {{stText}}</view>
+    </view>
+  </view>
+  <view class="msgs">
+    <view wx:for="{{replies}}" wx:key="index" class="msg {{item.sender === 'customer' ? 'mine' : ''}}">
+      <view class="who muted">{{item.sender === 'ai' ? '智能客服' : (item.sender === 'customer' ? '我' : '客服')}} · {{item.created_at}}</view>
+      <view class="bubble {{item.sender === 'customer' ? 'b-mine' : 'b-they'}}">{{item.body}}</view>
+    </view>
+    <view wx:if="{{!replies.length}}" class="muted center">正在处理，请稍候…</view>
+  </view>
+  <view class="rate" wx:if="{{canRate}}">
+    <text class="muted">本次反馈已办结，您的评价：</text>
+    <button class="rate-btn good" size="mini" data-v="good" bindtap="rate">满意</button>
+    <button class="rate-btn bad" size="mini" data-v="bad" bindtap="rate">不满意</button>
+  </view>
+  <view class="rated muted center" wx:if="{{rated}}">已收到您的评价，感谢反馈。</view>
+  <view class="inputbar" wx:if="{{canAppend}}">
+    <textarea class="ta" value="{{body}}" maxlength="500" placeholder="追加说明（500 字以内）" bindinput="onInput"></textarea>
+    <button class="btn-primary send" size="mini" bindtap="send" disabled="{{sending}}">发送</button>
+  </view>
+</view>
+<view class="card" wx:else>
+  <view class="muted center">正在加载…</view>
+</view>
