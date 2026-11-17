@@ -26,12 +26,10 @@
   </div>
 </div>
 
-<!-- 左侧导航（导师意见：客户反馈/通知/通讯录/档案/个人中心/合成案例库收进侧栏，请假入个人中心） -->
+<!-- 左侧导航（导师意见：客户反馈/通知/通讯录/档案/个人中心/合成案例库收进侧栏，请假入个人中心；用户要求平铺不再分工作区/办公区） -->
 <div class="shell">
   <nav class="sidenav" id="nav">
-    <div class="grp">工作区</div>
     <button id="nav-home" class="on">🧪 合成案例库</button>
-    <div class="grp">办公</div>
     <button id="nav-feedback">📨 客户反馈<span class="nbadge" id="fbbadge" hidden></span></button>
     <button id="nav-notices">📢 通知<span class="nbadge" id="nbadge" hidden></span></button>
     <button id="nav-dm">📖 通讯录<span class="nbadge" id="dmbadge" hidden></span></button>
@@ -734,10 +732,12 @@ async function loadFbThread(fbId, silent = false) {
 
 function fbOpen() {
   openModal('客户反馈 · 工单处理', `
-    <div class="dm-wrap">
+    <div class="fb-layout">
       <div class="fb-tabs" id="fb-tabs"></div>
-      <div class="dm-list" id="fb-list"><div class="empty">加载中…</div></div>
-      <div class="dm-chat" id="fb-chat"><div class="dm-empty">从左侧选择反馈工单</div></div>
+      <div class="fb-body">
+        <div class="dm-list" id="fb-list"><div class="empty">加载中…</div></div>
+        <div class="dm-chat" id="fb-chat"><div class="dm-empty">从左侧选择反馈工单</div></div>
+      </div>
     </div>`, {wide: true});
   loadFbList();
   loadFbBadge();

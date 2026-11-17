@@ -240,6 +240,7 @@ td.mono{font-family:var(--mono);font-size:11.5px}
   .modal-card{width:96vw;max-height:92vh}
   .modal-card.wide{width:100vw;height:92vh;height:92dvh}
   .dm-wrap{flex-direction:column}
+  .fb-body{flex-direction:column}
   .dm-list{width:100%;max-height:150px;border-right:none;border-bottom:1px solid var(--line)}
   .fb-tabs button{padding:4px 9px}
   pre.json{max-height:220px}
@@ -316,6 +317,12 @@ td.mono{font-family:var(--mono);font-size:11.5px}
 .fb-item.hot{box-shadow:inset 3px 0 0 #c62828}
 .fb-hot{display:inline-block;margin-left:6px;padding:0 6px;border-radius:999px;background:#ffebee;color:#c62828;font-size:10px;font-weight:700}
 .fb-tabs{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+/* 客户反馈弹窗布局：筛选标签条置顶（横向紧凑标签页），工单列表+会话占满剩余高度。
+   修复：此前 fb-tabs 作为 dm-wrap 的行内子项被拉伸成整列高大胶囊。 */
+.fb-layout{display:flex;flex-direction:column;width:100%;height:100%}
+.fb-layout .fb-tabs{flex:none}
+.fb-body{display:flex;flex:1;min-height:0;width:100%}
+.fb-body .dm-list{height:100%}
 .fb-tabs button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 10px;font-size:11.5px;color:var(--ink3,#607d8b);cursor:pointer}
 .fb-tabs button.on{background:var(--navy,#1a237e);border-color:var(--navy,#1a237e);color:#fff;font-weight:600}
 .fb-fi-row1{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:13px}
