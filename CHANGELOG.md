@@ -6,6 +6,12 @@
 
 ## [未发布]
 
+### 新增
+- `docs/26-小程序正式上线路径与前置条件清单.md`：五阶段路径（主体/类目资质/双重备案/
+  技术生产化/提审）、材料清单与责任方、时间量级、金融类驳回原因与备选路径。
+- `miniprogram/tools/preflight.js`：上线前静态自检（网关是否 HTTPS、ENV 是否 public、
+  urlCheck 是否开启、AppID 是否占位、隐私页与调试残留），任一 P0 未过则退出码 1。
+
 ### 变更
 - **小程序网关地址外置**：`app.js` 原先硬编码开发机局域网 IP（换人即失效），改为
   `miniprogram/config.js` 三档预设（localhost / lan / public），并支持运行时覆盖
