@@ -33,16 +33,24 @@ docker compose ps
 `inner` 只接入 `inner_net + dmz_net`；`dmz` 同时接入两张网，是唯一咽喉点。
 隔离靠网络拓扑实现，不靠代码自觉。
 
-### 方式 C：桌面客户端（分发给同事，双击即用）
+### 方式 C：绿色包分发给同事（对方不用装任何东西）
 
 ```bash
-pip install pywebview pyinstaller
+pip install pyinstaller
 python build_desktop.py
 ```
 
-产物在 `dist/BankAIWorkbench/`，**整个目录拷给同事**，双击 `BankAIWorkbench.exe`：
-三个区在进程内以独立线程 + 独立 SQLite 拉起，窗口用系统 WebView2 打开登录页。
-数据库落在 exe 同级的 `data/`，删掉即重置。
+产物：
+
+- `release/银行客服AI工作台-v<版本>-win64.zip` ← **发给同事的就是这一个**
+- `release/银行客服AI工作台-v<版本>-win64/` ← 解压后的形态，可先本地验证
+
+同事侧：解压 → 双击 `启动.bat` → 浏览器自动打开登录页。整包内嵌 Python 运行时
+与全部依赖，不需要装 Python、不用连你的电脑；数据落在包内 `data/`，删掉即重置。
+另有 `启动-局域网.bat`（`ZONE_HOST=0.0.0.0`，同网段手机可直接访问 8103）。
+
+> 打包形态的选择理由、迁移与备份方式、常见故障处置，见
+> [`docs/25-分发与迁移指南.md`](docs/25-分发与迁移指南.md)。
 
 > 三区在线程级隔离只在演示层面成立；给真实客户用之前，仍应以方式 B 的
 > 三网络拓扑部署服务端，桌面客户端退化为纯外壳（把窗口指向服务器地址即可）。

@@ -8,6 +8,7 @@ data/*.db-shm
 # 运行时产物与本地数据（不入仓库）
 dist/
 build/
+release/
 output/
 data/
 data_chk/

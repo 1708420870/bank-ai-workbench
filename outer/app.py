@@ -22,12 +22,15 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from common import audit
 
-# 手机演示页（与微信小程序同构的 H5 PoC）：仅作为演示入口，业务流程一致
-_H5_DIR = Path(__file__).resolve().parent.parent / "h5"
-_H5_PAGE = _H5_DIR / "index.html"
 from common.config import (
-    DATA_KEY, DMZ_URL, SCHEMA_VERSION, SECRET_DMZ_OUTER, SERVICE_TOKEN, db_path,
+    DATA_KEY, DMZ_URL, ROOT as APP_ROOT, SCHEMA_VERSION, SECRET_DMZ_OUTER, SERVICE_TOKEN, db_path,
 )
+
+# 手机演示页（与微信小程序同构的 H5 PoC）：仅作为演示入口，业务流程一致。
+# 路径基于 config.ROOT：源码模式指向项目根，PyInstaller 冻结模式指向 _MEIPASS。
+# 不能用 Path(__file__).parent.parent——冻结后 __file__ 落在 _internal 里，路径是错的。
+_H5_DIR = APP_ROOT / "h5"
+_H5_PAGE = _H5_DIR / "index.html"
 from common.crypto import sign, verify
 from common.schema import FEEDBACK_CATEGORIES
 
