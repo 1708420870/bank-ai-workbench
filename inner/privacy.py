@@ -119,6 +119,32 @@ class PrivacyService:
 
         return self.scan_text(json.dumps(payload, ensure_ascii=False))
 
+    # ---------- 业务判据（v1.5.1 新增） ----------
+    _CALLBACK = re.compile(r"回拨|回访")
+
+    def judge(self, text: str, note: str | None = None) -> dict | None:
+        """隐私三级判据：判「人有没有把原始标识贴进业务文本」，不判业务库取来的字段。
+
+        T1  命中 18 位证件号                         → BLOCKED（禁止复原 + 转人工）
+        T1' 补充说明（note）里出现完整卡号            → BLOCKED（人工把原文贴进了业务文本）
+        T2  要求回拨/回访且给了完整手机号             → HUMAN_HANDOFF（外呼需二次授权）
+
+        为什么不判正文里的卡号/手机号：A 组案例的正文本来就有合成卡号与手机号
+        （来自业务库、按最小权限取得），判正文会把 A 组全部误杀。
+        真正的风险是「人把原始标识粘进了业务文本」，所以卡号只判 note。
+        """
+        text = text or ""
+        if _ID.search(text):
+            return {"status": "BLOCKED", "code": "PRIVACY_ID_NUMBER", "severity": "critical",
+                    "msg": "命中 18 位证件号，禁止复原并转人工"}
+        if note and _CARD.search(note):
+            return {"status": "BLOCKED", "code": "PRIVACY_RAW_CARD_IN_NOTE", "severity": "critical",
+                    "msg": "补充说明中出现完整卡号，禁止复原并转人工"}
+        if self._CALLBACK.search(text) and _PHONE.search(text):
+            return {"status": "HUMAN_HANDOFF", "code": "CALLBACK_REQUIRES_AUTH", "severity": "medium",
+                    "msg": "外呼回访需二次授权，转人工"}
+        return None
+
 
 def restore_tokens(text: str, token_rows: list[dict], data_key: str) -> tuple[str, list[str]]:
     """按令牌映射回填真实值。调用方必须先完成三元匹配校验。"""

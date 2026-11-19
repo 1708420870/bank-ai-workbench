@@ -1072,6 +1072,21 @@ _FB_INTERNAL_RE = re.compile(
     r"COLLECT_MORE|intent_summary|risk_flags|next_step|Agent|智能体|规则引擎|模型", re.I)
 
 
+def _fb_intent_hint(body: str) -> str | None:
+    """客户通道的确定性意图提示（v1.5.1）。
+
+    模型（尤其 mock/降级）常只给通用动作码 GUIDE_APP_QUERY，导致"想提争议要准备
+    什么材料"这种低风险咨询也只得到一句通用自助话术。这里按关键词给更具体的动作码，
+    仅当模型没给更具体动作时生效（模型优先）。
+    """
+    text = body or ""
+    if re.search(r"争议|申诉|材料|怎么提|投诉|举证", text):
+        return "REQUEST_DISPUTE_FORM"
+    if re.search(r"不清楚|不知道|那个钱|不对|看不懂", text):
+        return "COLLECT_MORE_INFO"
+    return None
+
+
 def _fb_template_reply(category: str, step: str, first: bool,
                        missing: list | None = None) -> str:
     """模板兜底：按业务类型给足信息量；追问只围绕本次问题且不超过 2 项。"""
@@ -1131,11 +1146,17 @@ def _fb_compose_reply(category: str, body: str, history: list[dict] | None = Non
         meta["reply_source"] = "template-fallback"
     if meta.get("next_step") not in _FB_STEP_CN:
         meta["next_step"] = "GUIDE_APP_QUERY"
+    # v1.5.1：模型只给通用动作码时，用确定性意图提示补更具体的动作（模型优先）
+    _hint = _fb_intent_hint(body)
+    if _hint and meta.get("next_step") == "GUIDE_APP_QUERY":
+        meta["next_step"] = _hint
+        meta["intent_hint"] = _hint
     step = meta["next_step"]
 
-    # 客户答复：优先用模型产出的客户话术；不合格则降级改进后的模板口径
+    # 客户答复：优先用模型产出的客户话术；命中意图提示时改用对应模板（保证动作码与话术一致）
     reply = ""
-    if customer_reply and len(customer_reply) <= 300 and not _FB_INTERNAL_RE.search(customer_reply):
+    if (customer_reply and not meta.get("intent_hint")
+            and len(customer_reply) <= 300 and not _FB_INTERNAL_RE.search(customer_reply)):
         reply = customer_reply
         meta["reply_source"] = "model"
     else:
@@ -1253,7 +1274,13 @@ def fb_ingest_ep(req: FeedbackIngestRequest, request: Request) -> dict:
     # 模型可能漏判（冒烟实测），资金安全宁可错转也不可漏转。
     # 按导师意见：转人工的同时仍下发一条安抚答复（谨慎处理策略），
     # 客户不再是干巳巳的「已受理待人工接管」，而是有人味儿的即时回应。
-    if any(k in masked for k in ("骗", "盗", "洗钱", "资金损失", "被扣款", "冻结")):
+    if any(k in masked for k in (
+        # v1.5.1：补齐"疑似未授权"的表达——原来只认「盗/骗/冻结」，
+        # 客户说「陌生消费」「未授权」「不是本人」时会被当成普通咨询自动答复。
+        "骗", "盗", "洗钱", "资金损失", "被扣款", "冻结",
+        "陌生消费", "未授权", "不是本人", "非本人", "被刷", "异常消费",
+        "异常交易", "盗刷", "退款", "冒名", "挂失",
+    )):
         db.fb_set_status(req.fb_id, "PENDING_HUMAN", now)
         _fb_notify_status(req.fb_id, "PENDING_HUMAN")
         notice = ("您好，您反映的问题我们已收到，非常理解您的心情。"
