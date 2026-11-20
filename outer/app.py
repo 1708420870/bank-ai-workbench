@@ -18,7 +18,7 @@ from typing import Iterator
 import httpx
 from fastapi import Body, FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 from common import audit
 
@@ -31,6 +31,7 @@ from common.config import (
 # 不能用 Path(__file__).parent.parent——冻结后 __file__ 落在 _internal 里，路径是错的。
 _H5_DIR = APP_ROOT / "h5"
 _H5_PAGE = _H5_DIR / "index.html"
+_H5_LOGIN = _H5_DIR / "login.html"
 from common.crypto import sign, verify
 from common.schema import FEEDBACK_CATEGORIES
 
@@ -99,9 +100,32 @@ def _now() -> str:
 
 
 @app.get("/", include_in_schema=False)
+def demo_login() -> FileResponse:
+    """客户登录页（对外入口即登录，与手机银行已登录状态一致）。
+
+    no-store：演示期间页面会被反复更新，禁掉缓存，避免客户看到上一次的旧页面。
+    """
+    return FileResponse(_H5_LOGIN, headers={"Cache-Control": "no-store, must-revalidate"})
+
+
+@app.get("/app", include_in_schema=False)
 def demo_home() -> FileResponse:
-    """手机演示页（H5，与小程序同构）。生产环境小程序走微信正式链路，此页仅为演示入口。"""
-    return FileResponse(_H5_PAGE)
+    """登录后的客户反馈页（H5，与小程序同构）。未登录时前端会跳回 `/`。"""
+    return FileResponse(_H5_PAGE, headers={"Cache-Control": "no-store, must-revalidate"})
+
+
+@app.get("/emp", include_in_schema=False)
+def emp_portal(request: Request) -> RedirectResponse:
+    """员工入口：浏览器跳到内网控制台登录页（跨域只发生在浏览器侧，外网区不直连内网）。
+
+    取 Host 头优先于 socket 主机名：nginx 反代时 socket 是 127.0.0.1，
+    直接用会让浏览器跳到 127.0.0.1:19096 打不开。
+    """
+    host = (request.headers.get("x-forwarded-host")
+            or request.headers.get("host")
+            or request.url.hostname
+            or "127.0.0.1").split(":")[0]
+    return RedirectResponse(f"http://{host}:19096/", status_code=302)
 
 
 @app.middleware("http")

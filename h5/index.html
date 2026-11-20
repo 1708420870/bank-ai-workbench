@@ -138,8 +138,18 @@
 
 <div class="foot">
   本页为演示环境，全部客户信息均为合成数据，不含任何真实客户资料<br>
-  数据不出内网 · AI 只建议不裁决 · 全链路审计
+  数据不出内网 · AI 只建议不裁决 · 全链路审计<br>
+  <span id="who"></span> · <a href="#" id="logout" style="color:#2f6df6;text-decoration:none">退出登录</a>
 </div>
+<script>
+  (function(){
+    const a = localStorage.getItem('fb_acct') || '';
+    const who = document.getElementById('who');
+    if (who) who.textContent = a ? ('当前客户 ' + a.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')) : '';
+    const lo = document.getElementById('logout');
+    if (lo) lo.onclick = (e) => { e.preventDefault(); localStorage.removeItem('fb_openid'); localStorage.removeItem('fb_acct'); location.replace('/'); };
+  })();
+</script>
 <div class="toast" id="toast"></div>
 </div>
 <script>
@@ -159,12 +169,10 @@ const ST = {SUBMITTED:'已受理', AI_ANSWERING:'AI 应答中', CLOSED_AI:'AI �
   PENDING_HUMAN:'已转人工跟进', HUMAN_ANSWERING:'人工处理中', CLOSED_HUMAN:'已办结', UNKNOWN:'查询失败'};
 const $ = s => document.querySelector(s);
 
-// 伪 openid（与小程序同逻辑：本地生成、长期稳定；生产应 code2session 换取）
+// openid 来自登录页（真实环境由 code2session 换取；此处沿用同一 key，未登录一律回登录页）
 let openid = localStorage.getItem('fb_openid');
-if (!openid) {
-  openid = 'oPoc-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
-  localStorage.setItem('fb_openid', openid);
-}
+if (!openid) { location.replace('/'); }
+const acct = localStorage.getItem('fb_acct') || '';
 let fbList = JSON.parse(localStorage.getItem('fb_list') || '[]');
 let curFb = null, curTicket = null, timer = null, rated = false, cat = 'ACCOUNT', lastBody = '', lastCat = 'ACCOUNT';
 
