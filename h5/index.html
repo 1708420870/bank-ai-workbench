@@ -68,14 +68,22 @@
   .hint{max-width:480px;width:100%;margin:0 auto}
   .demo-note{max-width:480px;margin:14px auto 0;background:#fff;border-radius:10px;padding:10px 14px;
     font-size:11px;color:#7b8794;line-height:1.7}
-  .toast{position:fixed;left:50%;top:38%;transform:translateX(-50%);background:rgba(22,36,61,.92);
+  .faq{margin-top:14px}
+.faq .item{display:flex;gap:10px;align-items:flex-start;background:#fff;border:1px solid #e3e9f0;border-radius:10px;padding:11px 12px;margin-bottom:8px;cursor:pointer}
+.faq .item:active{border-color:#2f6df6}
+.faq .ico{width:22px;height:22px;border-radius:6px;background:#eef4ff;color:#2f6df6;font-size:12px;display:flex;align-items:center;justify-content:center;flex:0 0 22px}
+.faq .t{font-size:13px;color:#16243d;font-weight:600;line-height:1.4}
+.faq .d{font-size:11px;color:#7b8794;line-height:1.5;margin-top:2px}
+.demo-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:8px;background:#fff3cd;color:#8a6d3b;font-size:10px;vertical-align:middle}
+.foot{padding:14px 6px 22px;text-align:center;font-size:10px;color:#9aa6b2;line-height:1.7}
+.toast{position:fixed;left:50%;top:38%;transform:translateX(-50%);background:rgba(22,36,61,.92);
     color:#fff;padding:10px 18px;border-radius:9px;font-size:13px;z-index:99;display:none}
 </style>
 </head>
 <body>
 <div class="phone">
   <div class="hd">
-    <h1>微光银行 · 客户反馈</h1>
+    <h1>微光银行 · 客户反馈<span class="demo-tag">演示环境</span></h1>
     <p>数据不出内网 · AI 只建议不裁决 · 全链路审计</p>
   </div>
   <div class="tabs" id="tabs">
@@ -92,6 +100,8 @@
       <textarea id="txt" maxlength="500" placeholder="请描述您的问题或建议（1-500 字）"></textarea>
       <div class="cnt"><span id="n">0</span>/500</div>
       <button class="btn" id="submit">提交反馈</button>
+      <div class="lbl" style="margin-top:16px">常见问题（点击直接填入）</div>
+      <div class="faq" id="faq"></div>
       <p style="font-size:10.5px;color:#9aa6b2;margin-top:12px;line-height:1.6">
         提交后由 AI 客服先行为您解答；如需人工服务，在会话中回复「转人工」即可。
         涉及卡号、手机号等敏感信息会被系统自动脱敏。</p>
@@ -126,12 +136,27 @@
     </div>
   </div>
 
+<div class="foot">
+  本页为演示环境，全部客户信息均为合成数据，不含任何真实客户资料<br>
+  数据不出内网 · AI 只建议不裁决 · 全链路审计
+</div>
 <div class="toast" id="toast"></div>
 </div>
 <script>
+// —— 补丁 v1.5.0-fix7：时间戳按浏览器本地时区显示（服务端以 UTC 落库，直接切字符串会差 8 小时）
+function fmtTs(s){
+  if(!s) return '';
+  const raw = String(s);
+  const iso = /[zZ]$|[+-]\d{2}:?\d{2}$/.test(raw) ? raw : raw + 'Z';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return raw.replace('T',' ').slice(5,16);
+  const p = n => String(n).padStart(2,'0');
+  return `${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 const CAT = {ACCOUNT:'账户', LOAN:'贷款', CREDIT_CARD:'信用卡', OTHER:'其他'};
 const ST = {SUBMITTED:'已受理', AI_ANSWERING:'AI 应答中', CLOSED_AI:'AI 已回复',
-  PENDING_HUMAN:'待人工接管', HUMAN_ANSWERING:'人工处理中', CLOSED_HUMAN:'已办结', UNKNOWN:'查询失败'};
+  PENDING_HUMAN:'已转人工跟进', HUMAN_ANSWERING:'人工处理中', CLOSED_HUMAN:'已办结', UNKNOWN:'查询失败'};
 const $ = s => document.querySelector(s);
 
 // 伪 openid（与小程序同逻辑：本地生成、长期稳定；生产应 code2session 换取）
@@ -141,7 +166,7 @@ if (!openid) {
   localStorage.setItem('fb_openid', openid);
 }
 let fbList = JSON.parse(localStorage.getItem('fb_list') || '[]');
-let curFb = null, curTicket = null, timer = null, rated = false, cat = 'OTHER';
+let curFb = null, curTicket = null, timer = null, rated = false, cat = 'ACCOUNT', lastBody = '', lastCat = 'ACCOUNT';
 
 async function api(path, method='GET', data) {
   const opt = {method, headers:{'Content-Type':'application/json'}};
@@ -170,6 +195,24 @@ document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => show(b.
 // 提单页
 $('#cats').innerHTML = Object.entries(CAT).map(([k, v]) =>
   `<button data-k="${k}" class="${k === cat ? 'on' : ''}">${v}</button>`).join('');
+// —— 补丁 v1.5.0-fix9：常见问题前置（内容取自生效规则 R-DISPUTE-01/02、R-TXN-01/02、R-UNAUTH-01）
+const FAQ = [
+  { k: 'ACCOUNT', t: '想对一笔消费提争议，要准备什么？', d: 'App「我的-交易争议」提交；需交易时间、金额、商户、争议原因', v: '我想对一笔消费提争议，需要准备哪些材料？' },
+  { k: 'ACCOUNT', t: '账单里有一笔扣款我看不懂', d: '可先按商户编号查明细，系统会给您查询路径', v: '账单里有一笔扣款我不认识，想核对是什么费用。' },
+  { k: 'CREDIT_CARD', t: '卡在身上，却出现陌生消费', d: '属疑似未授权，系统会优先转人工核实，不自动给结论', v: '卡一直在我身边，却出现一笔陌生消费，需要处理。' },
+  { k: 'ACCOUNT', t: '交易还没到账，怎么查进度？', d: 'App「我的-交易明细」可按日期或商户筛选', v: '我的一笔交易还没到账，想查一下处理进度。' }
+];
+$('#faq').innerHTML = FAQ.map((f, i) => `<div class="item" data-i="${i}">
+  <div class="ico">${i + 1}</div><div><div class="t">${f.t}</div><div class="d">${f.d}</div></div></div>`).join('');
+document.querySelectorAll('#faq .item').forEach(el => {
+  el.onclick = () => {
+    const f = FAQ[+el.dataset.i];
+    cat = f.k;
+    document.querySelectorAll('#cats button').forEach(x => x.classList.toggle('on', x.dataset.k === cat));
+    $('#txt').value = f.v; $('#n').textContent = f.v.length;
+    $('#txt').focus(); toast('已填入，可直接提交');
+  };
+});
 document.querySelectorAll('#cats button').forEach(b => b.onclick = () => {
   cat = b.dataset.k;
   document.querySelectorAll('#cats button').forEach(x => x.classList.toggle('on', x.dataset.k === cat));
@@ -177,6 +220,7 @@ document.querySelectorAll('#cats button').forEach(b => b.onclick = () => {
 $('#txt').oninput = e => $('#n').textContent = e.target.value.length;
 $('#submit').onclick = async () => {
   const body = $('#txt').value.trim();
+  lastBody = body; lastCat = cat;
   if (!body) return toast('请填写反馈内容');
   const btn = $('#submit'); btn.disabled = true;
   try {
@@ -185,7 +229,7 @@ $('#submit').onclick = async () => {
     if (!fbList.includes(d.fb_id)) { fbList.unshift(d.fb_id); localStorage.setItem('fb_list', JSON.stringify(fbList)); }
     toast(d.verdict === 'pass' ? '提交成功，AI 正在处理' : '已受理');
     openChat(d.fb_id);
-  } catch (e) { toast('提交失败：' + e.message); }
+  } catch (e) { const m=/不存在|not found/i.test(e.message||'') ? '提交失败，请稍后重试' : e.message; toast(m); }
   btn.disabled = false;
 };
 
@@ -200,7 +244,7 @@ async function renderList() {
       const d = await api('/feedback/api/v1/tickets/' + fb + '?openid=' + encodeURIComponent(openid));
       el.querySelector('.r1 span').outerHTML = chip(d.status);
       const last = (d.replies || []).slice(-1)[0];
-      el.querySelector('.r2').textContent = CAT[d.category] + ' · ' + (last ? last.body.slice(0, 26) : '（无消息）');
+      el.querySelector('.r2').textContent = CAT[d.category] + ' · ' + (last ? desensitize(last.body).slice(0, 26) : '（无消息）');
       el.onclick = () => openChat(fb);
     } catch (e) {
       el.querySelector('.r1 span').outerHTML = chip('UNKNOWN');
@@ -215,19 +259,38 @@ $('#qbtn').onclick = async () => {
     await api('/feedback/api/v1/tickets/' + id + '?openid=' + encodeURIComponent(openid));
     if (!fbList.includes(id)) { fbList.unshift(id); localStorage.setItem('fb_list', JSON.stringify(fbList)); }
     openChat(id);
-  } catch (e) { toast('查询失败：' + e.message); }
+  } catch (e) { const m=/不存在|未找到|not found/i.test(e.message||'') ? '未找到该工单，请核对工单号' : e.message; toast(m); }
 };
 
 // 会话页
+
+// —— 补丁 v1.5.0-fix4：令牌兜底（复原失败时不得回显内部令牌）——
+function desensitize(s){
+  if (!s) return s;
+  let out = s;
+  // 带数字前缀的金额令牌：39.AMOUNT_001 / 15600.00 AMOUNT_002
+  out = out.replace(/[\d.,]*\s*AMOUNT_\d{3}/g, '该笔金额');
+  out = out.replace(/[\d.,]*\s*CARD_\d{3}/g, '卡号尾号****');
+  out = out.replace(/NAME_\d{3}/g, '客户');
+  out = out.replace(/PHONE_\d{3}/g, '预留手机号');
+  out = out.replace(/ID_\d{3}/g, '证件信息');
+  out = out.replace(/MERCHANT_\d{3}/g, '该商户');
+  out = out.replace(/[A-Z]{2,}_\d{3}/g, '相关信息');
+  out = out.replace(/您好，客户[，,。]/g, '您好，');
+  out = out.replace(/尊敬的\s*客户[，,]\s*您好[！!]?/g, '您好！');
+  out = out.replace(/\s{2,}/g, ' ').replace(/\s+([，。！？、])/g, '$1');
+  out = out.replace(/([！？。，])\1+/g, '$1').replace(/[！？]\s*。/g, '。');
+  return out;
+}
 function msgHtml(replies) {
   return replies.map(m => {
     if (m.sender === 'system')
-      return `<div class="sys">${m.body}<br>${(m.created_at || '').replace('T',' ').slice(5,16)}</div>`;
+      return `<div class="sys">${desensitize(m.body)}<br>${fmtTs(m.created_at)}</div>`;
     const out = m.sender === 'customer';
     const who = m.sender === 'ai' ? '智能客服' : (out ? '我' : '客服');
     return `<div class="m ${out ? 'out' : 'in'}">
-      <div class="who">${who} · ${(m.created_at || '').replace('T',' ').slice(5,16)}</div>
-      <div class="bub">${m.body}</div></div>`;
+      <div class="who">${who} · ${fmtTs(m.created_at)}</div>
+      <div class="bub">${desensitize(m.body)}</div></div>`;
   }).join('');
 }
 async function openChat(fb) {
@@ -243,8 +306,39 @@ async function refreshChat() {
     const d = await api('/feedback/api/v1/tickets/' + curFb + '?openid=' + encodeURIComponent(openid));
     curTicket = d;
     const closed = d.status === 'CLOSED_AI' || d.status === 'CLOSED_HUMAN';
-    $('#msgs').innerHTML = `<div class="sys">${curFb} · ${CAT[d.category] || d.category} · ${chip(d.status)}</div>` +
+    $('#msgs').innerHTML = `<div class="sys">${curFb} · ${CAT[d.category] || d.category} · ${chip(d.status)}${d.created_at ? ' · 创建于 ' + fmtTs(d.created_at) : ''}</div>` +
       (msgHtml(d.replies || []) || '<div class="sys">暂无消息</div>');
+    // —— 补丁 v1.5.0-fix6：AI 长时间未回应时的如实提示（不谎称已转人工）
+    // —— 补丁 v1.5.0-fix8：超时如实提示 + 一键再发（不谎称已转人工）
+    if (d.status === 'AI_ANSWERING') {
+      const t0 = Date.parse(d.created_at || '') || 0;
+      const waited = t0 ? (Date.now() - t0) : 0;
+      if (waited > 60000 && !(d.replies || []).length) {
+        const more = waited > 120000 ? '已超过 2 分钟，建议重新提交或联系人工客服。' : '如长时间没有回应，可重新提交一次。';
+        $('#msgs').innerHTML += `<div class="sys">AI 处理时间较长，工单仍在排队。${more}
+          <button class="ghost" id="resend" style="margin-left:8px">再发一次</button></div>`;
+        const rs = document.querySelector('#resend');
+        if (rs) rs.onclick = async () => {
+          if (!lastBody) return;
+          rs.disabled = true; rs.textContent = '提交中…';
+          try {
+            const nd = await api('/feedback/api/v1/tickets', 'POST', {openid, category: lastCat, body: lastBody});
+            if (!fbList.includes(nd.fb_id)) { fbList.unshift(nd.fb_id); localStorage.setItem('fb_list', JSON.stringify(fbList)); }
+            toast('已重新提交'); openChat(nd.fb_id);
+          } catch (e) { toast('提交失败：' + e.message); rs.disabled = false; rs.textContent = '再发一次'; }
+        };
+      }
+    }
+    // —— 补丁 v1.5.0-fix8：转人工后给自助指引（内容取自生效规则 R-DISPUTE-01/02 与 R-TXN-01/02）
+    if (d.status === 'PENDING_HUMAN' && !(d.replies || []).some(m => m.sender === 'system' && /自助指引/.test(m.body || ''))) {
+      const GUIDE = {
+        DISPUTE: '「我的」→「交易争议」→ 选择对应交易提交；需备：交易时间、金额、商户名称、争议原因。客服不代提交、不承诺时限。',
+        TXN: '「我的」→「交易明细」按日期或商户筛选；商户不明时可用商户编号查询。',
+        OTHER: '可在手机银行 APP 的「我的 - 帮助中心」查看办理路径，或等待人工客服回电。'
+      };
+      const g = /争议|退款|盗刷|陌生消费/.test(lastBody) ? GUIDE.DISPUTE : /交易|到账|扣款|查询/.test(lastBody) ? GUIDE.TXN : GUIDE.OTHER;
+      $('#msgs').innerHTML += `<div class="sys" style="text-align:left;line-height:1.6"><b>自助指引（业务规则摘要）</b><br>${g}</div>`;
+    }
     const box = $('#msgs'); box.scrollTop = box.scrollHeight;
     $('#ibar').hidden = closed;
     $('#rate').hidden = !(rated === false && (d.status === 'AI_ANSWERING' || closed));
