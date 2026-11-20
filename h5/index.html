@@ -169,9 +169,13 @@ const ST = {SUBMITTED:'已受理', AI_ANSWERING:'AI 应答中', CLOSED_AI:'AI �
   PENDING_HUMAN:'已转人工跟进', HUMAN_ANSWERING:'人工处理中', CLOSED_HUMAN:'已办结', UNKNOWN:'查询失败'};
 const $ = s => document.querySelector(s);
 
-// openid 来自登录页（真实环境由 code2session 换取；此处沿用同一 key，未登录一律回登录页）
+// openid：优先用登录页写入的客户号；直接打开 /app 时给一个演示号（生产由 code2session 换取）
 let openid = localStorage.getItem('fb_openid');
-if (!openid) { location.replace('/'); }
+if (!openid) {
+  openid = 'oPoc-13800138000';
+  localStorage.setItem('fb_openid', openid);
+  localStorage.setItem('fb_acct', '13800138000');
+}
 const acct = localStorage.getItem('fb_acct') || '';
 let fbList = JSON.parse(localStorage.getItem('fb_list') || '[]');
 let curFb = null, curTicket = null, timer = null, rated = false, cat = 'ACCOUNT', lastBody = '', lastCat = 'ACCOUNT';

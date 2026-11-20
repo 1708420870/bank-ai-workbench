@@ -101,7 +101,7 @@ def _now() -> str:
 
 @app.get("/", include_in_schema=False)
 def demo_login() -> FileResponse:
-    """客户登录页（对外入口即登录，与手机银行已登录状态一致）。
+    """对外入口即登录页（与内网登录页同一套视觉与文案，另加「客户体验」入口）。
 
     no-store：演示期间页面会被反复更新，禁掉缓存，避免客户看到上一次的旧页面。
     """
