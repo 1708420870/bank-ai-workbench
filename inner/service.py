@@ -232,6 +232,16 @@ async def handle_case(*, case_id: str, emp_id: str, session_id: str | None, note
                       "agent_version": meta["agent_version"],
                       "model": f"{meta['model_supplier']}/{meta['model_version']}"})
 
+    # ⑩.5【补丁 v1.5.3 · T10】规则覆盖动作码：强制人工/规则冲突时收敛为 HUMAN_REVIEW
+    _ov = verdict.get("action_override")
+    if _ov and output.get("recommended_next_step") != _ov:
+        audit.log("inner", "ACTION_OVERRIDDEN", request_id=request_id, actor=emp_id,
+                  detail={"from": output.get("recommended_next_step"), "to": _ov,
+                          "reasons": verdict["reason_codes"]})
+        output = dict(output)
+        output["recommended_next_step"] = _ov
+        _persist(request_id, agent_output=json.dumps(output, ensure_ascii=False))
+
     if verdict["decision"] != "SHOW_SUGGESTION":
         _persist(request_id, status="HUMAN_HANDOFF")
         return _result(request_id)

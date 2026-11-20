@@ -108,10 +108,22 @@ def evaluate(
         reasons.append("MISSING_REQUIRED_OUTPUT")
 
     decision = "HUMAN_HANDOFF" if reasons else "SHOW_SUGGESTION"
+
+    # ⑧【补丁 v1.5.3 · T10】内网规则优先：一旦判定转人工，模型给的"下一步"不再对外
+    # 理由：转人工场景下若仍写着 COLLECT_MORE_INFO，坐席会去收集信息，
+    #       而正确动作是交人工研判——"外部建议与内网规则冲突，以内网为准"的落地。
+    action_override = None
+    _force = {"MANDATORY_HUMAN", "RULE_ACTION_CONFLICT", "INVALID_RULE_REFERENCE",
+              "PROHIBITED_CLAIM", "INVALID_ACTION_CODE"}
+    if decision == "HUMAN_HANDOFF" and (_force & set(reasons)) and action != "HUMAN_REVIEW":
+        action_override = "HUMAN_REVIEW"
+        reasons = list(reasons) + ["ACTION_OVERRIDDEN_BY_RULE"]
+
     return {
         "decision": decision,
         "reason_codes": sorted(set(reasons)),
         "conflicts": conflicts,
         "rule_ids": [r["rule_id"] for r in local_rules],
         "template": template_for(intent) if decision == "SHOW_SUGGESTION" else None,
+        "action_override": action_override,
     }
