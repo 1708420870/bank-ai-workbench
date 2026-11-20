@@ -10,8 +10,11 @@
 """
 from __future__ import annotations
 
+import base64
+import hashlib
 import hmac
 import json
+import os
 import re
 import time
 from collections import deque
@@ -24,12 +27,13 @@ from fastapi.responses import JSONResponse
 
 from common import audit
 from common.config import (
-    DMZ_PORT, INNER_URL, MAX_REQUEST_CHARS, OUTER_URL, RATE_LIMIT_MAX_CALLS,
+    DMZ_PORT,
+    ROOT as APP_ROOT, INNER_URL, MAX_REQUEST_CHARS, OUTER_URL, RATE_LIMIT_MAX_CALLS,
     RATE_LIMIT_MAX_PER_ACTOR, RATE_LIMIT_WINDOW_SECONDS, SECRET_DMZ_OUTER,
     SECRET_INNER_DMZ, SERVICE_TOKEN,
 )
 from common.crypto import sign, verify
-from common.egress import guard
+from common.egress import guard, scan_tokenmap
 from common.logger import get as get_logger
 from common.schema import (
     EGRESS_FIELD_WHITELIST, FeedbackDeliverRequest, FeedbackIngestRequest, McpCall,
@@ -144,6 +148,11 @@ async def dispatch(task: dict = Body(...)) -> JSONResponse:
     extra = set(task.keys()) - EGRESS_FIELD_WHITELIST
     if extra:
         _deny("FIELD_NOT_WHITELISTED", rid, {"extra": sorted(extra)}, 400)
+
+    # ①.5 外发物内容检查（T03）：字段白名单挡不住的"把映射表塞进合法字段"在这里再挡一次
+    _hit = scan_tokenmap(json.dumps(task, ensure_ascii=False))
+    if _hit:
+        _deny("TOKENMAP_IN_EGRESS", rid, {"evidence": _hit}, 403)
 
     # ② 签名校验
     if not verify(task, SECRET_INNER_DMZ):
@@ -400,6 +409,48 @@ async def fb_deliver(req: FeedbackDeliverRequest, request: Request) -> dict:
     audit.log("dmz", "FB_OUTBOUND_DELIVERED", request_id=req.fb_id,
               detail={"sender": req.sender, "status_after": req.status_after})
     return {"verdict": "pass"}
+
+
+EGRESS_OUT = APP_ROOT / "data" / "egress_out"
+
+
+@app.post("/dmz/api/v1/egress/attachment")
+async def egress_attachment(request: Request, payload: dict = Body(...)) -> JSONResponse:
+    """外发物传输入口（PoC）：文件先落「外发目录」，命中令牌映射表即拒绝并隔离。
+
+    对应任务书 T03：token 映射表文件被放入外发目录 → 网关拒绝传输并记录审计。
+    说明：真实银行里这一步由数据防泄漏（DLP）设备完成；此处用确定性内容特征实现同名语义，
+    保证"映射表出不去"这条边界可被验证，而不是靠约定。
+    """
+    _require_service(request)
+    rid = str(payload.get("request_id") or "?")
+    name = os.path.basename(str(payload.get("filename") or "attachment.bin")) or "attachment.bin"
+    try:
+        data = base64.b64decode(str(payload.get("content_b64") or ""), validate=False)
+    except Exception:
+        _deny("ATTACHMENT_DECODE_FAILED", rid, {"filename": name}, 400)
+        return JSONResponse({}, status_code=400)
+
+    os.makedirs(EGRESS_OUT, exist_ok=True)
+    pending = EGRESS_OUT / f"{rid}-{name}"
+    pending.write_bytes(data)
+
+    hit = scan_tokenmap(data.decode("utf-8", "replace")) or scan_tokenmap(name)
+    if hit:
+        blocked = EGRESS_OUT / "blocked"
+        os.makedirs(blocked, exist_ok=True)
+        try:
+            os.replace(pending, blocked / pending.name)
+        except Exception:
+            pass
+        audit.log("dmz", "EGRESS_TOKENMAP_BLOCKED", request_id=rid, severity="critical",
+                  detail={"filename": name, "evidence": hit, "action": "quarantined"})
+        raise HTTPException(403, "策略拒绝：外发物包含令牌映射表")
+
+    digest = hashlib.sha256(data).hexdigest()[:16]
+    audit.log("dmz", "EGRESS_ATTACHMENT_ACCEPTED", request_id=rid,
+              detail={"filename": name, "sha256_16": digest, "len": len(data)})
+    return JSONResponse({"ok": True, "filename": name, "sha256_16": digest, "len": len(data)})
 
 
 @app.post("/dmz/api/v1/feedback/status")

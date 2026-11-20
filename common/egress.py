@@ -60,3 +60,35 @@ def guard(zone: str, url: str) -> None:
 
 def is_allowed(zone: str, url: str) -> bool:
     return _port_of(url) in ALLOWED_PORTS.get(zone, set())
+
+
+# ---------------------------------------------------------------------------
+# 外发物内容检查（v1.5.2，对应 T03：token 映射表不得经网关外发）
+# ---------------------------------------------------------------------------
+import re as _re
+
+_TOKENMAP_RES = (
+    # 结构化映射表：sealed_value / token_map / mapping_table 字段
+    _re.compile(r'"(sealed_value|token_map|mapping_table)"\s*:', _re.I),
+    # 令牌与密文并排出现：NAME_001 <16+ 位 base64/十六进制> 或 NAME_001,CARD_001,...
+    _re.compile(r"\b(?:NAME|CARD|PHONE|ID|AMT|MERCHANT)_\d{3,}\b\s*[,:\t]\s*[A-Za-z0-9+/=]{16,}"),
+    # 映射表文件头（CSV 导出常见）
+    _re.compile(r"^\s*(request_id\s*,\s*token\s*,\s*field_type\s*,\s*sealed_value)", _re.I | _re.M),
+)
+
+
+class TokenMapInEgress(BlockedEgress):
+    """外发物里含令牌映射表：属于数据边界的关键缺陷，一律拒绝并留审计。"""
+
+
+def scan_tokenmap(text: str) -> str | None:
+    """检测外发物是否包含令牌映射表内容。命中返回证据片段（脱敏），否则 None。"""
+    if not text:
+        return None
+    for pat in _TOKENMAP_RES:
+        m = pat.search(text)
+        if m:
+            frag = m.group(0)[:40].replace("\n", " ")
+            return f"tokenmap-signature:{frag}"
+    return None
+

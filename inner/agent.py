@@ -153,8 +153,8 @@ def _hermes_completion(intent: str, context: str, ep: Endpoint) -> dict:
         headers={"Authorization": f"Bearer {HERMES_API_KEY}"},
                 json={
             "model": HERMES_MODEL,
-            "temperature": 0.4,
-            "max_tokens": 600,
+            "temperature": 0.2,
+            "max_tokens": 320,
             "chat_template_kwargs": {"enable_thinking": False},
             # v1.5.1：vLLM 用 chat_template_kwargs 关思考；OpenAI 兼容端点（如中转站）
             # 不认这个字段，需要 reasoning_effort=none，否则内容落到 reasoning_content、

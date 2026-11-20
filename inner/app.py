@@ -1072,18 +1072,34 @@ _FB_INTERNAL_RE = re.compile(
     r"COLLECT_MORE|intent_summary|risk_flags|next_step|Agent|智能体|规则引擎|模型", re.I)
 
 
-def _fb_intent_hint(body: str) -> str | None:
-    """客户通道的确定性意图提示（v1.5.1）。
+_FB_CONFIRM_RE = re.compile(r"^(嗯+|对+|好+|是+|是的|可以|行|ok|OK|继续|然后呢|还有呢|说说)[。！!？?\s]*$")
+
+
+def _fb_intent_hint(body: str, history: list[dict] | None = None) -> str | None:
+    """客户通道的确定性意图提示（v1.5.1 / 多轮兜底 v1.5.2）。
 
     模型（尤其 mock/降级）常只给通用动作码 GUIDE_APP_QUERY，导致"想提争议要准备
     什么材料"这种低风险咨询也只得到一句通用自助话术。这里按关键词给更具体的动作码，
     仅当模型没给更具体动作时生效（模型优先）。
+
+    多轮兜底：客户只回"嗯/对/继续"这类短句时关键词命中不了，会掉回通用话术。
+    此时回看历史里最近一条有意图的客户消息，沿用它的动作码（只回看一层，避免递归）。
     """
-    text = body or ""
+    text = (body or "").strip()
     if re.search(r"争议|申诉|材料|怎么提|投诉|举证", text):
         return "REQUEST_DISPUTE_FORM"
     if re.search(r"不清楚|不知道|那个钱|不对|看不懂", text):
         return "COLLECT_MORE_INFO"
+    if _FB_CONFIRM_RE.match(text) or len(text) <= 3:
+        for m in reversed(history or []):
+            if m.get("sender") != "customer":
+                continue
+            prev = (m.get("body_masked") or m.get("body") or "").strip()
+            if not prev or prev == text:
+                continue
+            inherited = _fb_intent_hint(prev, None)
+            if inherited:
+                return inherited
     return None
 
 
@@ -1147,7 +1163,7 @@ def _fb_compose_reply(category: str, body: str, history: list[dict] | None = Non
     if meta.get("next_step") not in _FB_STEP_CN:
         meta["next_step"] = "GUIDE_APP_QUERY"
     # v1.5.1：模型只给通用动作码时，用确定性意图提示补更具体的动作（模型优先）
-    _hint = _fb_intent_hint(body)
+    _hint = _fb_intent_hint(body, history)
     if _hint and meta.get("next_step") == "GUIDE_APP_QUERY":
         meta["next_step"] = _hint
         meta["intent_hint"] = _hint
@@ -1303,8 +1319,14 @@ def fb_ingest_ep(req: FeedbackIngestRequest, request: Request) -> dict:
 
     # AI 多轮会话：人工接管前由 AI 持续应答，带会话上下文；不自动办结，
     # 客户评价（eval）或转人工后才离开 AI_ANSWERING 态。
-    reply, meta = _fb_compose_reply(req.category, masked,
-                                    history=db.fb_replies(req.fb_id))
+    # 多轮历史：优先本工单；本工单没有历史时，用同一客户（openid_hash）最近的跨工单消息兜底
+    _hist = db.fb_replies(req.fb_id)
+    if len(_hist) < 2:
+        try:
+            _hist = db.fb_recent_by_openid(req.openid_hash) + _hist
+        except Exception:
+            pass
+    reply, meta = _fb_compose_reply(req.category, masked, history=_hist)
     if "HUMAN_REVIEW_REQUIRED" in meta.get("risk_flags", []) \
             or meta["next_step"] == "HUMAN_REVIEW":
         db.fb_set_status(req.fb_id, "PENDING_HUMAN", now)

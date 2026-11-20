@@ -927,6 +927,21 @@ def fb_replies(fb_id: str) -> list[dict]:
         return [dict(r) for r in rows]
 
 
+def fb_recent_by_openid(openid_hash: str, limit: int = 8) -> list[dict]:
+    """同一客户（openid_hash）最近的几条客户消息（跨工单）。
+
+    背景：客户页每条消息都会创建一个新工单，因此「多轮」在数据层是跨工单的。
+    多轮意图兜底（"嗯/对"这类短句）需要拿到这个客户上一句说了什么。
+    """
+    with conn() as c:
+        rows = c.execute(
+            "SELECT fb_id, body_masked, created_at FROM feedback_tickets"
+            " WHERE openid_hash=? AND body_masked IS NOT NULL AND body_masked<>''"
+            " ORDER BY created_at DESC LIMIT ?", (openid_hash, limit)).fetchall()
+    return [{"sender": "customer", "body": r["body_masked"], "fb_id": r["fb_id"]}
+            for r in reversed(rows)]
+
+
 def fb_pending_count() -> int:
     """未接管工单数（坐席端角标）：新单/AI 应答中/待人工接管均计入，
     任一坐席接管（或直接回复）后即对全员消失。"""
