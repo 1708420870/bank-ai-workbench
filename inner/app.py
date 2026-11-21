@@ -97,7 +97,7 @@ def login_page(request: Request):
     # 防止共用电脑/离开座位后他人打开地址即直接进入控制台。
     # 再次登录按单会话规则顶掉旧会话（此处吊销后再登录效果一致）。
     u = _user(request)
-    resp = FileResponse(WEB / "login.html")
+    resp = FileResponse(WEB / "login.html", headers={"Cache-Control": "no-store, must-revalidate"})
     if u:
         auth.logout(u["sid"], u["emp_id"])
         auth.clear_cookie(resp)
@@ -118,7 +118,7 @@ def client_page(request: Request):
     if not u or u["portal"] != "client":
         # 未登录、或管理员试图进坐席工作台：都回登录页，不提示"你走错端了"
         return RedirectResponse("/login", 302)
-    return FileResponse(WEB / "index.html")
+    return FileResponse(WEB / "index.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/admin")
@@ -126,7 +126,7 @@ def admin_page(request: Request):
     u = _user(request)
     if not u or u["portal"] != "admin":
         return RedirectResponse("/login?portal=admin", 302)
-    return FileResponse(WEB / "admin.html")
+    return FileResponse(WEB / "admin.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/change-password")
@@ -134,7 +134,7 @@ def change_password_page(request: Request):
     """自助改密页：所有已登录角色可达；首登强制改密时前端会引导到这里。"""
     if not _user(request):
         return RedirectResponse("/login", 302)
-    return FileResponse(WEB / "password.html")
+    return FileResponse(WEB / "password.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 app.mount("/assets", StaticFiles(directory=str(WEB)), name="assets")

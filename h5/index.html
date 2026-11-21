@@ -143,11 +143,11 @@
 </div>
 <script>
   (function(){
-    const a = localStorage.getItem('fb_acct') || '';
+    const g = (() => { try { return JSON.parse(localStorage.getItem('fb_guest') || 'null'); } catch (e) { return null; } })();
     const who = document.getElementById('who');
-    if (who) who.textContent = a ? ('当前客户 ' + a.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2')) : '';
+    if (who) who.textContent = g && g.openid ? ('体验会话 ' + String(g.openid).slice(-6)) : '';
     const lo = document.getElementById('logout');
-    if (lo) lo.onclick = (e) => { e.preventDefault(); localStorage.removeItem('fb_openid'); localStorage.removeItem('fb_acct'); location.replace('/'); };
+    if (lo) lo.onclick = (e) => { e.preventDefault(); localStorage.removeItem('fb_guest'); location.replace('/'); };
   })();
 </script>
 <div class="toast" id="toast"></div>
@@ -169,22 +169,35 @@ const ST = {SUBMITTED:'已受理', AI_ANSWERING:'AI 应答中', CLOSED_AI:'AI �
   PENDING_HUMAN:'已转人工跟进', HUMAN_ANSWERING:'人工处理中', CLOSED_HUMAN:'已办结', UNKNOWN:'查询失败'};
 const $ = s => document.querySelector(s);
 
-// openid：优先用登录页写入的客户号；直接打开 /app 时给一个演示号（生产由 code2session 换取）
-let openid = localStorage.getItem('fb_openid');
-if (!openid) {
-  openid = 'oPoc-13800138000';
-  localStorage.setItem('fb_openid', openid);
-  localStorage.setItem('fb_acct', '13800138000');
+// v1.5.4：客户页不再拿手机号当身份，统一用后端签发的临时访客会话（2 小时有效）
+let GS = null, openid = '';
+function _guestStored(){ try { return JSON.parse(localStorage.getItem('fb_guest') || 'null'); } catch (e) { return null; } }
+async function _issueGuest(){
+  const r = await fetch('/feedback/api/v1/guest_session', {method: 'POST', headers: {'Content-Type': 'application/json'}});
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok || !d.token) throw new Error(d.detail || '体验会话创建失败');
+  const g = {openid: d.openid, token: d.token, exp: d.expires_at};
+  localStorage.setItem('fb_guest', JSON.stringify(g));
+  return g;
 }
-const acct = localStorage.getItem('fb_acct') || '';
+async function ensureGuest(){
+  let g = _guestStored();
+  if (!g || !g.token || !g.openid || new Date(g.exp).getTime() <= Date.now()) g = await _issueGuest();
+  return g;
+}
+const guestReady = ensureGuest().then(g => { GS = g; openid = g.openid; return g; })
+  .catch(() => { toast('体验会话创建失败，请刷新重试'); throw new Error('guest_session_failed'); });
 let fbList = JSON.parse(localStorage.getItem('fb_list') || '[]');
 let curFb = null, curTicket = null, timer = null, rated = false, cat = 'ACCOUNT', lastBody = '', lastCat = 'ACCOUNT';
 
 async function api(path, method='GET', data) {
+  const g = await guestReady;                    // 保证访客会话有效
+  const url = path + (path.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(g.token);
   const opt = {method, headers:{'Content-Type':'application/json'}};
-  if (data) opt.body = JSON.stringify(data);
-  const r = await fetch(path, opt);
+  if (data) opt.body = JSON.stringify(Object.assign({}, data, {guest_token: g.token, openid: g.openid}));
+  const r = await fetch(url, opt);
   const d = await r.json().catch(() => ({}));
+  if (r.status === 401) { localStorage.removeItem('fb_guest'); location.replace('/'); }
   if (!r.ok) throw new Error(d.detail || ('HTTP ' + r.status));
   return d;
 }
