@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>银行客服 AI 工作台</title>
+<style>
+:root{
+  --navy:#0e2f55; --navy-2:#173e6b; --navy-3:#0a2340;
+  --gold:#b8912f; --gold-2:#d3b25e;
+  --ink:#182230; --ink2:#455062; --ink3:#7c8698;
+  --line:#e3e7ee; --line2:#cbd2dd;
+  --bg:#f4f6fa; --panel:#fff; --panel2:#f6f8fb;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);
+font:14px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+a{text-decoration:none;color:inherit}
+
+/* 顶栏 */
+.top{background:linear-gradient(160deg,var(--navy-3),var(--navy) 55%,var(--navy-2));color:#dce6f2;
+padding:26px 0 40px;position:relative;overflow:hidden}
+.top::after{content:"";position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(ellipse 55% 60% at 88% 0%,rgba(211,178,94,.16),transparent 62%),
+  radial-gradient(ellipse 45% 55% at 6% 100%,rgba(122,168,224,.14),transparent 60%)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;position:relative}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(145deg,#1d4a85,#123563);
+border:1px solid rgba(211,178,94,.55);display:flex;align-items:center;justify-content:center;
+font-weight:700;font-size:18px;color:var(--gold-2)}
+.brand h1{font-size:17px;font-weight:600;color:#fff;margin:0;letter-spacing:.02em}
+.brand h1 small{display:block;font-size:11.5px;color:rgba(255,255,255,.55);font-weight:400;
+margin-top:3px;letter-spacing:.06em}
+.lead{margin:26px 0 0;font-size:13.5px;line-height:1.95;color:#c3d3e4;max-width:620px;
+word-break:keep-all;overflow-wrap:anywhere;
+border-left:2px solid var(--gold);padding-left:14px}
+.zone{display:flex;gap:22px;flex-wrap:wrap;margin-top:22px;font-size:12px;color:#9fb4cc}
+.zone span{display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:#3fbd85;box-shadow:0 0 0 3px rgba(63,189,133,.18)}
+.dot.b{background:#6fa6e0;box-shadow:0 0 0 3px rgba(111,166,224,.18)}
+.dot.a{background:var(--gold-2);box-shadow:0 0 0 3px rgba(211,178,94,.2)}
+
+/* 主体 */
+.main{max-width:1080px;margin:-24px auto 0;padding:0 24px 40px;position:relative}
+.title{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+padding:22px 26px;box-shadow:0 6px 22px rgba(14,47,85,.07)}
+.title h2{margin:0;font-size:20px;letter-spacing:-.01em}
+.title p{margin:6px 0 0;font-size:12.5px;color:var(--ink3)}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 22px 20px;
+box-shadow:0 4px 16px rgba(14,47,85,.05);display:flex;flex-direction:column;transition:.15s;position:relative}
+.card:hover{border-color:var(--navy-2);box-shadow:0 10px 26px rgba(14,47,85,.12);transform:translateY(-2px)}
+.card .ico{width:38px;height:38px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);
+display:flex;align-items:center;justify-content:center;font-size:17px;color:var(--navy);margin-bottom:14px}
+.card h3{margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:8px}
+.chip{font-size:10.5px;font-weight:500;color:#0f6e56;background:#e6f7f0;border:1px solid #b7e6d5;
+border-radius:999px;padding:1px 7px;letter-spacing:0}
+.card p{margin:0;font-size:12.5px;color:var(--ink3);line-height:1.8;flex:1;
+word-break:keep-all;overflow-wrap:anywhere}
+.go{margin-top:16px;font-size:13px;color:var(--navy-2);font-weight:600;display:flex;align-items:center;gap:6px}
+.card:hover .go{color:var(--navy)}
+.card.cust{border-color:#c9dcf5;box-shadow:0 8px 22px rgba(24,95,165,.10)}
+.card.cust .ico{background:#eef6ff;color:#185fa5}
+.card.agent .ico{background:#eefaf4;color:#0f6e56}
+.card.admin .ico{background:#fdf7e8;color:#8a5209}
+
+.foot{max-width:1080px;margin:0 auto;padding:0 24px 40px;font-size:11.5px;color:var(--ink3);line-height:1.9}
+.foot b{color:var(--ink2)}
+.err{margin-top:16px;font-size:12.5px;color:#a32d2d;background:#fcebeb;border:1px solid #f7c1c1;
+border-radius:8px;padding:10px 13px;display:none}
+.err.on{display:block}
+.skeleton{opacity:.6;pointer-events:none}
+
+@media (max-width:860px){
+  .cards{grid-template-columns:1fr}
+  .top{padding:22px 0 34px}
+  .main{margin-top:-18px}
+  .lead{font-size:13px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">光</div>
+      <h1>银行客服 AI 工作台<small>内网可信域 · 统一身份入口</small></h1>
+    </div>
+    <p class="lead">AI 只提供建议，裁决权留在内网。所有客户数据在穿越边界前完成令牌化，复原须三元匹配。</p>
+    <div class="zone">
+      <span><i class="dot"></i>内网可信域 · 持有原始数据与规则引擎</span>
+      <span><i class="dot b"></i>DMZ 安全交换区 · 字段白名单与内容复检</span>
+      <span><i class="dot a"></i>外网 AI 协同域 · 只持有算力</span>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="title">
+    <h2>请选择您要体验的业务模块</h2>
+    <p>三个入口在登录环节分流：客户进客户视图，坐席账号进不了管理端，管理账号也进不了坐席端。</p>
+  </div>
+
+  <div class="cards">
+    <a class="card cust" id="goCust" href="#">
+      <div class="ico">◎</div>
+      <h3>客户体验<span class="chip">无需账号 · 推荐</span></h3>
+      <p>体验智能客服、业务咨询与问题反馈。进入后自动分配体验会话，无需填写账号。</p>
+      <div class="go">开始体验 <span>→</span></div>
+    </a>
+
+    <a class="card agent" href="/emp?portal=client">
+      <div class="ico">▤</div>
+      <h3>坐席工作台</h3>
+      <p>工单处理、AI 辅助回复、人工接管与原始信息复原。需员工账号登录。</p>
+      <div class="go">进入工作台 <span>→</span></div>
+    </a>
+
+    <a class="card admin" href="/emp?portal=admin">
+      <div class="ico">◫</div>
+      <h3>管理控制台</h3>
+      <p>系统审计、业务规则、MCP 工具管理与变更审批。需管理员账号登录。</p>
+      <div class="go">进入控制台 <span>→</span></div>
+    </a>
+  </div>
+
+  <div class="err" id="err"></div>
+</main>
+
+<footer class="foot">
+  <b>当前为体验环境，客户数据全部为模拟数据，不含任何真实客户资料。</b><br>
+  AI 只建议不裁决 · 数据不出内网 · 全链路审计
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+
+// 客户体验：向后端申请一个临时访客会话（服务端签发、2 小时有效），再进客户页
+$('#goCust').onclick = async (e) => {
+  e.preventDefault();
+  const card = e.currentTarget;
+  const err = $('#err');
+  err.classList.remove('on');
+  card.classList.add('skeleton');
+  try {
+    const r = await fetch('/feedback/api/v1/guest_session', {method: 'POST', headers: {'Content-Type': 'application/json'}});
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.token) throw new Error(d.detail || '体验会话创建失败');
+    localStorage.setItem('fb_guest', JSON.stringify({openid: d.openid, token: d.token, exp: d.expires_at}));
+    location.href = '/app';
+  } catch (ex) {
+    card.classList.remove('skeleton');
+    err.textContent = '暂时无法进入体验（' + (ex.message || '网络异常') + '），请稍后重试。';
+    err.classList.add('on');
+  }
+};
+</script>
+</body>
+</html>

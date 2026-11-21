@@ -11,14 +11,14 @@ from __future__ import annotations
 import sqlite3
 import time
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterator
 
 import httpx
 from fastapi import Body, FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 
 from common import audit
 
@@ -31,6 +31,7 @@ from common.config import (
 # 不能用 Path(__file__).parent.parent——冻结后 __file__ 落在 _internal 里，路径是错的。
 _H5_DIR = APP_ROOT / "h5"
 _H5_PAGE = _H5_DIR / "index.html"
+_H5_LOGIN = _H5_DIR / "login.html"
 from common.crypto import sign, verify
 from common.schema import FEEDBACK_CATEGORIES
 
@@ -61,6 +62,11 @@ CREATE TABLE IF NOT EXISTS fb_replies (
     body TEXT NOT NULL, created_at TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_fb_replies_pid ON fb_replies(fb_id);
+CREATE TABLE IF NOT EXISTS guest_sessions (
+    token_hash TEXT PRIMARY KEY, openid TEXT NOT NULL, tenant TEXT NOT NULL,
+    created_at TEXT, expires_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_guest_openid ON guest_sessions(openid);
 """
 
 _FAULT = {"mode": "ok"}
@@ -99,9 +105,33 @@ def _now() -> str:
 
 
 @app.get("/", include_in_schema=False)
+def demo_login() -> FileResponse:
+    """对外入口即登录页（与内网登录页同一套视觉与文案，另加「客户体验」入口）。
+
+    no-store：演示期间页面会被反复更新，禁掉缓存，避免客户看到上一次的旧页面。
+    """
+    return FileResponse(_H5_LOGIN, headers={"Cache-Control": "no-store, must-revalidate"})
+
+
+@app.get("/app", include_in_schema=False)
 def demo_home() -> FileResponse:
-    """手机演示页（H5，与小程序同构）。生产环境小程序走微信正式链路，此页仅为演示入口。"""
-    return FileResponse(_H5_PAGE)
+    """登录后的客户反馈页（H5，与小程序同构）。未登录时前端会跳回 `/`。"""
+    return FileResponse(_H5_PAGE, headers={"Cache-Control": "no-store, must-revalidate"})
+
+
+@app.get("/emp", include_in_schema=False)
+def emp_portal(request: Request, portal: str = "client") -> RedirectResponse:
+    """员工入口：浏览器跳到内网控制台登录页（跨域只发生在浏览器侧，外网区不直连内网）。
+
+    取 Host 头优先于 socket 主机名：nginx 反代时 socket 是 127.0.0.1，
+    直接用会让浏览器跳到 127.0.0.1:19096 打不开。
+    """
+    host = (request.headers.get("x-forwarded-host")
+            or request.headers.get("host")
+            or request.url.hostname
+            or "127.0.0.1").split(":")[0]
+    p = "admin" if portal == "admin" else "client"
+    return RedirectResponse(f"http://{host}:19096/login?portal={p}", status_code=302)
 
 
 @app.middleware("http")
@@ -294,14 +324,68 @@ def _fb_now() -> str:
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="milliseconds")
 
 
+# ---------- 客户体验：临时访客会话（v1.5.4） ----------
+# 为什么要有这一层：之前客户页拿"任意手机号"当 openid，等于没认证。
+# 访客模式必须是**服务端签发**的短时令牌，绑定 demo 租户，过期即失效；
+# 真实客户使用时仍要走正式身份认证（短信验证码/网银登录），此处只服务演示体验。
+GUEST_TTL_MINUTES = 120
+GUEST_TENANT = "demo"
+
+
+def _guest_hash(token: str) -> str:
+    import hashlib
+    return hashlib.sha256(("guest-salt|" + token).encode()).hexdigest()[:40]
+
+
+def _guest_verify(openid: str, token: str) -> bool:
+    """校验访客令牌：必须存在、未过期、且与 openid 绑定。"""
+    if not token or not openid:
+        return False
+    with _conn_ctx() as c:
+        row = c.execute(
+            "SELECT openid, expires_at FROM guest_sessions WHERE token_hash=?",
+            (_guest_hash(token),)).fetchone()
+    if not row:
+        return False
+    if row["openid"] != openid:
+        return False
+    try:
+        if datetime.fromisoformat(row["expires_at"]) < datetime.now(timezone.utc).astimezone():
+            return False
+    except Exception:
+        return False
+    return True
+
+
+@app.post("/feedback/api/v1/guest_session")
+def guest_session() -> dict:
+    """签发一个临时访客会话（免登录体验用）。返回 openid + token，TTL 2 小时。"""
+    import secrets as _secrets
+    token = _secrets.token_urlsafe(24)
+    openid = "guest-" + _secrets.token_hex(8)
+    now = datetime.now(timezone.utc).astimezone()
+    exp = (now + timedelta(minutes=GUEST_TTL_MINUTES)).isoformat(timespec="seconds")
+    with _conn_ctx() as c:
+        c.execute("INSERT INTO guest_sessions (token_hash, openid, tenant, created_at, expires_at)"
+                  " VALUES (?,?,?,?,?)",
+                  (_guest_hash(token), openid, GUEST_TENANT, now.isoformat(timespec="seconds"), exp))
+        # 顺手清掉过期会话，避免表无限增长
+        c.execute("DELETE FROM guest_sessions WHERE expires_at < ?", (now.isoformat(timespec="seconds"),))
+    audit.log("outer", "GUEST_SESSION_ISSUED", detail={"tenant": GUEST_TENANT, "ttl_min": GUEST_TTL_MINUTES})
+    return {"openid": openid, "token": token, "expires_at": exp, "tenant": GUEST_TENANT}
+
+
 @app.post("/feedback/api/v1/tickets")
 async def fb_submit(payload: dict = Body(...)) -> dict:
     import secrets as _secrets
     openid = str(payload.get("openid", "")).strip()
     category = str(payload.get("category", "")).strip()
     body = str(payload.get("body", "")).strip()
-    if len(openid) < 6 or len(openid) > 64:
-        raise HTTPException(400, "openid 缺失或格式不合法")
+    # v1.5.4：客户身份必须是服务端签发的访客会话——任意手机号不再等于"已认证"
+    if not _guest_verify(openid, str(payload.get("guest_token", "")).strip()):
+        audit.log("outer", "GUEST_SESSION_INVALID", severity="high",
+                  detail={"reason": "missing_or_expired"})
+        raise HTTPException(401, "体验会话无效或已过期，请重新进入体验")
     if category not in FEEDBACK_CATEGORIES:
         raise HTTPException(400, "未知业务类型")
     if not 1 <= len(body) <= 500:
@@ -348,8 +432,10 @@ async def fb_submit(payload: dict = Body(...)) -> dict:
 
 
 @app.get("/feedback/api/v1/tickets/{fb_id}")
-def fb_query(fb_id: str, openid: str) -> dict:
+def fb_query(fb_id: str, openid: str, token: str = "") -> dict:
     import hmac
+    if not _guest_verify(openid, token):
+        raise HTTPException(401, "体验会话无效或已过期，请重新进入体验")
     with _conn_ctx() as c:
         row = c.execute("SELECT * FROM fb_tickets WHERE fb_id=?", (fb_id,)).fetchone()
         if not row:

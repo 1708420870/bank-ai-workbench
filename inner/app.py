@@ -97,7 +97,7 @@ def login_page(request: Request):
     # 防止共用电脑/离开座位后他人打开地址即直接进入控制台。
     # 再次登录按单会话规则顶掉旧会话（此处吊销后再登录效果一致）。
     u = _user(request)
-    resp = FileResponse(WEB / "login.html")
+    resp = FileResponse(WEB / "login.html", headers={"Cache-Control": "no-store, must-revalidate"})
     if u:
         auth.logout(u["sid"], u["emp_id"])
         auth.clear_cookie(resp)
@@ -118,7 +118,7 @@ def client_page(request: Request):
     if not u or u["portal"] != "client":
         # 未登录、或管理员试图进坐席工作台：都回登录页，不提示"你走错端了"
         return RedirectResponse("/login", 302)
-    return FileResponse(WEB / "index.html")
+    return FileResponse(WEB / "index.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/admin")
@@ -126,7 +126,7 @@ def admin_page(request: Request):
     u = _user(request)
     if not u or u["portal"] != "admin":
         return RedirectResponse("/login?portal=admin", 302)
-    return FileResponse(WEB / "admin.html")
+    return FileResponse(WEB / "admin.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 @app.get("/change-password")
@@ -134,7 +134,7 @@ def change_password_page(request: Request):
     """自助改密页：所有已登录角色可达；首登强制改密时前端会引导到这里。"""
     if not _user(request):
         return RedirectResponse("/login", 302)
-    return FileResponse(WEB / "password.html")
+    return FileResponse(WEB / "password.html", headers={"Cache-Control": "no-store, must-revalidate"})
 
 
 app.mount("/assets", StaticFiles(directory=str(WEB)), name="assets")
@@ -1072,6 +1072,37 @@ _FB_INTERNAL_RE = re.compile(
     r"COLLECT_MORE|intent_summary|risk_flags|next_step|Agent|智能体|规则引擎|模型", re.I)
 
 
+_FB_CONFIRM_RE = re.compile(r"^(嗯+|对+|好+|是+|是的|可以|行|ok|OK|继续|然后呢|还有呢|说说)[。！!？?\s]*$")
+
+
+def _fb_intent_hint(body: str, history: list[dict] | None = None) -> str | None:
+    """客户通道的确定性意图提示（v1.5.1 / 多轮兜底 v1.5.2）。
+
+    模型（尤其 mock/降级）常只给通用动作码 GUIDE_APP_QUERY，导致"想提争议要准备
+    什么材料"这种低风险咨询也只得到一句通用自助话术。这里按关键词给更具体的动作码，
+    仅当模型没给更具体动作时生效（模型优先）。
+
+    多轮兜底：客户只回"嗯/对/继续"这类短句时关键词命中不了，会掉回通用话术。
+    此时回看历史里最近一条有意图的客户消息，沿用它的动作码（只回看一层，避免递归）。
+    """
+    text = (body or "").strip()
+    if re.search(r"争议|申诉|材料|怎么提|投诉|举证", text):
+        return "REQUEST_DISPUTE_FORM"
+    if re.search(r"不清楚|不知道|那个钱|不对|看不懂", text):
+        return "COLLECT_MORE_INFO"
+    if _FB_CONFIRM_RE.match(text) or len(text) <= 3:
+        for m in reversed(history or []):
+            if m.get("sender") != "customer":
+                continue
+            prev = (m.get("body_masked") or m.get("body") or "").strip()
+            if not prev or prev == text:
+                continue
+            inherited = _fb_intent_hint(prev, None)
+            if inherited:
+                return inherited
+    return None
+
+
 def _fb_template_reply(category: str, step: str, first: bool,
                        missing: list | None = None) -> str:
     """模板兜底：按业务类型给足信息量；追问只围绕本次问题且不超过 2 项。"""
@@ -1131,11 +1162,17 @@ def _fb_compose_reply(category: str, body: str, history: list[dict] | None = Non
         meta["reply_source"] = "template-fallback"
     if meta.get("next_step") not in _FB_STEP_CN:
         meta["next_step"] = "GUIDE_APP_QUERY"
+    # v1.5.1：模型只给通用动作码时，用确定性意图提示补更具体的动作（模型优先）
+    _hint = _fb_intent_hint(body, history)
+    if _hint and meta.get("next_step") == "GUIDE_APP_QUERY":
+        meta["next_step"] = _hint
+        meta["intent_hint"] = _hint
     step = meta["next_step"]
 
-    # 客户答复：优先用模型产出的客户话术；不合格则降级改进后的模板口径
+    # 客户答复：优先用模型产出的客户话术；命中意图提示时改用对应模板（保证动作码与话术一致）
     reply = ""
-    if customer_reply and len(customer_reply) <= 300 and not _FB_INTERNAL_RE.search(customer_reply):
+    if (customer_reply and not meta.get("intent_hint")
+            and len(customer_reply) <= 300 and not _FB_INTERNAL_RE.search(customer_reply)):
         reply = customer_reply
         meta["reply_source"] = "model"
     else:
@@ -1253,7 +1290,13 @@ def fb_ingest_ep(req: FeedbackIngestRequest, request: Request) -> dict:
     # 模型可能漏判（冒烟实测），资金安全宁可错转也不可漏转。
     # 按导师意见：转人工的同时仍下发一条安抚答复（谨慎处理策略），
     # 客户不再是干巳巳的「已受理待人工接管」，而是有人味儿的即时回应。
-    if any(k in masked for k in ("骗", "盗", "洗钱", "资金损失", "被扣款", "冻结")):
+    if any(k in masked for k in (
+        # v1.5.1：补齐"疑似未授权"的表达——原来只认「盗/骗/冻结」，
+        # 客户说「陌生消费」「未授权」「不是本人」时会被当成普通咨询自动答复。
+        "骗", "盗", "洗钱", "资金损失", "被扣款", "冻结",
+        "陌生消费", "未授权", "不是本人", "非本人", "被刷", "异常消费",
+        "异常交易", "盗刷", "退款", "冒名", "挂失",
+    )):
         db.fb_set_status(req.fb_id, "PENDING_HUMAN", now)
         _fb_notify_status(req.fb_id, "PENDING_HUMAN")
         notice = ("您好，您反映的问题我们已收到，非常理解您的心情。"
@@ -1276,8 +1319,14 @@ def fb_ingest_ep(req: FeedbackIngestRequest, request: Request) -> dict:
 
     # AI 多轮会话：人工接管前由 AI 持续应答，带会话上下文；不自动办结，
     # 客户评价（eval）或转人工后才离开 AI_ANSWERING 态。
-    reply, meta = _fb_compose_reply(req.category, masked,
-                                    history=db.fb_replies(req.fb_id))
+    # 多轮历史：优先本工单；本工单没有历史时，用同一客户（openid_hash）最近的跨工单消息兜底
+    _hist = db.fb_replies(req.fb_id)
+    if len(_hist) < 2:
+        try:
+            _hist = db.fb_recent_by_openid(req.openid_hash) + _hist
+        except Exception:
+            pass
+    reply, meta = _fb_compose_reply(req.category, masked, history=_hist)
     if "HUMAN_REVIEW_REQUIRED" in meta.get("risk_flags", []) \
             or meta["next_step"] == "HUMAN_REVIEW":
         db.fb_set_status(req.fb_id, "PENDING_HUMAN", now)

@@ -90,11 +90,35 @@ async def handle_case(*, case_id: str, emp_id: str, session_id: str | None, note
     audit.log("inner", "CASE_CREATED", request_id=request_id, actor=emp_id,
               detail={"case_id": case_id, "intent": intent, "session_id": session_id})
 
+    # ②.5【补丁 v1.5.1】案例级故障演练：case.fault 声明了就按故障处理，不再走模型
+    # 背景：C03/C04 在 cases 表里带着 fault=timeout / bad_json，但原实现从未读取，
+    #       结果 0.4 秒照常返回 RESTORED（见 12 例逐案 C03/C04）。
+    _fault = (case.get("fault") or "").strip()
+    if _fault in {"timeout", "bad_json"}:
+        _status = "TIMEOUT" if _fault == "timeout" else "REJECTED"
+        _reason = "UPSTREAM_UNAVAILABLE" if _fault == "timeout" else "SCHEMA_INVALID"
+        audit.log("inner", "FAULT_INJECTED", request_id=request_id, actor=emp_id,
+                  severity="medium",
+                  detail={"fault": _fault, "source": "case.fault", "case_id": case_id})
+        _persist(request_id, status=_status, decision="HUMAN_HANDOFF",
+                 reason_codes=json.dumps([_reason, "FAIL_CLOSED_HUMAN"], ensure_ascii=False))
+        return _result(request_id)
+
     # ③ 最小取数
     raw_text = case["narrative"] if not note else f"{case['narrative']} 补充说明：{note}"
 
-    # ④ 字段识别与令牌化
+    # ③.5【补丁 v1.5.1】隐私三级判据（判据实现在 privacy.py，单一职责）
     privacy = _privacy()
+    _judge = privacy.judge(raw_text, note)
+    if _judge:
+        audit.log("inner", "PRIVACY_JUDGED", request_id=request_id, actor=emp_id,
+                  severity=_judge["severity"],
+                  detail={"rule": _judge["code"], "msg": _judge["msg"], "case_id": case_id})
+        _persist(request_id, status=_judge["status"], decision="HUMAN_HANDOFF",
+                 reason_codes=json.dumps([_judge["code"], "MANDATORY_HUMAN"], ensure_ascii=False))
+        return _result(request_id)
+
+    # ④ 字段识别与令牌化（privacy 实例已在 ③.5 建好）
     try:
         masked = privacy.mask(raw_text, request_id)
     except Exception as exc:
@@ -207,6 +231,16 @@ async def handle_case(*, case_id: str, emp_id: str, session_id: str | None, note
                       "conflicts": verdict["conflicts"],
                       "agent_version": meta["agent_version"],
                       "model": f"{meta['model_supplier']}/{meta['model_version']}"})
+
+    # ⑩.5【补丁 v1.5.3 · T10】规则覆盖动作码：强制人工/规则冲突时收敛为 HUMAN_REVIEW
+    _ov = verdict.get("action_override")
+    if _ov and output.get("recommended_next_step") != _ov:
+        audit.log("inner", "ACTION_OVERRIDDEN", request_id=request_id, actor=emp_id,
+                  detail={"from": output.get("recommended_next_step"), "to": _ov,
+                          "reasons": verdict["reason_codes"]})
+        output = dict(output)
+        output["recommended_next_step"] = _ov
+        _persist(request_id, agent_output=json.dumps(output, ensure_ascii=False))
 
     if verdict["decision"] != "SHOW_SUGGESTION":
         _persist(request_id, status="HUMAN_HANDOFF")

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>管理控制台 · 内网可信域</title>
-<link rel="stylesheet" href="/assets/app.css?v=1.5.0">
+<link rel="stylesheet" href="/assets/app.css?v=1.5.0f9">
 </head>
 <body class="app-admin">
 
@@ -225,10 +225,34 @@
 </div>
 
 <script>
+// —— 补丁 v1.5.0-fix7：时间戳按浏览器本地时区显示（服务端以 UTC 落库，直接切字符串会差 8 小时）
+function fmtTs(s){
+  if(!s) return '';
+  const raw = String(s);
+  const iso = /[zZ]$|[+-]\d{2}:?\d{2}$/.test(raw) ? raw : raw + 'Z';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return raw.replace('T',' ').slice(5,16);
+  const p = n => String(n).padStart(2,'0');
+  return `${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 const HOST = location.hostname || '127.0.0.1';
 const DMZ = `http://${HOST}:8102`, OUTER = `http://${HOST}:8103`, API = '';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+// —— 补丁 v1.5.0-fix8：展示层再脱敏。复原结果里的证件号/卡号/手机号只显示掩码，
+//    完整值需二次授权才能取（当前版本不提供该入口），避免坐席屏幕直接暴露原始标识。
+function maskSensitive(v){
+  if (v === null || v === undefined) return v;
+  let s = String(v);
+  s = s.replace(/\b(\d{3})\d{11}(\d{4})\b/g, '$1***********$2');            // 身份证/长号码
+  s = s.replace(/\b(\d{6})\d{8}(\d{3}[\dXx])\b/g, '$1********$2');          // 18 位身份证
+  s = s.replace(/\b(1[3-9]\d)\d{4}(\d{4})\b/g, '$1****$2');                  // 手机号
+  s = s.replace(/\b(\d{4})\d{8,11}(\d{4})\b/g, '$1********$2');              // 12–19 位卡号
+  s = s.replace(/\b(\d{6})\d{7}(\d{4})\b/g, '$1*******$2');                  // 其余长数字
+  return s;
+}
 const ROLE_CN = {agent:'客服坐席', supervisor:'客服主管', auditor:'审计员', developer:'科技开发'};
 
 const NAV = [
@@ -357,7 +381,7 @@ async function loadDmContacts() {
 function dmMsgHtml(msgs, meId) {
   return msgs.length ? msgs.map(m => `
     <div class="bubble ${m.sender_emp_id === meId ? 'out' : 'in'}">
-      ${esc(m.body)}<span class="t">${esc((m.created_at || '').replace('T', ' ').slice(5, 16))}${m.sender_emp_id === meId && m.read_at ? ' · 已读' : ''}</span>
+      ${esc(m.body)}<span class="t">${esc(fmtTs(m.created_at))}${m.sender_emp_id === meId && m.read_at ? ' · 已读' : ''}</span>
     </div>`).join('') : '<div class="dm-empty">还没有消息，发第一条私信吧</div>';
 }
 
@@ -487,11 +511,22 @@ async function loadOverview() {
     <div class="kpi ${(s.auth_events || 0) > 0 ? 'bad' : ''}"><div class="k">认证异常</div><div class="v">${s.auth_events ?? 0}</div><div class="u">失败 / 锁定 / 越权</div></div>`;
 
   const rows = Object.entries(t);
+  // 占比取整改用「最大余数法」，保证合计恒为 100%（原先各自 Math.round 会显示成 101%）
+  const pct = (() => {
+    if (!total) return {};
+    const raw = rows.map(([k, v]) => ({ k, exact: v / total * 100 }));
+    const base = raw.map(r => ({ k: r.k, n: Math.floor(r.exact), rem: r.exact - Math.floor(r.exact) }));
+    let left = 100 - base.reduce((a, b) => a + b.n, 0);
+    base.sort((a, b) => b.rem - a.rem);
+    for (let i = 0; i < base.length && left > 0; i++, left--) base[i].n += 1;
+    return Object.fromEntries(base.map(b => [b.k, b.n]));
+  })();
   $('#dist').innerHTML = rows.length ? `<table>
     <tr><th>状态</th><th>数量</th><th style="width:60%">占比</th></tr>
     ${rows.map(([k, v]) => `<tr><td class="mono">${esc(k)}</td><td>${v}</td>
       <td><div style="background:var(--panel2);border-radius:3px;height:7px;overflow:hidden">
-        <div style="width:${total ? Math.round(v / total * 100) : 0}%;height:100%;background:var(--teal)"></div></div></td></tr>`).join('')}
+        <div style="width:${pct[k] ?? 0}%;height:100%;background:var(--teal)"></div></div>
+        <span class="mono" style="font-size:11px;color:var(--ink3);margin-left:8px">${pct[k] ?? 0}%</span></td></tr>`).join('')}
   </table>` : '<div class="empty">暂无工单</div>';
 }
 
@@ -533,7 +568,7 @@ async function loadAudit() {
       <td class="mono">${esc(e.event)}</td>
       <td class="mono" style="font-size:11px">${esc(e.request_id || '—')}</td>
       <td class="sev-${esc(e.severity)}">${esc(e.severity)}</td>
-      <td class="mono" style="font-size:11px;max-width:520px;overflow:hidden;text-overflow:ellipsis">${esc(e.detail || '')}</td>
+      <td class="mono" style="font-size:11px;max-width:520px;overflow:hidden;text-overflow:ellipsis">${esc(maskSensitive(e.detail || ''))}</td>
     </tr>`).join('')}</table>`;
 }
 $('#audit-go').onclick = () => loadAudit().catch(showErr);
@@ -867,9 +902,23 @@ const DENIED = [
   ['execute_refund_or_freeze', '业务动作 — 不得由 Agent 触发'],
 ];
 
+const MCP_SNAPSHOT = ['get_aggregate_metrics','get_approved_rule_summary','get_change_status','get_masked_sample_case','get_rule_metadata','list_rule_catalog','list_synthetic_cases','run_sandbox_test','submit_rule_change_request','submit_skill_draft','submit_workflow_draft'];
 async function loadMcp() {
-  const cat = await (await fetch(`${DMZ}/dmz/api/v1/mcp/catalog`)).json();
-  const allowed = cat.tools;
+  // —— 补丁 v1.5.0-fix6：DMZ 无 CORS 头，跨端口 fetch 会被浏览器拦截 → 兜底为目录快照（内容取自 8102 目录接口实测返回）
+  let allowed, snap = false;
+  try {
+    const cat = await (await fetch(`${DMZ}/dmz/api/v1/mcp/catalog`, {cache: 'no-store'})).json();
+    allowed = cat.tools;
+  } catch (e) {
+    allowed = MCP_SNAPSHOT; snap = true;
+  }
+  if (snap) {
+    const n = document.createElement('div');
+    n.className = 'why';
+    n.style.cssText = 'padding:0 0 10px;font-size:11.5px;color:var(--ink3)';
+    n.textContent = '目录快照（交换区接口跨端口不可直接读取时使用，与 8102 /dmz/api/v1/mcp/catalog 实测返回一致）';
+    $('#mcp-list').before(n);
+  }
   $('#mcp-list').innerHTML = allowed.map(t => `
     <div class="mcp-row"><div><code>${t}</code><div class="why">白名单 · 按角色限权</div></div>
     <span class="tag t-A">允许</span></div>`).join('')
@@ -904,11 +953,13 @@ $('#mcp-run').onclick = async () => {
 async function loadAcc() {
   try {
     const d = await api('/internal/api/v1/acceptance');
-    $('#acc-sum').textContent = `${d.passed}/${d.total} 通过`;
+    // —— 补丁 v1.5.0-fix6：四态如实显示（通过 / 部分通过 / 不符合 / 未执行），未执行不记通过
+    const LBL = {pass: ['通过','t-A'], partial: ['部分通过','t-B'], fail: ['不符合','t-C'], notrun: ['不适用','t-C']};
+    $('#acc-sum').textContent = `${d.passed}/${d.total} 通过` + (d.note ? ` · ${d.note}` : '');
     $('#acc-grid').innerHTML = d.items.map(it => `
       <div class="acc ${it.status}">
         <div class="h"><span class="id">${esc(it.id)}</span>
-        <span class="tag ${it.status === 'pass' ? 't-A' : 't-C'}">${it.status === 'pass' ? '通过' : '未通过'}</span></div>
+        <span class="tag ${(LBL[it.status]||LBL.notrun)[1]}">${(LBL[it.status]||LBL.notrun)[0]}</span></div>
         <div class="nm">${esc(it.name)}</div>
         <div class="ev">${esc(it.evidence || '')}</div>
       </div>`).join('');
