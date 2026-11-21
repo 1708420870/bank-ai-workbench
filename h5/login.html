@@ -223,7 +223,9 @@ $('#form').onsubmit = (e) => {
   }
   if (!v || !$('#p').value) return showErr('请填写账号与口令');
   // 员工入口：直接跳内网控制台登录页（同一台机器 19096），由那一侧完成身份校验
-  location.href = `http://${HOST}:19096/login?portal=${portal}&u=${encodeURIComponent(v)}`;
+  // 员工入口带上演示账号与 demo=1：落到内网登录页时账号口令已填好，点一次就进
+  const d = DEMO[portal];
+  location.href = `http://${HOST}:19096/login?portal=${portal}&u=${encodeURIComponent(v || d.acct)}&demo=1`;
 };
 
 paint();   // 移到末尾：DEMO/paintHint 声明完成后才渲染（原先在此处调用会触发 TDZ）

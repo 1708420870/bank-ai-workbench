@@ -48,6 +48,10 @@ body{background:var(--bg)}
 .err.on{display:block}
 
 .note{font-size:11px;color:var(--ink3);margin-top:26px;border-top:1px solid var(--line);padding-top:14px;line-height:1.65}
+.quick{display:flex;gap:8px;margin-top:14px}
+.qb{flex:1;padding:10px 8px;font-size:12.5px;border:1px solid var(--line2);border-radius:7px;
+background:var(--panel2);color:var(--navy);font-weight:500;transition:.12s}
+.qb:hover{border-color:var(--navy-2);background:#fff}
 .dhint{margin-top:14px;padding:9px 12px;border:1px dashed var(--line2);border-radius:7px;
 background:var(--panel2);font-size:11.5px;color:var(--ink2);line-height:1.7}
 .dhint b{color:var(--navy);font-weight:600}
@@ -103,6 +107,11 @@ background:var(--panel2);border:1px solid var(--line);border-radius:7px;text-dec
         <button class="submit" id="go">登 录</button>
       </form>
 
+      <div class="quick">
+        <button type="button" class="qb" data-u="b001" data-p="abc122333" data-portal="client">一键：坐席演示登录</button>
+        <button type="button" class="qb" data-u="a001" data-p="abc123456" data-portal="admin">一键：管理演示登录</button>
+      </div>
+
       <div class="err" id="err"></div>
 
       <div class="note">账号由管理员统一发放，初始口令首次登录须修改。连续 5 次口令错误将锁定账号 300 秒，登录与越权事件全部进入审计。</div>
@@ -122,11 +131,29 @@ const COPY = {
 };
 
 let portal = new URLSearchParams(location.search).get('portal') === 'admin' ? 'admin' : 'client';
-// 从对外入口跳过来时带 ?u=，预填工号（口令仍需手输）
+// 从对外入口跳过来时带 ?u= 与 ?demo=1：演示模式下账号口令都预填，点一次就进
 (function () {
-  const u = new URLSearchParams(location.search).get('u');
+  const q = new URLSearchParams(location.search);
+  const u = q.get('u');
   if (u) document.getElementById('u').value = u;
+  if (q.get('demo') === '1') {
+    const DEMO = {client:['b001','abc122333'], admin:['a001','abc123456']};
+    const d = DEMO[portal] || DEMO.client;
+    document.getElementById('u').value = u || d[0];
+    document.getElementById('p').value = d[1];
+  }
 })();
+
+// 一键登录：不用打字，点哪个角色就直接进对应工作台
+document.querySelectorAll('.qb').forEach(b => {
+  b.onclick = () => {
+    portal = b.dataset.portal;               // 按钮决定角色
+    document.getElementById('u').value = b.dataset.u;
+    document.getElementById('p').value = b.dataset.p;
+    document.getElementById('err').classList.remove('on');
+    document.getElementById('form').requestSubmit();
+  };
+});
 
 function paint() {
   document.querySelectorAll('#switch button').forEach(b => b.classList.toggle('on', b.dataset.portal === portal));
