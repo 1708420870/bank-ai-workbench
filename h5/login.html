@@ -67,7 +67,26 @@ border-radius:7px;padding:9px 12px;display:none;line-height:1.55}
 .demo-tag{font-size:11px;font-weight:500;color:#8a6d3b;background:#fff4d6;border:1px solid #f2dfae;
 border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:middle;letter-spacing:0}
 
-@media (max-width:820px){.wrap{grid-template-columns:1fr}.side{display:none}}
+html,body{max-width:100%;overflow-x:hidden}
+.mfoot{display:none}
+@media (max-width:820px){
+  .box{display:flex;flex-direction:column;min-height:calc(100dvh - 62px)}
+  .mfoot{display:block;margin:auto auto 0;width:100%;max-width:420px;text-align:center;font-size:11px;
+  color:var(--ink3);line-height:1.8;border-top:1px solid var(--line);padding-top:14px}
+  body{padding-top:env(safe-area-inset-top)}
+}
+@media (max-width:820px){
+  .side{display:none}
+  .wrap{display:block;min-height:100vh}
+  .formside{padding:34px 16px 28px;min-height:100vh;align-items:flex-start}
+  .box{max-width:420px;margin:0 auto}
+  .switch button{font-size:12px;padding:9px 4px;letter-spacing:0}
+  .box h2{font-size:18px}
+  .box .sub{font-size:12.5px;margin-bottom:20px}
+  .fld input{font-size:15px;padding:11px 12px}
+  .submit{padding:12px}
+  .note{margin-top:20px}
+}
 </style>
 </head>
 <body>
@@ -119,6 +138,11 @@ border-radius:999px;padding:1px 8px;margin-left:8px;vertical-align:middle;letter
       <div class="err" id="err"></div>
 
       <div class="note" id="note">账号由管理员统一发放，初始口令首次登录须修改。连续 5 次口令错误将锁定账号 300 秒，登录与越权事件全部进入审计。</div>
+
+      <div class="mfoot">
+        微光银行 · 客服工作台 v1.5.3<br>
+        PoC 演示环境 · 全部数据为合成数据，不含真实客户资料
+      </div>
     </div>
   </main>
 </div>
